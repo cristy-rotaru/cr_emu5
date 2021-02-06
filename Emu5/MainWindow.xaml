@@ -5,34 +5,49 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Emu5"
         mc:Ignorable="d"
-        Title="Emu5" MinHeight="800" MinWidth="1300" Height="860" Width="1330" WindowState="Maximized">
+        Title="Emu5" MinHeight="800" MinWidth="1300" Height="860" Width="1330" WindowState="Maximized"
+        Closing="MainWindow_Closing">
     <Window.Background>
         <ImageBrush ImageSource="MainWindow.jpg" Stretch="None" AlignmentX="Left" AlignmentY="Top" />
     </Window.Background>
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.New" Executed="commandNew_Executed" />
+        <CommandBinding Command="ApplicationCommands.Open" Executed="commandOpen_Executed" />
+        <CommandBinding Command="ApplicationCommands.Save" Executed="commandSave_Executed" CanExecute="commandSave_CanExecute" />
+        <CommandBinding Command="ApplicationCommands.SaveAs" Executed="commandSaveAs_Executed" CanExecute="commandSaveAs_CanExecute" />
+        <CommandBinding Command="ApplicationCommands.Undo" Executed="commandUndo_Executed" CanExecute="commandUndo_CanExecute" />
+        <CommandBinding Command="ApplicationCommands.Redo" Executed="commandRedo_Executed" CanExecute="commandRedo_CanExecute" />
+        <CommandBinding Command="ApplicationCommands.Cut" Executed="commandCut_Executed" CanExecute="commandCut_CanExecute" />
+        <CommandBinding Command="ApplicationCommands.Copy" Executed="commandCopy_Executed" CanExecute="commandCopy_CanExecute" />
+        <CommandBinding Command="ApplicationCommands.Paste" Executed="commandPaste_Executed" CanExecute="commandPaste_CanExecute" />
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        
+    </Window.InputBindings>
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="#72C7C7C7">
             <MenuItem Header="_File">
-                <MenuItem Header="_New" InputGestureText="Ctrl+N" />
-                <MenuItem Header="_Open" InputGestureText="Ctrl+O" />
+                <MenuItem Name="menuItemFileNew" Header="_New" InputGestureText="Ctrl+N" Command="ApplicationCommands.New" />
+                <MenuItem Name="menuItemFileOpen"  Header="_Open" InputGestureText="Ctrl+O" Command="ApplicationCommands.Open" />
                 <Separator />
-                <MenuItem Header="_Save" InputGestureText="Ctrl+S" />
-                <MenuItem Header="Save As" InputGestureText="Ctrl+Shift+S" />
+                <MenuItem Name="menuItemFileSave" Header="_Save" InputGestureText="Ctrl+S" Command="ApplicationCommands.Save" />
+                <MenuItem Name="menuItemFileSaveAs"  Header="Save As" InputGestureText="Ctrl+Shift+S" Command="ApplicationCommands.SaveAs" />
                 <Separator />
-                <MenuItem Header="E_xit" InputGestureText="Alt+F4" />
+                <MenuItem Name="menuItemFileExit" Header="E_xit" InputGestureText="Alt+F4" Click="menuItemFileExit_Click" />
             </MenuItem>
             <MenuItem Header="_Edit">
-                <MenuItem Header="_Undo" InputGestureText="Ctrl+Z" />
-                <MenuItem Header="_Redo" InputGestureText="Ctrl+Y" />
+                <MenuItem Name="menuItemEditUndo" Header="_Undo" InputGestureText="Ctrl+Z" Command="ApplicationCommands.Undo" />
+                <MenuItem Name="menuItemEditRedo" Header="_Redo" InputGestureText="Ctrl+Y" Command="ApplicationCommands.Redo" />
                 <Separator />
-                <MenuItem Header="Cu_t" InputGestureText="Ctrl+X" />
-                <MenuItem Header="_Copy" InputGestureText="Ctrl+C" />
-                <MenuItem Header="_Paste" InputGestureText="Ctrl+V" />
+                <MenuItem Name="menuItemEditCut" Header="Cu_t" InputGestureText="Ctrl+X" Command="ApplicationCommands.Cut" />
+                <MenuItem Name="menuItemEditCopy" Header="_Copy" InputGestureText="Ctrl+C" Command="ApplicationCommands.Copy" />
+                <MenuItem Name="menuItemEditPaste" Header="_Paste" InputGestureText="Ctrl+V" Command="ApplicationCommands.Paste" />
             </MenuItem>
             <MenuItem Header="E_mulator">
             </MenuItem>
             <MenuItem Header="_Help">
-                <MenuItem Header="_Settings" />
-                <MenuItem Header="_About" />
+                <MenuItem Name="menuItemHelpSettings" Header="_Settings" />
+                <MenuItem Name="menuItemHelpAbout" Header="_About" />
             </MenuItem>
         </Menu>
         <Grid>
