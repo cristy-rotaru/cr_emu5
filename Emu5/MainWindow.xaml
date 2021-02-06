@@ -5,8 +5,37 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Emu5"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="Emu5" MinHeight="800" MinWidth="1300" Height="860" Width="1330" WindowState="Maximized">
+    <Window.Background>
+        <ImageBrush ImageSource="MainWindow.jpg" Stretch="None" AlignmentX="Left" AlignmentY="Top" />
+    </Window.Background>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Background="#72C7C7C7">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New" InputGestureText="Ctrl+N" />
+                <MenuItem Header="_Open" InputGestureText="Ctrl+O" />
+                <Separator />
+                <MenuItem Header="_Save" InputGestureText="Ctrl+S" />
+                <MenuItem Header="Save As" InputGestureText="Ctrl+Shift+S" />
+                <Separator />
+                <MenuItem Header="E_xit" InputGestureText="Alt+F4" />
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="_Undo" InputGestureText="Ctrl+Z" />
+                <MenuItem Header="_Redo" InputGestureText="Ctrl+Y" />
+                <Separator />
+                <MenuItem Header="Cu_t" InputGestureText="Ctrl+X" />
+                <MenuItem Header="_Copy" InputGestureText="Ctrl+C" />
+                <MenuItem Header="_Paste" InputGestureText="Ctrl+V" />
+            </MenuItem>
+            <MenuItem Header="E_mulator">
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_Settings" />
+                <MenuItem Header="_About" />
+            </MenuItem>
+        </Menu>
+        <Grid>
+        </Grid>
+    </DockPanel>
 </Window>
