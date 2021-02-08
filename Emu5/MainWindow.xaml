@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Emu5"
         mc:Ignorable="d"
         Title="Emu5" MinHeight="800" MinWidth="1300" Height="860" Width="1330" WindowState="Maximized"  FontSize="13"
-        Closing="MainWindow_Closing">
+        Initialized="MainWindow_Initialized" Closing="MainWindow_Closing">
     <Window.Background>
         <ImageBrush ImageSource="MainWindow.jpg" Stretch="None" AlignmentX="Left" AlignmentY="Top" />
     </Window.Background>
@@ -164,8 +164,16 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="_Help">
-                <MenuItem Name="menuItemHelpSettings" Header="_Settings" />
-                <MenuItem Name="menuItemHelpAbout" Header="_About" />
+                <MenuItem Name="menuItemHelpSettings" Header="_Settings" Click="menuItemHelpSettings_Click">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/help_settings.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="menuItemHelpAbout" Header="_About" Click="menuItemHelpAbout_Click">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/help_about.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
         </Menu>
         <DockPanel DockPanel.Dock="Top" Background="#72C7C7C7">
@@ -234,7 +242,6 @@
                 </Button>
             </StackPanel>
         </DockPanel>
-        <Grid>
-        </Grid>
+        <TabControl Name="tabControlMain" Margin="3" Background="#72C7C7C7" SelectionChanged="tabControlMain_SelectionChanged" />
     </DockPanel>
 </Window>

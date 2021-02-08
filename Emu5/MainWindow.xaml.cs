@@ -27,6 +27,16 @@ namespace Emu5
         }
 
         #region r_windowEvents
+        private void MainWindow_Initialized(object sender, EventArgs e)
+        {
+            TabItem l_welcomeTab = new TabItem();
+            l_welcomeTab.Header = new TabHeader("Welcome", false, () => { RemoveTab(l_welcomeTab); });
+            l_welcomeTab.Content = new WelcomePage();
+            tabControlMain.Items.Add(l_welcomeTab);
+
+            tabControlMain.SelectedIndex = 0;
+        }
+
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
             
@@ -213,6 +223,41 @@ namespace Emu5
         private void menuItemFileExit_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void menuItemHelpSettings_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void menuItemHelpAbout_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        #endregion
+
+        #region r_tabControlHandling
+        private void RemoveTab(TabItem tab)
+        {
+            if (tab.Content.GetType() == typeof(WelcomePage))
+            {
+                tabControlMain.Items.Remove(tab);
+            }
+
+            if (tabControlMain.Items.Count == 0) // add welcome tab if no other tabs are available
+            {
+                TabItem l_welcomeTab = new TabItem();
+                l_welcomeTab.Header = new TabHeader("Welcome", false, () => { RemoveTab(l_welcomeTab); });
+                l_welcomeTab.Content = new WelcomePage();
+                tabControlMain.Items.Add(l_welcomeTab);
+
+                tabControlMain.SelectedIndex = 0;
+            }
+        }
+
+        private void tabControlMain_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
         #endregion
     }
