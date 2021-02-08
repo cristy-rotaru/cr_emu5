@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Emu5"
         mc:Ignorable="d"
-        Title="Emu5" MinHeight="800" MinWidth="1300" Height="860" Width="1330" WindowState="Maximized"
+        Title="Emu5" MinHeight="800" MinWidth="1300" Height="860" Width="1330" WindowState="Maximized"  FontSize="13"
         Closing="MainWindow_Closing">
     <Window.Background>
         <ImageBrush ImageSource="MainWindow.jpg" Stretch="None" AlignmentX="Left" AlignmentY="Top" />
@@ -53,39 +53,115 @@
         <KeyBinding Key="T" Modifiers="Ctrl" Command="local:EmulatorCommands.OpenTerminal" />
     </Window.InputBindings>
     <DockPanel>
-        <Menu DockPanel.Dock="Top" Background="#72C7C7C7">
+        <Menu DockPanel.Dock="Top" Background="#72C7C7C7" FontSize="13">
             <MenuItem Header="_File">
-                <MenuItem Name="menuItemFileNew" Header="_New" InputGestureText="Ctrl+N" Command="ApplicationCommands.New" />
-                <MenuItem Name="menuItemFileOpen"  Header="_Open" InputGestureText="Ctrl+O" Command="ApplicationCommands.Open" />
+                <MenuItem Name="menuItemFileNew" Header="_New" InputGestureText="Ctrl+N" Command="ApplicationCommands.New">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/file_new.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="menuItemFileOpen"  Header="_Open" InputGestureText="Ctrl+O" Command="ApplicationCommands.Open">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/file_open.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
                 <Separator />
-                <MenuItem Name="menuItemFileSave" Header="_Save" InputGestureText="Ctrl+S" Command="ApplicationCommands.Save" />
-                <MenuItem Name="menuItemFileSaveAs"  Header="Save As" InputGestureText="Ctrl+Shift+S" Command="ApplicationCommands.SaveAs" />
+                <MenuItem Name="menuItemFileSave" Header="_Save" InputGestureText="Ctrl+S" Command="ApplicationCommands.Save">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/file_save.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="menuItemFileSaveAs"  Header="Save As" InputGestureText="Ctrl+Shift+S" Command="ApplicationCommands.SaveAs">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/file_save_as.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
                 <Separator />
-                <MenuItem Name="menuItemFileExit" Header="E_xit" InputGestureText="Alt+F4" Click="menuItemFileExit_Click" />
+                <MenuItem Name="menuItemFileExit" Header="E_xit" InputGestureText="Alt+F4" Click="menuItemFileExit_Click">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/file_exit.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="_Edit">
-                <MenuItem Name="menuItemEditUndo" Header="_Undo" InputGestureText="Ctrl+Z" Command="ApplicationCommands.Undo" />
-                <MenuItem Name="menuItemEditRedo" Header="_Redo" InputGestureText="Ctrl+Y" Command="ApplicationCommands.Redo" />
+                <MenuItem Name="menuItemEditUndo" Header="_Undo" InputGestureText="Ctrl+Z" Command="ApplicationCommands.Undo">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/edit_undo.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="menuItemEditRedo" Header="_Redo" InputGestureText="Ctrl+Y" Command="ApplicationCommands.Redo">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/edit_redo.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
                 <Separator />
-                <MenuItem Name="menuItemEditCut" Header="Cu_t" InputGestureText="Ctrl+X" Command="ApplicationCommands.Cut" />
-                <MenuItem Name="menuItemEditCopy" Header="_Copy" InputGestureText="Ctrl+C" Command="ApplicationCommands.Copy" />
-                <MenuItem Name="menuItemEditPaste" Header="_Paste" InputGestureText="Ctrl+V" Command="ApplicationCommands.Paste" />
+                <MenuItem Name="menuItemEditCut" Header="Cu_t" InputGestureText="Ctrl+X" Command="ApplicationCommands.Cut">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/edit_cut.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="menuItemEditCopy" Header="_Copy" InputGestureText="Ctrl+C" Command="ApplicationCommands.Copy">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/edit_copy.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="menuItemEditPaste" Header="_Paste" InputGestureText="Ctrl+V" Command="ApplicationCommands.Paste">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/edit_paste.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="E_mulator">
-                <MenuItem Name="menuItemEmulatorStartEmulator" Header="Start _Emulator" InputGestureText="Ctrl+E" Command="local:EmulatorCommands.StartEmulator" />
+                <MenuItem Name="menuItemEmulatorStartEmulator" Header="Start _Emulator" InputGestureText="Ctrl+E" Command="local:EmulatorCommands.StartEmulator">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/emulator_start_emulator.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
                 <Separator />
-                <MenuItem Name="menuItemEmulatorStep" Header="_Step" InputGestureText="F5" Command="local:EmulatorCommands.Step" />
-                <MenuItem Name="menuItemEmulatorRunClocked" Header="Run _Clocked" InputGestureText="F10" Command="local:EmulatorCommands.RunClocked" />
-                <MenuItem Name="menuItemEmulatorRun" Header="_Run" InputGestureText="F11" Command="local:EmulatorCommands.Run" />
-                <MenuItem Name="menuItemEmulatorPause" Header="_Pause" InputGestureText="F6" Command="local:EmulatorCommands.Pause" />
+                <MenuItem Name="menuItemEmulatorStep" Header="_Step" InputGestureText="F5" Command="local:EmulatorCommands.Step">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/emulator_step.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="menuItemEmulatorRunClocked" Header="Run _Clocked" InputGestureText="F10" Command="local:EmulatorCommands.RunClocked">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/emulator_run_clocked.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="menuItemEmulatorRun" Header="_Run" InputGestureText="F11" Command="local:EmulatorCommands.Run">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/emulator_run.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="menuItemEmulatorPause" Header="_Pause" InputGestureText="F6" Command="local:EmulatorCommands.Pause">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/emulator_pause.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
                 <Separator />
-                <MenuItem Name="menuItemEmulatorInjectInterrupt" Header="_Inject Interrupt" InputGestureText="Ctrl+I" Command="local:EmulatorCommands.InjectInterrupt" />
+                <MenuItem Name="menuItemEmulatorInjectInterrupt" Header="_Inject Interrupt" InputGestureText="Ctrl+I" Command="local:EmulatorCommands.InjectInterrupt">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/emulator_inject_interrupt.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
                 <Separator />
-                <MenuItem Name="menuItemEmulatorStop" Header="St_op" InputGestureText="Ctrl+F4" Command="local:EmulatorCommands.Stop" />
+                <MenuItem Name="menuItemEmulatorStop" Header="St_op" InputGestureText="Ctrl+F4" Command="local:EmulatorCommands.Stop">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/emulator_stop.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="_Tools">
-                <MenuItem Name="menuItemToolsTerminal" Header="_Terminal" InputGestureText="Ctrl+T" Command="local:EmulatorCommands.OpenTerminal" />
-                <MenuItem Name="menuItemToolsIOPanel" Header="I/O Panel" Command="local:EmulatorCommands.OpenIOPanel" />
+                <MenuItem Name="menuItemToolsTerminal" Header="_Terminal" InputGestureText="Ctrl+T" Command="local:EmulatorCommands.OpenTerminal">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/tools_terminal.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="menuItemToolsIOPanel" Header="I/O Panel" Command="local:EmulatorCommands.OpenIOPanel">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/tools_io_panel.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Name="menuItemHelpSettings" Header="_Settings" />

@@ -98,5 +98,30 @@
   <ItemGroup>
     <Resource Include="MainWindow.jpg" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\edit_copy.png" />
+    <Resource Include="Icons\edit_cut.png" />
+    <Resource Include="Icons\edit_paste.png" />
+    <Resource Include="Icons\edit_redo.png" />
+    <Resource Include="Icons\edit_undo.png" />
+    <Resource Include="Icons\emulator_pause.png" />
+    <Resource Include="Icons\emulator_run.png" />
+    <Resource Include="Icons\emulator_run_clocked.png" />
+    <Resource Include="Icons\emulator_start_emulator.png" />
+    <Resource Include="Icons\emulator_step.png" />
+    <Resource Include="Icons\emulator_stop.png" />
+    <Resource Include="Icons\file_exit.png" />
+    <Resource Include="Icons\file_new.png" />
+    <Resource Include="Icons\file_open.png" />
+    <Resource Include="Icons\file_save.png" />
+    <Resource Include="Icons\file_save_as.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\tools_io_panel.png" />
+    <Resource Include="Icons\tools_terminal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\emulator_inject_interrupt.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
