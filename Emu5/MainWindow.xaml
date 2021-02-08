@@ -53,7 +53,7 @@
         <KeyBinding Key="T" Modifiers="Ctrl" Command="local:EmulatorCommands.OpenTerminal" />
     </Window.InputBindings>
     <DockPanel>
-        <Menu DockPanel.Dock="Top" Background="#72C7C7C7" FontSize="13">
+        <Menu DockPanel.Dock="Top" Background="#FFC7C7C7" FontSize="13">
             <MenuItem Header="_File">
                 <MenuItem Name="menuItemFileNew" Header="_New" InputGestureText="Ctrl+N" Command="ApplicationCommands.New">
                     <MenuItem.Icon>
@@ -168,6 +168,72 @@
                 <MenuItem Name="menuItemHelpAbout" Header="_About" />
             </MenuItem>
         </Menu>
+        <DockPanel DockPanel.Dock="Top" Background="#72C7C7C7">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" FlowDirection="LeftToRight"> <!--Used to host perspectives -->
+                <Button Name="buttonPerspectiveEditor" Width="24" Height="24" Margin="3" ToolTip="Editor Perspective">
+                    <Image Source="Icons/perspective_editor.png" />
+                </Button>
+                <Button Name="buttonPerspectiveEmulator" Width="24" Height="24" Margin="3" ToolTip="Emulator Perspective">
+                    <Image Source="Icons/perspective_emulator.png" />
+                </Button>
+                <Button Name="buttonPerspectiveLog" Width="24" Height="24" Margin="3" ToolTip="Log Perspective">
+                    <Image Source="Icons/perspective_log.png" />
+                </Button>
+            </StackPanel>
+            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" FlowDirection="LeftToRight"> <!-- Used to host the toolbar -->
+                <Button Name="buttonFileNew" Width="24" Height="24" Margin="3" ToolTip="New File" Command="ApplicationCommands.New">
+                    <Image Source="Icons/file_new.png" />
+                </Button>
+                <Button Name="buttonFileOpen" Width="24" Height="24" Margin="3" ToolTip="Open File" Command="ApplicationCommands.Open">
+                    <Image Source="Icons/file_open.png" />
+                </Button>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                <Button Name="buttonFileSave" Width="24" Height="24" Margin="3" ToolTip="Save" Command="ApplicationCommands.Save">
+                    <Image Source="Icons/file_save.png" />
+                </Button>
+                <Button Name="buttonFileSaveAs" Width="24" Height="24" Margin="3" ToolTip="Save As" Command="ApplicationCommands.SaveAs">
+                    <Image Source="Icons/file_save_as.png" />
+                </Button>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                <Button Name="buttonEditUndo" Width="24" Height="24" Margin="3" ToolTip="Undo" Command="ApplicationCommands.Undo">
+                    <Image Source="Icons/edit_undo.png" />
+                </Button>
+                <Button Name="buttonEditRedo" Width="24" Height="24" Margin="3" ToolTip="Redo" Command="ApplicationCommands.Redo">
+                    <Image Source="Icons/edit_redo.png" />
+                </Button>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                <Button Name="buttonEmulatorStartEmulator" Width="24" Height="24" Margin="3" ToolTip="Start Emulator" Command="local:EmulatorCommands.StartEmulator">
+                    <Image Source="Icons/emulator_start_emulator.png" />
+                </Button>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                <Button Name="buttonEmulatorStep" Width="24" Height="24" Margin="3" ToolTip="Step" Command="local:EmulatorCommands.Step">
+                    <Image Source="Icons/emulator_step.png" />
+                </Button>
+                <Button Name="buttonEmulatorRunClocked" Width="24" Height="24" Margin="3" ToolTip="Run Clocked" Command="local:EmulatorCommands.RunClocked">
+                    <Image Source="Icons/emulator_run_clocked.png" />
+                </Button>
+                <Button Name="buttonEmulatorRun" Width="24" Height="24" Margin="3" ToolTip="Run" Command="local:EmulatorCommands.Run">
+                    <Image Source="Icons/emulator_run.png" />
+                </Button>
+                <Button Name="buttonEmulatorPause" Width="24" Height="24" Margin="3" ToolTip="Pause" Command="local:EmulatorCommands.Pause">
+                    <Image Source="Icons/emulator_pause.png" />
+                </Button>
+                <Button Name="buttonEmulatorStop" Width="24" Height="24" Margin="3" ToolTip="Stop" Command="local:EmulatorCommands.Stop">
+                    <Image Source="Icons/emulator_stop.png" />
+                </Button>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                <Button Name="buttonEmulatorInjectInterrupt" Width="24" Height="24" Margin="3" ToolTip="Inject Interrupt" Command="local:EmulatorCommands.InjectInterrupt">
+                    <Image Source="Icons/emulator_inject_interrupt.png" />
+                </Button>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                <Button Name="buttonToolsTerminal" Width="24" Height="24" Margin="3" ToolTip="Open Terminal" Command="local:EmulatorCommands.OpenTerminal">
+                    <Image Source="Icons/tools_terminal.png" />
+                </Button>
+                <Button Name="buttonToolsIOPanel" Width="24" Height="24" Margin="3" ToolTip="Open I/O Panel" Command="local:EmulatorCommands.OpenIOPanel">
+                    <Image Source="Icons/tools_io_panel.png" />
+                </Button>
+            </StackPanel>
+        </DockPanel>
         <Grid>
         </Grid>
     </DockPanel>

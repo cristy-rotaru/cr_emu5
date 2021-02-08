@@ -123,5 +123,10 @@
   <ItemGroup>
     <Resource Include="Icons\emulator_inject_interrupt.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\perspective_editor.png" />
+    <Resource Include="Icons\perspective_emulator.png" />
+    <Resource Include="Icons\perspective_log.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
