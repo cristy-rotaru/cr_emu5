@@ -20,9 +20,37 @@
         <CommandBinding Command="ApplicationCommands.Cut" Executed="commandCut_Executed" CanExecute="commandCut_CanExecute" />
         <CommandBinding Command="ApplicationCommands.Copy" Executed="commandCopy_Executed" CanExecute="commandCopy_CanExecute" />
         <CommandBinding Command="ApplicationCommands.Paste" Executed="commandPaste_Executed" CanExecute="commandPaste_CanExecute" />
+
+        <CommandBinding Command="local:EmulatorCommands.StartEmulator" Executed="commandStartEmulator_Executed" CanExecute="commandStartEmulator_CanExecute" />
+        <CommandBinding Command="local:EmulatorCommands.Step" Executed="commandStep_Executed" CanExecute="commandStep_CanExecute" />
+        <CommandBinding Command="local:EmulatorCommands.RunClocked" Executed="commandRunClocked_Executed" CanExecute="commandRunClocked_CanExecute" />
+        <CommandBinding Command="local:EmulatorCommands.Run" Executed="commandRun_Executed" CanExecute="commandRun_CanExecute" />
+        <CommandBinding Command="local:EmulatorCommands.Pause" Executed="commandPause_Executed" CanExecute="commandPause_CanExecute" />
+        <CommandBinding Command="local:EmulatorCommands.InjectInterrupt" Executed="commandInjectInterrupt_Executed" CanExecute="commandInjectInterrupt_CanExecute" />
+        <CommandBinding Command="local:EmulatorCommands.Stop" Executed="commandStop_Executed" CanExecute="commandStop_CanExecute" />
+        <CommandBinding Command="local:EmulatorCommands.OpenTerminal" Executed="commandOpenTerminal_Executed" CanExecute="commandOpenTerminal_CanExecute" />
+        <CommandBinding Command="local:EmulatorCommands.OpenIOPanel" Executed="commandOpenIOPanel_Executed" CanExecute="commandOpenIOPanel_CanExecute" />
     </Window.CommandBindings>
     <Window.InputBindings>
+        <KeyBinding Key="N" Modifiers="Ctrl" Command="ApplicationCommands.New" />
+        <KeyBinding Key="O" Modifiers="Ctrl" Command="ApplicationCommands.Open" />
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="ApplicationCommands.Save" />
+        <KeyBinding Key="S" Modifiers="Ctrl+Shift" Command="ApplicationCommands.SaveAs" />
+        <KeyBinding Key="Z" Modifiers="Ctrl" Command="ApplicationCommands.Undo" />
+        <KeyBinding Key="Y" Modifiers="Ctrl" Command="ApplicationCommands.Redo" />
+        <KeyBinding Key="X" Modifiers="Ctrl" Command="ApplicationCommands.Cut" />
+        <KeyBinding Key="C" Modifiers="Ctrl" Command="ApplicationCommands.Copy" />
+        <KeyBinding Key="V" Modifiers="Ctrl" Command="ApplicationCommands.Paste" />
+
+        <KeyBinding Key="E" Modifiers="Ctrl" Command="local:EmulatorCommands.StartEmulator" />
+        <KeyBinding Key="F5" Command="local:EmulatorCommands.Step" />
+        <KeyBinding Key="F10" Command="local:EmulatorCommands.RunClocked" />
+        <KeyBinding Key="F11" Command="local:EmulatorCommands.Run" />
+        <KeyBinding Key="F6" Command="local:EmulatorCommands.Pause" />
+        <KeyBinding Key="I" Modifiers="Ctrl" Command="local:EmulatorCommands.InjectInterrupt" />
+        <KeyBinding Key="F4" Modifiers="Ctrl" Command="local:EmulatorCommands.Stop" />
         
+        <KeyBinding Key="T" Modifiers="Ctrl" Command="local:EmulatorCommands.OpenTerminal" />
     </Window.InputBindings>
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="#72C7C7C7">
@@ -44,6 +72,20 @@
                 <MenuItem Name="menuItemEditPaste" Header="_Paste" InputGestureText="Ctrl+V" Command="ApplicationCommands.Paste" />
             </MenuItem>
             <MenuItem Header="E_mulator">
+                <MenuItem Name="menuItemEmulatorStartEmulator" Header="Start _Emulator" InputGestureText="Ctrl+E" Command="local:EmulatorCommands.StartEmulator" />
+                <Separator />
+                <MenuItem Name="menuItemEmulatorStep" Header="_Step" InputGestureText="F5" Command="local:EmulatorCommands.Step" />
+                <MenuItem Name="menuItemEmulatorRunClocked" Header="Run _Clocked" InputGestureText="F10" Command="local:EmulatorCommands.RunClocked" />
+                <MenuItem Name="menuItemEmulatorRun" Header="_Run" InputGestureText="F11" Command="local:EmulatorCommands.Run" />
+                <MenuItem Name="menuItemEmulatorPause" Header="_Pause" InputGestureText="F6" Command="local:EmulatorCommands.Pause" />
+                <Separator />
+                <MenuItem Name="menuItemEmulatorInjectInterrupt" Header="_Inject Interrupt" InputGestureText="Ctrl+I" Command="local:EmulatorCommands.InjectInterrupt" />
+                <Separator />
+                <MenuItem Name="menuItemEmulatorStop" Header="St_op" InputGestureText="Ctrl+F4" Command="local:EmulatorCommands.Stop" />
+            </MenuItem>
+            <MenuItem Header="_Tools">
+                <MenuItem Name="menuItemToolsTerminal" Header="_Terminal" InputGestureText="Ctrl+T" Command="local:EmulatorCommands.OpenTerminal" />
+                <MenuItem Name="menuItemToolsIOPanel" Header="I/O Panel" Command="local:EmulatorCommands.OpenIOPanel" />
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Name="menuItemHelpSettings" Header="_Settings" />

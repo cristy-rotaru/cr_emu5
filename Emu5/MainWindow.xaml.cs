@@ -34,6 +34,7 @@ namespace Emu5
         #endregion
 
         #region r_commandBindings
+        #region r_applicationCommands
         void commandNew_Executed(object target, ExecutedRoutedEventArgs e)
         {
             
@@ -113,6 +114,99 @@ namespace Emu5
         {
             e.CanExecute = false;
         }
+        #endregion
+
+        #region r_emulatorCommands
+        void commandStartEmulator_Executed(object target, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        void commandStartEmulator_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = false;
+        }
+
+        void commandStep_Executed(object target, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        void commandStep_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = false;
+        }
+
+        void commandRunClocked_Executed(object target, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        void commandRunClocked_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = false;
+        }
+
+        void commandRun_Executed(object target, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        void commandRun_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = false;
+        }
+
+        void commandPause_Executed(object target, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        void commandPause_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = false;
+        }
+
+        void commandInjectInterrupt_Executed(object target, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        void commandInjectInterrupt_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = false;
+        }
+
+        void commandStop_Executed(object target, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        void commandStop_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = false;
+        }
+
+        void commandOpenTerminal_Executed(object target, ExecutedRoutedEventArgs e)
+        {
+            MessageBox.Show("Open Terminal");
+        }
+
+        void commandOpenTerminal_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        void commandOpenIOPanel_Executed(object target, ExecutedRoutedEventArgs e)
+        {
+            MessageBox.Show("Open I/O Panel");
+        }
+
+        void commandOpenIOPanel_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+        #endregion
         #endregion
 
         #region r_menuItemsHandlers
