@@ -11,5 +11,10 @@ namespace Emu5
         {
             InitializeComponent();
         }
+
+        public bool CloseOnNewTab()
+        {
+            return checkBoxCloseOnNewTab.IsChecked == true;
+        }
     }
 }

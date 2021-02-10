@@ -47,7 +47,27 @@ namespace Emu5
         #region r_applicationCommands
         void commandNew_Executed(object target, ExecutedRoutedEventArgs e)
         {
-            
+            if (tabControlMain.Items.Count > 0)
+            {
+                TabItem l_firstTab = (TabItem)tabControlMain.Items[0];
+                
+                if (l_firstTab.Content.GetType() == typeof(WelcomePage))
+                {
+                    WelcomePage l_welcomePage = (WelcomePage)l_firstTab.Content;
+                    
+                    if (l_welcomePage.CloseOnNewTab())
+                    {
+                        tabControlMain.Items.Remove(l_firstTab);
+                    }
+                }
+            }
+
+            TabItem l_newTab = new TabItem();
+            l_newTab.Header = new TabHeader("Untitled", true, () => { RemoveTab(l_newTab); });
+            l_newTab.Content = new PerspectivePage();
+            tabControlMain.Items.Add(l_newTab);
+
+            tabControlMain.SelectedItem = l_newTab;
         }
 
         void commandOpen_Executed(object target, ExecutedRoutedEventArgs e)
@@ -57,72 +77,216 @@ namespace Emu5
 
         void commandSave_Executed(object target, ExecutedRoutedEventArgs e)
         {
-
+            MessageBox.Show("Save");
         }
 
         void commandSave_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = false;
+            bool l_canExecute = false;
+
+            if (tabControlMain != null)
+            {
+                if (tabControlMain.SelectedIndex >= 0)
+                {
+                    TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+
+                    if (l_tab.Content.GetType() == typeof(PerspectivePage))
+                    {
+                        PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+
+                        if (l_page.GetCurrentPerspective() == Perspective.Editor || l_page.GetCurrentPerspective() == Perspective.Log)
+                        {
+                            l_canExecute = true;
+                        }
+                    }
+                }
+            }
+
+            e.CanExecute = l_canExecute;
         }
 
         void commandSaveAs_Executed(object target, ExecutedRoutedEventArgs e)
         {
-
+            MessageBox.Show("Save As");
         }
 
         void commandSaveAs_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = false;
+            bool l_canExecute = false;
+
+            if (tabControlMain != null)
+            {
+                if (tabControlMain.SelectedIndex >= 0)
+                {
+                    TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+
+                    if (l_tab.Content.GetType() == typeof(PerspectivePage))
+                    {
+                        PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+
+                        if (l_page.GetCurrentPerspective() == Perspective.Editor || l_page.GetCurrentPerspective() == Perspective.Log)
+                        {
+                            l_canExecute = true;
+                        }
+                    }
+                }
+            }
+
+            e.CanExecute = l_canExecute;
         }
 
         void commandUndo_Executed(object target, ExecutedRoutedEventArgs e)
         {
-
+            TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+            PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+            l_page.Undo();
         }
 
         void commandUndo_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = false;
+            bool l_canExecute = false;
+
+            if (tabControlMain != null)
+            {
+                if (tabControlMain.SelectedIndex >= 0)
+                {
+                    TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+
+                    if (l_tab.Content.GetType() == typeof(PerspectivePage))
+                    {
+                        PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+
+                        l_canExecute = l_page.CanUndo();
+                    }
+                }
+            }
+
+            e.CanExecute = l_canExecute;
         }
 
         void commandRedo_Executed(object target, ExecutedRoutedEventArgs e)
         {
-
+            TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+            PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+            l_page.Redo();
         }
 
         void commandRedo_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = false;
+            bool l_canExecute = false;
+
+            if (tabControlMain != null)
+            {
+                if (tabControlMain.SelectedIndex >= 0)
+                {
+                    TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+
+                    if (l_tab.Content.GetType() == typeof(PerspectivePage))
+                    {
+                        PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+
+                        l_canExecute = l_page.CanRedo();
+                    }
+                }
+            }
+
+            e.CanExecute = l_canExecute;
         }
 
         void commandCut_Executed(object target, ExecutedRoutedEventArgs e)
         {
-
+            TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+            PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+            l_page.Cut();
         }
 
         void commandCut_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = false;
+            bool l_canExecute = false;
+
+            if (tabControlMain != null)
+            {
+                if (tabControlMain.SelectedIndex >= 0)
+                {
+                    TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+
+                    if (l_tab.Content.GetType() == typeof(PerspectivePage))
+                    {
+                        PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+
+                        if (l_page.GetCurrentPerspective() == Perspective.Editor || l_page.GetCurrentPerspective() == Perspective.Log)
+                        {
+                            l_canExecute = true;
+                        }
+                    }
+                }
+            }
+
+            e.CanExecute = l_canExecute;
         }
 
         void commandCopy_Executed(object target, ExecutedRoutedEventArgs e)
         {
-
+            TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+            PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+            l_page.Copy();
         }
 
         void commandCopy_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = false;
+            bool l_canExecute = false;
+
+            if (tabControlMain != null)
+            {
+                if (tabControlMain.SelectedIndex >= 0)
+                {
+                    TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+
+                    if (l_tab.Content.GetType() == typeof(PerspectivePage))
+                    {
+                        PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+
+                        if (l_page.GetCurrentPerspective() == Perspective.Editor || l_page.GetCurrentPerspective() == Perspective.Log)
+                        {
+                            l_canExecute = true;
+                        }
+                    }
+                }
+            }
+
+            e.CanExecute = l_canExecute;
         }
 
         void commandPaste_Executed(object target, ExecutedRoutedEventArgs e)
         {
-
+            TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+            PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+            l_page.Paste();
         }
 
         void commandPaste_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = false;
+            bool l_canExecute = false;
+
+            if (tabControlMain != null)
+            {
+                if (tabControlMain.SelectedIndex >= 0)
+                {
+                    TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+
+                    if (l_tab.Content.GetType() == typeof(PerspectivePage))
+                    {
+                        PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+
+                        if (l_page.GetCurrentPerspective() == Perspective.Editor)
+                        {
+                            l_canExecute = true;
+                        }
+                    }
+                }
+            }
+
+            e.CanExecute = l_canExecute;
         }
         #endregion
 
@@ -189,7 +353,7 @@ namespace Emu5
 
         void commandStop_Executed(object target, ExecutedRoutedEventArgs e)
         {
-
+            
         }
 
         void commandStop_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -202,19 +366,9 @@ namespace Emu5
             MessageBox.Show("Open Terminal");
         }
 
-        void commandOpenTerminal_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
-        }
-
         void commandOpenIOPanel_Executed(object target, ExecutedRoutedEventArgs e)
         {
             MessageBox.Show("Open I/O Panel");
-        }
-
-        void commandOpenIOPanel_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
         }
         #endregion
         #endregion
@@ -241,6 +395,11 @@ namespace Emu5
         {
             if (tab.Content.GetType() == typeof(WelcomePage))
             {
+                tabControlMain.Items.Remove(tab);
+            }
+            else if (tab.Content.GetType() == typeof(PerspectivePage))
+            {
+                // TODO: perform check if file is saved
                 tabControlMain.Items.Remove(tab);
             }
 
