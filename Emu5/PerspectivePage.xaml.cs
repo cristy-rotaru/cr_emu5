@@ -1,17 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows.Controls;
 
 namespace Emu5
 {
@@ -29,6 +16,8 @@ namespace Emu5
     {
         Perspective m_currentPerspective = Perspective.Editor;
 
+        TabHeader m_tabHeader = null;
+
         EditorPerspective m_editor = new EditorPerspective();
 
         public PerspectivePage()
@@ -36,6 +25,12 @@ namespace Emu5
             InitializeComponent();
 
             dockPanelMain.Children.Add(m_editor);
+        }
+
+        public PerspectivePage(TabHeader tabHeader) : this()
+        {
+            m_tabHeader = tabHeader;
+            m_editor.RegisterFileModifiedCallback(() => m_tabHeader.SetSavedState(true));
         }
 
         public Perspective GetCurrentPerspective()
@@ -98,6 +93,36 @@ namespace Emu5
             if (m_currentPerspective == Perspective.Editor)
             {
                 m_editor.Paste();
+            }
+        }
+
+        public void Save()
+        {
+            if (m_currentPerspective == Perspective.Editor)
+            {
+                if (m_editor.Save())
+                {
+                    m_tabHeader?.ChangeHeaderText(m_editor.GetFileName(), false);
+                }
+            }
+            else if (m_currentPerspective == Perspective.Log)
+            {
+                // save log
+            }
+        }
+
+        public void SaveAs()
+        {
+            if (m_currentPerspective == Perspective.Editor)
+            {
+                if (m_editor.SaveAs())
+                {
+                    m_tabHeader?.ChangeHeaderText(m_editor.GetFileName(), false);
+                }
+            }
+            else if (m_currentPerspective == Perspective.Log)
+            {
+                // save log
             }
         }
     }

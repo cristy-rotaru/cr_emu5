@@ -1,18 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Emu5
 {
@@ -30,7 +20,7 @@ namespace Emu5
         private void MainWindow_Initialized(object sender, EventArgs e)
         {
             TabItem l_welcomeTab = new TabItem();
-            l_welcomeTab.Header = new TabHeader("Welcome", false, () => { RemoveTab(l_welcomeTab); });
+            l_welcomeTab.Header = new TabHeader("Welcome", false, () => RemoveTab(l_welcomeTab));
             l_welcomeTab.Content = new WelcomePage();
             tabControlMain.Items.Add(l_welcomeTab);
 
@@ -63,8 +53,8 @@ namespace Emu5
             }
 
             TabItem l_newTab = new TabItem();
-            l_newTab.Header = new TabHeader("Untitled", true, () => { RemoveTab(l_newTab); });
-            l_newTab.Content = new PerspectivePage();
+            l_newTab.Header = new TabHeader("Untitled", true, () => RemoveTab(l_newTab));
+            l_newTab.Content = new PerspectivePage((TabHeader)l_newTab.Header);
             tabControlMain.Items.Add(l_newTab);
 
             tabControlMain.SelectedItem = l_newTab;
@@ -77,7 +67,9 @@ namespace Emu5
 
         void commandSave_Executed(object target, ExecutedRoutedEventArgs e)
         {
-            MessageBox.Show("Save");
+            TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+            PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+            l_page.Save();
         }
 
         void commandSave_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -107,7 +99,9 @@ namespace Emu5
 
         void commandSaveAs_Executed(object target, ExecutedRoutedEventArgs e)
         {
-            MessageBox.Show("Save As");
+            TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+            PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+            l_page.SaveAs();
         }
 
         void commandSaveAs_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -399,14 +393,22 @@ namespace Emu5
             }
             else if (tab.Content.GetType() == typeof(PerspectivePage))
             {
-                // TODO: perform check if file is saved
-                tabControlMain.Items.Remove(tab);
+                TabHeader l_header = (TabHeader)tab.Header;
+                
+                if (l_header.IsUnsaved() == false)
+                {
+                    tabControlMain.Items.Remove(tab);
+                }
+                else if (MessageBox.Show("The file is not saved.\nAll progress will be lost.\nAre you sure you want to close this tab?", "File not saved", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    tabControlMain.Items.Remove(tab);
+                }
             }
 
             if (tabControlMain.Items.Count == 0) // add welcome tab if no other tabs are available
             {
                 TabItem l_welcomeTab = new TabItem();
-                l_welcomeTab.Header = new TabHeader("Welcome", false, () => { RemoveTab(l_welcomeTab); });
+                l_welcomeTab.Header = new TabHeader("Welcome", false, () => RemoveTab(l_welcomeTab));
                 l_welcomeTab.Content = new WelcomePage();
                 tabControlMain.Items.Add(l_welcomeTab);
 

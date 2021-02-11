@@ -7,5 +7,5 @@
              xmlns:local="clr-namespace:Emu5"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <avalon:TextEditor Name="textEditorMain" FontFamily="Consolas" FontSize="13" ShowLineNumbers="true" />
+    <avalon:TextEditor Name="textEditorMain" FontFamily="Consolas" FontSize="15" ShowLineNumbers="true" TextChanged="textEditorMain_TextChanged" />
 </UserControl>

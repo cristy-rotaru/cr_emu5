@@ -50,7 +50,8 @@ namespace Emu5
 
         public void SetSavedState(bool unsaved)
         {
-            textBlockTabText.Text = unsaved ? m_headerText + "*" : m_headerText;
+            m_unsaved = unsaved;
+            textBlockTabText.Text = m_unsaved ? m_headerText + "*" : m_headerText;
         }
 
         public bool IsUnsaved()
