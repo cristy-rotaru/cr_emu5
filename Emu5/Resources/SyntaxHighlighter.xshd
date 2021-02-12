@@ -18,104 +18,238 @@
         </Span>
 
         <Keywords color="Instruction">
-            <Word>lui</Word>
-            <Word>auipc</Word>
-            <Word>jal</Word>
-            <Word>jalr</Word>
-            <Word>beq</Word>
-            <Word>bne</Word>
-            <Word>blt</Word>
-            <Word>bge</Word>
-            <Word>bltu</Word>
-            <Word>bgeu</Word>
-            <Word>lb</Word>
-            <Word>lh</Word>
-            <Word>lw</Word>
-            <Word>lbu</Word>
-            <Word>lhu</Word>
-            <Word>sb</Word>
-            <Word>sh</Word>
-            <Word>sw</Word>
-            <Word>addi</Word>
-            <Word>slti</Word>
-            <Word>sltiu</Word>
-            <Word>xori</Word>
-            <Word>ori</Word>
-            <Word>andi</Word>
-            <Word>slli</Word>
-            <Word>srli</Word>
-            <Word>srai</Word>
-            <Word>add</Word>
-            <Word>sub</Word>
-            <Word>sll</Word>
-            <Word>slt</Word>
-            <Word>sltu</Word>
-            <Word>xor</Word>
-            <Word>srl</Word>
-            <Word>sra</Word>
-            <Word>or</Word>
-            <Word>and</Word>
-            <Word>fence</Word>
-            <Word>ecall</Word>
-            <Word>ebreak</Word>
-            <Word>lwu</Word>
-            <Word>ld</Word>
-            <Word>sd</Word>
-            <Word>addiw</Word>
-            <Word>slliw</Word>
-            <Word>srliw</Word>
-            <Word>sraiw</Word>
-            <Word>addw</Word>
-            <Word>subw</Word>
-            <Word>sllw</Word>
-            <Word>srlw</Word>
-            <Word>sraw</Word>
-            <Word>fence.i</Word>
-            <Word>csrrw</Word>
-            <Word>csrrs</Word>
-            <Word>csrrc</Word>
-            <Word>csrrwi</Word>
-            <Word>csrrsi</Word>
-            <Word>csrrci</Word>
-            <Word>mul</Word>
-            <Word>mulh</Word>
-            <Word>mulhsu</Word>
-            <Word>mulhu</Word>
-            <Word>div</Word>
-            <Word>divu</Word>
-            <Word>rem</Word>
-            <Word>remu</Word>
-            <Word>mulw</Word>
-            <Word>divw</Word>
-            <Word>divuw</Word>
-            <Word>remw</Word>
-            <Word>remuw</Word>
-            <Word>lr.w</Word>
-            <Word>sc.w</Word>
-            <Word>amoswap.w</Word>
-            <Word>amoadd.w</Word>
-            <Word>amoxor.w</Word>
-            <Word>amoand.w</Word>
-            <Word>amoor.w</Word>
-            <Word>amomin.w</Word>
-            <Word>amomax.w</Word>
-            <Word>amominu.w</Word>
-            <Word>amomaxu.w</Word>
-            <Word>lr.d</Word>
-            <Word>sc.d</Word>
-            <Word>amoswap.d</Word>
-            <Word>amoadd.d</Word>
-            <Word>amoxor.d</Word>
-            <Word>amoand.d</Word>
-            <Word>amoor.d</Word>
-            <Word>amomin.d</Word>
-            <Word>amomax.d</Word>
-            <Word>amominu.d</Word>
-            <Word>amomaxu.d</Word>
+            <Word>lui</Word> <Word>LUI</Word>
+            <Word>auipc</Word> <Word>AUIPC</Word>
+            <Word>jal</Word> <Word>JAL</Word>
+            <Word>jalr</Word> <Word>JALR</Word>
+            <Word>beq</Word> <Word>BEQ</Word>
+            <Word>bne</Word> <Word>BNE</Word>
+            <Word>blt</Word> <Word>BLT</Word>
+            <Word>bge</Word> <Word>BGE</Word>
+            <Word>bltu</Word> <Word>BLTU</Word>
+            <Word>bgeu</Word> <Word>BGEU</Word>
+            <Word>lb</Word> <Word>LB</Word>
+            <Word>lh</Word> <Word>LH</Word>
+            <Word>lw</Word> <Word>LW</Word>
+            <Word>lbu</Word> <Word>LBU</Word>
+            <Word>lhu</Word> <Word>LHU</Word>
+            <Word>sb</Word> <Word>SB</Word>
+            <Word>sh</Word> <Word>SH</Word>
+            <Word>sw</Word> <Word>SW</Word>
+            <Word>addi</Word> <Word>ADDI</Word>
+            <Word>slti</Word> <Word>SLTI</Word>
+            <Word>sltiu</Word> <Word>SLTIU</Word>
+            <Word>xori</Word> <Word>XORI</Word>
+            <Word>ori</Word> <Word>ORI</Word>
+            <Word>andi</Word> <Word>ANDI</Word>
+            <Word>slli</Word> <Word>SLLI</Word>
+            <Word>srli</Word> <Word>SRLI</Word>
+            <Word>srai</Word> <Word>SRAI</Word>
+            <Word>add</Word> <Word>ADD</Word>
+            <Word>sub</Word> <Word>SUB</Word>
+            <Word>sll</Word> <Word>SLL</Word>
+            <Word>slt</Word> <Word>SLT</Word>
+            <Word>sltu</Word> <Word>SLTU</Word>
+            <Word>xor</Word> <Word>XOR</Word>
+            <Word>srl</Word> <Word>SRL</Word>
+            <Word>sra</Word> <Word>SRA</Word>
+            <Word>or</Word> <Word>OR</Word>
+            <Word>and</Word> <Word>AND</Word>
+            <Word>fence</Word> <Word>FENCE</Word>
+            <Word>ecall</Word> <Word>ECALL</Word>
+            <Word>ebreak</Word> <Word>EBREAK</Word>
+            <Word>lwu</Word> <Word>LWU</Word>
+            <Word>ld</Word> <Word>LD</Word>
+            <Word>sd</Word> <Word>SD</Word>
+            <Word>addiw</Word> <Word>ADDIW</Word>
+            <Word>slliw</Word> <Word>SLLIW</Word>
+            <Word>srliw</Word> <Word>SRLIW</Word>
+            <Word>sraiw</Word> <Word>SRAIW</Word>
+            <Word>addw</Word> <Word>ADDW</Word>
+            <Word>subw</Word> <Word>SUBW</Word>
+            <Word>sllw</Word> <Word>SLLW</Word>
+            <Word>srlw</Word> <Word>SRLW</Word>
+            <Word>sraw</Word> <Word>SRAW</Word>
+            <Word>fence.i</Word> <Word>FENCE.I</Word>
+            <Word>csrrw</Word> <Word>CSRRW</Word>
+            <Word>csrrs</Word> <Word>CSRRS</Word>
+            <Word>csrrc</Word> <Word>CSRRC</Word>
+            <Word>csrrwi</Word> <Word>CSRRWI</Word>
+            <Word>csrrsi</Word> <Word>CSRRSI</Word>
+            <Word>csrrci</Word> <Word>CSRRCI</Word>
+            <Word>mul</Word> <Word>MUL</Word>
+            <Word>mulh</Word> <Word>MULH</Word>
+            <Word>mulhsu</Word> <Word>MULHSU</Word>
+            <Word>mulhu</Word> <Word>MULHU</Word>
+            <Word>div</Word> <Word>DIV</Word>
+            <Word>divu</Word> <Word>DIVU</Word>
+            <Word>rem</Word> <Word>REM</Word>
+            <Word>remu</Word> <Word>REMU</Word>
+            <Word>mulw</Word> <Word>MULW</Word>
+            <Word>divw</Word> <Word>DIVW</Word>
+            <Word>divuw</Word> <Word>DIVUW</Word>
+            <Word>remw</Word> <Word>REMW</Word>
+            <Word>remuw</Word> <Word>REMUW</Word>
+            <Word>lr.w</Word> <Word>LR.W</Word>
+            <Word>sc.w</Word> <Word>SC.W</Word>
+            <Word>amoswap.w</Word> <Word>AMOSWAP.W</Word>
+            <Word>amoadd.w</Word> <Word>AMOADD.W</Word>
+            <Word>amoxor.w</Word> <Word>AMOXOR.W</Word>
+            <Word>amoand.w</Word> <Word>AMOAND.W</Word>
+            <Word>amoor.w</Word> <Word>AMOOR.W</Word>
+            <Word>amomin.w</Word> <Word>AMOMIN.W</Word>
+            <Word>amomax.w</Word> <Word>AMOMAX.W</Word>
+            <Word>amominu.w</Word> <Word>AMOMINU.W</Word>
+            <Word>amomaxu.w</Word> <Word>AMOMAXU.W</Word>
+            <Word>lr.d</Word> <Word>LR.D</Word>
+            <Word>sc.d</Word> <Word>SC.D</Word>
+            <Word>amoswap.d</Word> <Word>AMOSWAP.D</Word>
+            <Word>amoadd.d</Word> <Word>AMOADD.D</Word>
+            <Word>amoxor.d</Word> <Word>AMOXOR.D</Word>
+            <Word>amoand.d</Word> <Word>AMOAND.D</Word>
+            <Word>amoor.d</Word> <Word>AMOOR.D</Word>
+            <Word>amomin.d</Word> <Word>AMOMIN.D</Word>
+            <Word>amomax.d</Word> <Word>AMOMAX.D</Word>
+            <Word>amominu.d</Word> <Word>AMOMINU.D</Word>
+            <Word>amomaxu.d</Word> <Word>AMOMAXU.D</Word>
+            <Word>flw</Word> <Word>FLW</Word>
+            <Word>fsw</Word> <Word>FSW</Word>
+            <Word>fmadd.s</Word> <Word>FMADD.S</Word>
+            <Word>fmsub.s</Word> <Word>FMSUB.S</Word>
+            <Word>fnmsub.s</Word> <Word>FNMSUB.S</Word>
+            <Word>fnmadd.s</Word> <Word>FNMADD.S</Word>
+            <Word>fadd.s</Word> <Word>FADD.S</Word>
+            <Word>fsub.s</Word> <Word>FSUB.S</Word>
+            <Word>fmul.s</Word> <Word>FMUL.S</Word>
+            <Word>fdiv.s</Word> <Word>FDIV.S</Word>
+            <Word>fsqrt.s</Word> <Word>FSQRT.S</Word>
+            <Word>fsgnj.s</Word> <Word>FSGNJ.S</Word>
+            <Word>fsgnjn.s</Word> <Word>FSGNJN.S</Word>
+            <Word>fsgnjx.s</Word> <Word>FSGNJX.S</Word>
+            <Word>fmin.s</Word> <Word>FMIN.S</Word>
+            <Word>fmax.s</Word> <Word>FMAX.S</Word>
+            <Word>fcvt.w.s</Word> <Word>FCVT.W.S</Word>
+            <Word>fcvt.wu.s</Word> <Word>FCVT.WU.S</Word>
+            <Word>fmv.x.w</Word> <Word>FMV.X.W</Word>
+            <Word>feq.s</Word> <Word>FEQ.S</Word>
+            <Word>flt.s</Word> <Word>FLT.S</Word>
+            <Word>fle.s</Word> <Word>FLE.S</Word>
+            <Word>fclass.s</Word> <Word>FCLASS.S</Word>
+            <Word>fcvt.s.w</Word> <Word>FCVT.S.W</Word>
+            <Word>fcvt.s.wu</Word> <Word>FCVT.S.WU</Word>
+            <Word>fmv.w.x</Word> <Word>FMV.W.X</Word>
+            <Word>fcvt.l.s</Word> <Word>FCVT.L.S</Word>
+            <Word>fcvt.lu.s</Word> <Word>FCVT.LU.S</Word>
+            <Word>fcvt.s.l</Word> <Word>FCVT.S.L</Word>
+            <Word>fcvt.s.lu</Word> <Word>FCVT.S.LU</Word>
+            <Word>fld</Word> <Word>FLD</Word>
+            <Word>fsd</Word> <Word>FSD</Word>
+            <Word>fmadd.d</Word> <Word>FMADD.D</Word>
+            <Word>fmsub.d</Word> <Word>FMSUB.D</Word>
+            <Word>fnmsub.d</Word> <Word>FNMSUB.D</Word>
+            <Word>fnmadd.d</Word> <Word>FNMADD.D</Word>
+            <Word>fadd.d</Word> <Word>FADD.D</Word>
+            <Word>fsub.d</Word> <Word>FSUB.D</Word>
+            <Word>fmul.d</Word> <Word>FMUL.D</Word>
+            <Word>fdiv.d</Word> <Word>FDIV.D</Word>
+            <Word>fsqrt.d</Word> <Word>FSQRT.D</Word>
+            <Word>fsgnj.d</Word> <Word>FSGNJ.D</Word>
+            <Word>fsgnjn.d</Word> <Word>FSGNJN.D</Word>
+            <Word>fsgnjx.d</Word> <Word>FSGNJX.D</Word>
+            <Word>fmin.d</Word> <Word>FMIN.D</Word>
+            <Word>fmax.d</Word> <Word>FMAX.D</Word>
+            <Word>fcvt.s.d</Word> <Word>FCVT.S.D</Word>
+            <Word>fcvt.d.s</Word> <Word>FCVT.D.S</Word>
+            <Word>feq.d</Word> <Word>FEQ.D</Word>
+            <Word>flt.d</Word> <Word>FLT.D</Word>
+            <Word>fle.d</Word> <Word>FLE.D</Word>
+            <Word>fclass.d</Word> <Word>FCLASS.D</Word>
+            <Word>fcvt.w.d</Word> <Word>FCVT.W.D</Word>
+            <Word>fcvt.wu.d</Word> <Word>FCVT.WU.D</Word>
+            <Word>fcvt.d.w</Word> <Word>FCVT.D.W</Word>
+            <Word>fcvt.d.wu</Word> <Word>FCVT.D.WU</Word>
+            <Word>fcvt.l.d</Word> <Word>FCVT.L.D</Word>
+            <Word>fcvt.lu.d</Word> <Word>FCVT.LU.D</Word>
+            <Word>fmv.x.d</Word> <Word>FMV.X.D</Word>
+            <Word>fcvt.d.l</Word> <Word>FCVT.D.L</Word>
+            <Word>fcvt.d.lu</Word> <Word>FCVT.D.LU</Word>
+            <Word>fmv.d.x</Word> <Word>FMV.D.X</Word>
+            <Word>flq</Word> <Word>FLQ</Word>
+            <Word>fsq</Word> <Word>FSQ</Word>
+            <Word>fmadd.q</Word> <Word>FMADD.Q</Word>
+            <Word>fmsub.q</Word> <Word>FMSUB.Q</Word>
+            <Word>fnmsub.q</Word> <Word>FNMSUB.Q</Word>
+            <Word>fnmadd.q</Word> <Word>FNMADD.Q</Word>
+            <Word>fadd.q</Word> <Word>FADD.Q</Word>
+            <Word>fsub.q</Word> <Word>FSUB.Q</Word>
+            <Word>fmul.q</Word> <Word>FMUL.Q</Word>
+            <Word>fdiv.q</Word> <Word>FDIV.Q</Word>
+            <Word>fsqrt.q</Word> <Word>FSQRT.Q</Word>
+            <Word>fsgnj.q</Word> <Word>FSGNJ.Q</Word>
+            <Word>fsgnjn.q</Word> <Word>FSGNJN.Q</Word>
+            <Word>fsgnjx.q</Word> <Word>FSGNJX.Q</Word>
+            <Word>fmin.q</Word> <Word>FMIN.Q</Word>
+            <Word>fmax.q</Word> <Word>FMAX.Q</Word>
+            <Word>fcvt.s.q</Word> <Word>FCVT.S.Q</Word>
+            <Word>fcvt.q.s</Word> <Word>FCVT.Q.S</Word>
+            <Word>feq.q</Word> <Word>FEQ.Q</Word>
+            <Word>flt.q</Word> <Word>FLT.Q</Word>
+            <Word>fle.q</Word> <Word>FLE.Q</Word>
+            <Word>fclass.q</Word> <Word>FCLASS.Q</Word>
+            <Word>fcvt.w.q</Word> <Word>FCVT.W.Q</Word>
+            <Word>fcvt.wu.q</Word> <Word>FCVT.WU.Q</Word>
+            <Word>fcvt.q.w</Word> <Word>FCVT.Q.W</Word>
+            <Word>fcvt.q.wu</Word> <Word>FCVT.Q.WU</Word>
+            <Word>fcvt.l.q</Word> <Word>FCVT.L.Q</Word>
+            <Word>fcvt.lu.q</Word> <Word>FCVT.LU.Q</Word>
+            <Word>fcvt.q.l</Word> <Word>FCVT.Q.L</Word>
+            <Word>fcvt.q.lu</Word> <Word>FCVT.Q.LU</Word>
+            <Word>hlt</Word> <Word>HLT</Word>
+            <Word>rst</Word> <Word>RST</Word>
+            <Word>wfi</Word> <Word>WFI</Word>
+        </Keywords>
+
+        <Keywords color="PseudoInstruction">
+            <Word>la</Word> <Word>LA</Word>
+            <Word>li</Word> <Word>LI</Word>
+            <Word>nop</Word> <Word>NOP</Word>
+            <Word>mv</Word> <Word>MV</Word>
+            <Word>not</Word> <Word>NOT</Word>
+            <Word>neg</Word> <Word>NEG</Word>
+            <Word>negw</Word> <Word>NEGW</Word>
+            <Word>sext.w</Word> <Word>SEXT.W</Word>
+            <Word>seqz</Word> <Word>SEQZ</Word>
+            <Word>snez</Word> <Word>SNEZ</Word>
+            <Word>sltz</Word> <Word>SLTZ</Word>
+            <Word>sgtz</Word> <Word>SGTZ</Word>
+            <Word>fmv.s</Word> <Word>FMV.S</Word>
+            <Word>fabs.s</Word> <Word>FABS.S</Word>
+            <Word>fneg.s</Word> <Word>FNEG.S</Word>
+            <Word>fmv.d</Word> <Word>FMV.D</Word>
+            <Word>fabs.d</Word> <Word>FABS.D</Word>
+            <Word>fneg.d</Word> <Word>FNEG.D</Word>
+            <Word>beqz</Word> <Word>BEQZ</Word>
+            <Word>bnez</Word> <Word>BNEZ</Word>
+            <Word>blez</Word> <Word>BLEZ</Word>
+            <Word>bltz</Word> <Word>BLTZ</Word>
+            <Word>bgtz</Word> <Word>BGTZ</Word>
+            <Word>bgt</Word> <Word>BGT</Word>
+            <Word>ble</Word> <Word>BLE</Word>
+            <Word>bgtu</Word> <Word>BGTU</Word>
+            <Word>bleu</Word> <Word>BLEU</Word>
+            <Word>j</Word> <Word>J</Word>
+            <Word>jr</Word> <Word>JR</Word>
+            <Word>ret</Word> <Word>RET</Word>
+            <Word>call</Word> <Word>CALL</Word>
+            <Word>tail</Word> <Word>TAIL</Word>
         </Keywords>
 
         <Rule color="Label">
             ([_a-zA-z][_a-zA-Z0-9]+|[a-zA-z]):
+        </Rule>
+
+        <Rule color="Literal">
+            \b((0x[0-9a-fA-F]+)|(0o[0-7]+)|(0b[01]+))\b|\b(\d+(\.[0-9]+)?)([eE][+-][0-9]+)?\b
         </Rule>
     </RuleSet>
 </SyntaxDefinition>
