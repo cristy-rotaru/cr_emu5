@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
 
 namespace Emu5
 {
@@ -96,11 +97,15 @@ namespace Emu5
             }
         }
 
-        public void Save()
+        public bool Save()
         {
+            bool l_result = false;
+
             if (m_currentPerspective == Perspective.Editor)
             {
-                if (m_editor.Save())
+                l_result = m_editor.Save();
+
+                if (l_result)
                 {
                     m_tabHeader?.ChangeHeaderText(m_editor.GetFileName(), false);
                 }
@@ -109,6 +114,8 @@ namespace Emu5
             {
                 // save log
             }
+
+            return l_result;
         }
 
         public void SaveAs()
@@ -124,6 +131,23 @@ namespace Emu5
             {
                 // save log
             }
+        }
+
+        public bool Open()
+        {
+            bool l_result = m_editor.Open();
+
+            if (l_result == true)
+            {
+                m_tabHeader?.ChangeHeaderText(m_editor.GetFileName(), false);
+            }
+
+            return l_result;
+        }
+
+        public String GetFileName()
+        {
+            return m_editor.GetFileName();
         }
     }
 }

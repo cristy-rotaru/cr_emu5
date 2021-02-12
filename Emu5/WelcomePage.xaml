@@ -23,7 +23,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Column="0" Grid.Row="0" Text="Ctrl+N: Create a new file" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                <TextBlock Grid.Column="0" Grid.Row="1" Text="Ctrl+N: Open a file" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="Ctrl+O: Open a file" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 <CheckBox Name="checkBoxCloseOnNewTab" Grid.Column="0" Grid.Row="2" Content="Close this page automatically" IsChecked="True" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
         </Border>

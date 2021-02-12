@@ -29,7 +29,36 @@ namespace Emu5
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
-            
+            foreach (TabItem i_tab in tabControlMain.Items)
+            {
+                if (i_tab.Content.GetType() == typeof(PerspectivePage))
+                {
+                    if (((TabHeader)i_tab.Header).IsUnsaved())
+                    {
+                        String l_fileName = ((PerspectivePage)i_tab.Content).GetFileName();
+                        String l_message = l_fileName == null ? "File was not saved." : "Latest changes to " + l_fileName + " were not saved";
+                        l_message += "\nDo you want to save before closing?";
+
+                        tabControlMain.SelectedItem = i_tab;
+                        tabControlMain.UpdateLayout();
+
+                        MessageBoxResult l_result =  MessageBox.Show(l_message, "File not saved", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                        if (l_result == MessageBoxResult.Yes)
+                        {
+                            if (((PerspectivePage)i_tab.Content).Save() == false)
+                            {
+                                e.Cancel = true;
+                                return;
+                            }
+                        }
+                        else if (l_result == MessageBoxResult.Cancel)
+                        {
+                            e.Cancel = true;
+                            return;
+                        }
+                    }
+                }
+            }
         }
         #endregion
 
@@ -37,18 +66,16 @@ namespace Emu5
         #region r_applicationCommands
         void commandNew_Executed(object target, ExecutedRoutedEventArgs e)
         {
-            if (tabControlMain.Items.Count > 0)
+
+            TabItem l_firstTab = (TabItem)tabControlMain.Items[0];
+
+            if (l_firstTab.Content.GetType() == typeof(WelcomePage))
             {
-                TabItem l_firstTab = (TabItem)tabControlMain.Items[0];
-                
-                if (l_firstTab.Content.GetType() == typeof(WelcomePage))
+                WelcomePage l_welcomePage = (WelcomePage)l_firstTab.Content;
+
+                if (l_welcomePage.CloseOnNewTab())
                 {
-                    WelcomePage l_welcomePage = (WelcomePage)l_firstTab.Content;
-                    
-                    if (l_welcomePage.CloseOnNewTab())
-                    {
-                        tabControlMain.Items.Remove(l_firstTab);
-                    }
+                    tabControlMain.Items.Remove(l_firstTab);
                 }
             }
 
@@ -62,7 +89,28 @@ namespace Emu5
 
         void commandOpen_Executed(object target, ExecutedRoutedEventArgs e)
         {
+            TabItem l_newTab = new TabItem();
+            l_newTab.Header = new TabHeader("", false, () => RemoveTab(l_newTab));
+            l_newTab.Content = new PerspectivePage((TabHeader)l_newTab.Header);
 
+            if (((PerspectivePage)l_newTab.Content).Open() == true)
+            {
+                TabItem l_firstTab = (TabItem)tabControlMain.Items[0];
+
+                if (l_firstTab.Content.GetType() == typeof(WelcomePage))
+                {
+                    WelcomePage l_welcomePage = (WelcomePage)l_firstTab.Content;
+
+                    if (l_welcomePage.CloseOnNewTab())
+                    {
+                        tabControlMain.Items.Remove(l_firstTab);
+                    }
+                }
+
+                tabControlMain.Items.Add(l_newTab);
+
+                tabControlMain.SelectedItem = l_newTab;
+            }
         }
 
         void commandSave_Executed(object target, ExecutedRoutedEventArgs e)
@@ -347,7 +395,7 @@ namespace Emu5
 
         void commandStop_Executed(object target, ExecutedRoutedEventArgs e)
         {
-            
+
         }
 
         void commandStop_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -394,7 +442,7 @@ namespace Emu5
             else if (tab.Content.GetType() == typeof(PerspectivePage))
             {
                 TabHeader l_header = (TabHeader)tab.Header;
-                
+
                 if (l_header.IsUnsaved() == false)
                 {
                     tabControlMain.Items.Remove(tab);

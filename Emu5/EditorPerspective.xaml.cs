@@ -140,6 +140,36 @@ namespace Emu5
             return true;
         }
 
+        public bool Open()
+        {
+            OpenFileDialog l_ofd = new OpenFileDialog();
+            l_ofd.Filter = "Assembly file(*.asm, *.s) | *.asm; *.s | All files | *";
+
+            if (l_ofd.ShowDialog() == true)
+            {
+                m_fileName = l_ofd.FileName;
+            }
+            else
+            {
+                return false;
+            }
+
+            try
+            {
+                StreamReader l_fileReader = new StreamReader(m_fileName);
+
+                textEditorMain.Text = l_fileReader.ReadToEnd();
+            }
+            catch (Exception e_fileOpenException)
+            {
+                MessageBox.Show(e_fileOpenException.Message, "Could not open the file", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return false;
+            }
+
+            m_unsaved = false;
+            return true;
+        }
+
         public bool IsUnsaved()
         {
             return m_unsaved;
