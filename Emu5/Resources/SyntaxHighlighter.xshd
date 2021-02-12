@@ -1,0 +1,121 @@
+<SyntaxDefinition name="Risc_V_asm" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+    <Color name="Comment" foreground="#FF19AB20" />
+    <Color name="String" foreground="#FFDA0808" />
+    <Color name="Label" foreground="#FFB0B0B0" />
+    <Color name="Instruction" foreground="#FF000ADA" />
+    <Color name="PseudoInstruction" foreground="#FF00C0B7" />
+    <Color name="Literal" foreground="#FFFFAC05" />
+
+    <RuleSet>
+        <Span color="Comment" begin="#" />
+
+        <Span color="String">
+        <Begin>"</Begin>
+        <End>"</End>
+        <RuleSet>
+            <Span begin="\\" end="." />
+        </RuleSet>
+        </Span>
+
+        <Keywords color="Instruction">
+            <Word>lui</Word>
+            <Word>auipc</Word>
+            <Word>jal</Word>
+            <Word>jalr</Word>
+            <Word>beq</Word>
+            <Word>bne</Word>
+            <Word>blt</Word>
+            <Word>bge</Word>
+            <Word>bltu</Word>
+            <Word>bgeu</Word>
+            <Word>lb</Word>
+            <Word>lh</Word>
+            <Word>lw</Word>
+            <Word>lbu</Word>
+            <Word>lhu</Word>
+            <Word>sb</Word>
+            <Word>sh</Word>
+            <Word>sw</Word>
+            <Word>addi</Word>
+            <Word>slti</Word>
+            <Word>sltiu</Word>
+            <Word>xori</Word>
+            <Word>ori</Word>
+            <Word>andi</Word>
+            <Word>slli</Word>
+            <Word>srli</Word>
+            <Word>srai</Word>
+            <Word>add</Word>
+            <Word>sub</Word>
+            <Word>sll</Word>
+            <Word>slt</Word>
+            <Word>sltu</Word>
+            <Word>xor</Word>
+            <Word>srl</Word>
+            <Word>sra</Word>
+            <Word>or</Word>
+            <Word>and</Word>
+            <Word>fence</Word>
+            <Word>ecall</Word>
+            <Word>ebreak</Word>
+            <Word>lwu</Word>
+            <Word>ld</Word>
+            <Word>sd</Word>
+            <Word>addiw</Word>
+            <Word>slliw</Word>
+            <Word>srliw</Word>
+            <Word>sraiw</Word>
+            <Word>addw</Word>
+            <Word>subw</Word>
+            <Word>sllw</Word>
+            <Word>srlw</Word>
+            <Word>sraw</Word>
+            <Word>fence.i</Word>
+            <Word>csrrw</Word>
+            <Word>csrrs</Word>
+            <Word>csrrc</Word>
+            <Word>csrrwi</Word>
+            <Word>csrrsi</Word>
+            <Word>csrrci</Word>
+            <Word>mul</Word>
+            <Word>mulh</Word>
+            <Word>mulhsu</Word>
+            <Word>mulhu</Word>
+            <Word>div</Word>
+            <Word>divu</Word>
+            <Word>rem</Word>
+            <Word>remu</Word>
+            <Word>mulw</Word>
+            <Word>divw</Word>
+            <Word>divuw</Word>
+            <Word>remw</Word>
+            <Word>remuw</Word>
+            <Word>lr.w</Word>
+            <Word>sc.w</Word>
+            <Word>amoswap.w</Word>
+            <Word>amoadd.w</Word>
+            <Word>amoxor.w</Word>
+            <Word>amoand.w</Word>
+            <Word>amoor.w</Word>
+            <Word>amomin.w</Word>
+            <Word>amomax.w</Word>
+            <Word>amominu.w</Word>
+            <Word>amomaxu.w</Word>
+            <Word>lr.d</Word>
+            <Word>sc.d</Word>
+            <Word>amoswap.d</Word>
+            <Word>amoadd.d</Word>
+            <Word>amoxor.d</Word>
+            <Word>amoand.d</Word>
+            <Word>amoor.d</Word>
+            <Word>amomin.d</Word>
+            <Word>amomax.d</Word>
+            <Word>amominu.d</Word>
+            <Word>amomaxu.d</Word>
+        </Keywords>
+
+        <Rule color="Label">
+            ([_a-zA-z][_a-zA-Z0-9]+|[a-zA-z]):
+        </Rule>
+    </RuleSet>
+</SyntaxDefinition>

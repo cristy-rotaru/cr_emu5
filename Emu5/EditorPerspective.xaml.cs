@@ -1,9 +1,12 @@
-﻿using Microsoft.Win32;
+﻿using ICSharpCode.AvalonEdit.Highlighting;
+using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using Microsoft.Win32;
 using System;
 using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Xml;
 
 namespace Emu5
 {
@@ -16,12 +19,29 @@ namespace Emu5
 
         FileModifiedDelegate m_textChangedHandler = null;
 
+        IHighlightingDefinition m_syntaxHighlightingDefinition = null;
+
         bool m_unsaved = true;
         String m_fileName = null;
 
         public EditorPerspective()
         {
             InitializeComponent();
+
+            ActivateSyntaxHighighting();
+        }
+
+        private void ActivateSyntaxHighighting()
+        {
+            if (m_syntaxHighlightingDefinition == null)
+            {
+                Stream l_resourceStream = new MemoryStream(Properties.Resources.SyntaxHighlighter);
+                XmlTextReader l_streamReder = new XmlTextReader(l_resourceStream);
+
+                m_syntaxHighlightingDefinition = HighlightingLoader.Load(l_streamReder, HighlightingManager.Instance);
+            }
+
+            textEditorMain.SyntaxHighlighting = m_syntaxHighlightingDefinition;
         }
 
         public void RegisterFileModifiedCallback(FileModifiedDelegate handler)
