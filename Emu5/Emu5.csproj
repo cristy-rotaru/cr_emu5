@@ -65,6 +65,9 @@
     <Compile Include="PerspectivePage.xaml.cs">
       <DependentUpon>PerspectivePage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RVAssembler.cs" />
+    <Compile Include="RVEmulator.cs" />
+    <Compile Include="RVParser.cs" />
     <Compile Include="TabHeader.xaml.cs">
       <DependentUpon>TabHeader.xaml</DependentUpon>
     </Compile>

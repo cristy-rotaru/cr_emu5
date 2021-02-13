@@ -21,6 +21,8 @@ namespace Emu5
 
         EditorPerspective m_editor = new EditorPerspective();
 
+        RVEmulator m_rvEmulator = null;
+
         public PerspectivePage()
         {
             InitializeComponent();
@@ -148,6 +150,16 @@ namespace Emu5
         public String GetFileName()
         {
             return m_editor.GetFileName();
+        }
+
+        public void StartEmulator()
+        {
+            if (m_rvEmulator == null)
+            {
+                m_rvEmulator = new RVEmulator();
+            }
+
+            m_rvEmulator.Assemble(m_editor.GetText());
         }
     }
 }

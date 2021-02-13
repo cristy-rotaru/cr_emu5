@@ -205,6 +205,12 @@ namespace Emu5
             return Path.GetFileName(m_fileName);
         }
 
+        public String GetText()
+        {
+            String l_text = textEditorMain.Text;
+            return l_text;
+        }
+
         private void textEditorMain_TextChanged(object sender, EventArgs e)
         {
             m_unsaved = true;

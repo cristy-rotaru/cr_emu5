@@ -335,12 +335,29 @@ namespace Emu5
         #region r_emulatorCommands
         void commandStartEmulator_Executed(object target, ExecutedRoutedEventArgs e)
         {
-
+            TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+            PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+            l_page.StartEmulator();
         }
 
         void commandStartEmulator_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = false;
+            bool l_canExecute = false;
+
+            if (tabControlMain != null)
+            {
+                if (tabControlMain.SelectedIndex >= 0)
+                {
+                    TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+
+                    if (l_tab.Content.GetType() == typeof(PerspectivePage))
+                    {
+                        l_canExecute = true;
+                    }
+                }
+            }
+
+            e.CanExecute = l_canExecute;
         }
 
         void commandStep_Executed(object target, ExecutedRoutedEventArgs e)
