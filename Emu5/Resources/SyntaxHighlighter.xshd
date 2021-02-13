@@ -2,19 +2,19 @@
     <Color name="Comment" foreground="#FF19AB20" />
     <Color name="String" foreground="#FFDA0808" />
     <Color name="Label" foreground="#FFB0B0B0" />
+    <Color name="Adnotation" foreground="#FFB0B0B0" fontStyle="italic" />
     <Color name="Instruction" foreground="#FF000ADA" />
     <Color name="PseudoInstruction" foreground="#FF00C0B7" />
-    <Color name="Literal" foreground="#FFFFAC05" />
 
     <RuleSet>
         <Span color="Comment" begin="#" />
 
         <Span color="String">
-        <Begin>"</Begin>
-        <End>"</End>
-        <RuleSet>
-            <Span begin="\\" end="." />
-        </RuleSet>
+            <Begin>"</Begin>
+            <End>"</End>
+            <RuleSet>
+                <Span begin="\\" end="." />
+            </RuleSet>
         </Span>
 
         <Keywords color="Instruction">
@@ -206,6 +206,8 @@
             <Word>fcvt.q.lu</Word> <Word>FCVT.Q.LU</Word>
             <Word>hlt</Word> <Word>HLT</Word>
             <Word>rst</Word> <Word>RST</Word>
+            <Word>ien</Word> <Word>IEN</Word>
+            <Word>idis</Word> <Word>IDIS</Word>
             <Word>wfi</Word> <Word>WFI</Word>
         </Keywords>
 
@@ -248,8 +250,8 @@
             ([_a-zA-z][_a-zA-Z0-9]+|[a-zA-z]):
         </Rule>
 
-        <Rule color="Literal">
-            \b((0x[0-9a-fA-F]+)|(0o[0-7]+)|(0b[01]+))\b|\b(\d+(\.[0-9]+)?)([eE][+-][0-9]+)?\b
+        <Rule color="Adnotation">
+            @[0-9a-fA-F]+
         </Rule>
     </RuleSet>
 </SyntaxDefinition>

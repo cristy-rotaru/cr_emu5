@@ -19,7 +19,7 @@ namespace Emu5
 
         FileModifiedDelegate m_textChangedHandler = null;
 
-        IHighlightingDefinition m_syntaxHighlightingDefinition = null;
+        static IHighlightingDefinition s_syntaxHighlightingDefinition = null;
 
         bool m_unsaved = true;
         String m_fileName = null;
@@ -33,15 +33,15 @@ namespace Emu5
 
         private void ActivateSyntaxHighighting()
         {
-            if (m_syntaxHighlightingDefinition == null)
+            if (s_syntaxHighlightingDefinition == null)
             {
                 Stream l_resourceStream = new MemoryStream(Properties.Resources.SyntaxHighlighter);
                 XmlTextReader l_streamReder = new XmlTextReader(l_resourceStream);
 
-                m_syntaxHighlightingDefinition = HighlightingLoader.Load(l_streamReder, HighlightingManager.Instance);
+                s_syntaxHighlightingDefinition = HighlightingLoader.Load(l_streamReder, HighlightingManager.Instance);
             }
 
-            textEditorMain.SyntaxHighlighting = m_syntaxHighlightingDefinition;
+            textEditorMain.SyntaxHighlighting = s_syntaxHighlightingDefinition;
         }
 
         public void RegisterFileModifiedCallback(FileModifiedDelegate handler)
