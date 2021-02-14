@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Emu5
 {
@@ -10,6 +7,7 @@ namespace Emu5
     {
         Invalid = 0,
         Label,
+        Address,
         Integer,
         Decimal,
         String,
@@ -107,6 +105,13 @@ namespace Emu5
 
                                 l_tokenList.Add(l_separatorToken);
                             }
+                            else if (l_character == '@')
+                            {
+                                l_startIndex = (uint)i_characterIndex;
+                                l_data = null;
+
+                                l_state = ParserState.DetectingAddr;
+                            }
                             else if (l_character == '0')
                             {
                                 l_startIndex = (uint)i_characterIndex;
@@ -199,35 +204,665 @@ namespace Emu5
 
                                 l_state = ParserState.Idle;
                             }
-                            else if (l_character == '\"')
+                            else if (l_character == '\"' || l_character == '\'' || l_character == '@')
                             {
-                                RVToken l_identifierToken;
-                                l_identifierToken.type = RVTokenType.Label;
-                                l_identifierToken.line = (uint)i_lineIndex + 1;
-                                l_identifierToken.column = l_startIndex;
-                                l_identifierToken.value = l_data;
-
-                                l_tokenList.Add(l_identifierToken);
-
-                                l_startIndex = (uint)i_characterIndex;
-                                l_data = "";
-
-                                l_state = ParserState.DetectingString;
+                                throw new RVAssemblyException("Illegal character in identifier name.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
                             }
-                            else if (l_character == '\'')
+                            else
                             {
-                                RVToken l_identifierToken;
-                                l_identifierToken.type = RVTokenType.Label;
-                                l_identifierToken.line = (uint)i_lineIndex + 1;
-                                l_identifierToken.column = l_startIndex;
-                                l_identifierToken.value = l_data;
+                                throw new RVAssemblyException("Illegal character.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                            }
+                        }
+                        break;
 
-                                l_tokenList.Add(l_identifierToken);
+                        case ParserState.DetectingHex:
+                        {
+                            if (Char.IsWhiteSpace(l_character))
+                            {
+                                if (l_data == null)
+                                {
+                                    throw new RVAssemblyException("Incomplete numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+                                else
+                                {
+                                    RVToken l_integerToken;
+                                    l_integerToken.type = RVTokenType.Integer;
+                                    l_integerToken.line = (uint)i_lineIndex + 1;
+                                    l_integerToken.column = l_startIndex;
+                                    l_integerToken.value = l_data;
 
-                                l_startIndex = (uint)i_characterIndex;
+                                    l_tokenList.Add(l_integerToken);
+
+                                    l_state = ParserState.Idle;
+                                }
+                            }
+                            else if (l_character == '#')
+                            {
+                                if (l_data == null)
+                                {
+                                    throw new RVAssemblyException("Incomplete numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+                                else
+                                {
+                                    RVToken l_integerToken;
+                                    l_integerToken.type = RVTokenType.Integer;
+                                    l_integerToken.line = (uint)i_lineIndex + 1;
+                                    l_integerToken.column = l_startIndex;
+                                    l_integerToken.value = l_data;
+
+                                    l_tokenList.Add(l_integerToken);
+
+                                    l_breakFor = true; // ignore rest of the line
+                                    break;
+                                }
+                            }
+                            else if (l_character >= '0' && l_character <= '9')
+                            {
+                                UInt64 l_number = l_data == null ? 0 : (UInt64)l_data;
+
+                                if ((l_number & 0xF000000000000000) != 0)
+                                {
+                                    throw new RVAssemblyException("Number exceeds encodable range.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+
+                                l_number <<= 4;
+                                l_number |= (UInt16)(l_character - '0');
+
+                                l_data = l_number;
+                            }
+                            else if ((l_character >= 'a' && l_character <= 'f') || (l_character >= 'A' && l_character <= 'F'))
+                            {
+                                l_character = Char.ToLower(l_character);
+
+                                UInt64 l_number = l_data == null ? 0 : (UInt64)l_data;
+
+                                if ((l_number & 0xF000000000000000) != 0)
+                                {
+                                    throw new RVAssemblyException("Number exceeds encodable range.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+
+                                l_number <<= 4;
+                                l_number |= (UInt16)(l_character - 'a' + 10);
+
+                                l_data = l_number;
+                            }
+                            else if (l_character == '_' || l_character == '\"' || l_character == '\'' || l_character == '.' || l_character == '@' || (l_character >= 'G' && l_character <= 'Z') || (l_character >= 'g' && l_character <= 'z'))
+                            {
+                                throw new RVAssemblyException("Illegal character in numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                            }
+                            else if (l_character == ',' || l_character == ':' || l_character == '-')
+                            {
+                                if (l_data == null)
+                                {
+                                    throw new RVAssemblyException("Incomplete numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+                                else
+                                {
+                                    RVToken l_integerToken;
+                                    l_integerToken.type = RVTokenType.Integer;
+                                    l_integerToken.line = (uint)i_lineIndex + 1;
+                                    l_integerToken.column = l_startIndex;
+                                    l_integerToken.value = l_data;
+
+                                    l_tokenList.Add(l_integerToken);
+
+                                    RVToken l_separatorToken;
+                                    l_separatorToken.type = RVTokenType.Separator;
+                                    l_separatorToken.line = (uint)i_lineIndex + 1;
+                                    l_separatorToken.column = (uint)i_characterIndex;
+                                    l_separatorToken.value = l_character;
+
+                                    l_tokenList.Add(l_separatorToken);
+
+                                    l_state = ParserState.Idle;
+                                }
+                            }
+                            else
+                            {
+                                throw new RVAssemblyException("Illegal character.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                            }
+                        }
+                        break;
+
+                        case ParserState.DetectingOct:
+                        {
+                            if (Char.IsWhiteSpace(l_character))
+                            {
+                                if (l_data == null)
+                                {
+                                    throw new RVAssemblyException("Incomplete numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+                                else
+                                {
+                                    RVToken l_integerToken;
+                                    l_integerToken.type = RVTokenType.Integer;
+                                    l_integerToken.line = (uint)i_lineIndex + 1;
+                                    l_integerToken.column = l_startIndex;
+                                    l_integerToken.value = l_data;
+
+                                    l_tokenList.Add(l_integerToken);
+
+                                    l_state = ParserState.Idle;
+                                }
+                            }
+                            else if (l_character == '#')
+                            {
+                                if (l_data == null)
+                                {
+                                    throw new RVAssemblyException("Incomplete numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+                                else
+                                {
+                                    RVToken l_integerToken;
+                                    l_integerToken.type = RVTokenType.Integer;
+                                    l_integerToken.line = (uint)i_lineIndex + 1;
+                                    l_integerToken.column = l_startIndex;
+                                    l_integerToken.value = l_data;
+
+                                    l_tokenList.Add(l_integerToken);
+
+                                    l_breakFor = true; // ignore rest of the line
+                                    break;
+                                }
+                            }
+                            else if (l_character >= '0' && l_character <= '7')
+                            {
+                                UInt64 l_number = l_data == null ? 0 : (UInt64)l_data;
+
+                                if ((l_number & 0xE000000000000000) != 0)
+                                {
+                                    throw new RVAssemblyException("Number exceeds encodable range.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+
+                                l_number <<= 3;
+                                l_number |= (UInt16)(l_character - '0');
+
+                                l_data = l_number;
+                            }
+                            else if (l_character == '_' || l_character == '\"' || l_character == '\'' || l_character == '.' || l_character == '@' || l_character == '8' || l_character == '9' || (l_character >= 'A' && l_character <= 'Z') || (l_character >= 'a' && l_character <= 'z'))
+                            {
+                                throw new RVAssemblyException("Illegal character in numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                            }
+                            else if (l_character == ',' || l_character == ':' || l_character == '-')
+                            {
+                                if (l_data == null)
+                                {
+                                    throw new RVAssemblyException("Incomplete numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+                                else
+                                {
+                                    RVToken l_integerToken;
+                                    l_integerToken.type = RVTokenType.Integer;
+                                    l_integerToken.line = (uint)i_lineIndex + 1;
+                                    l_integerToken.column = l_startIndex;
+                                    l_integerToken.value = l_data;
+
+                                    l_tokenList.Add(l_integerToken);
+
+                                    RVToken l_separatorToken;
+                                    l_separatorToken.type = RVTokenType.Separator;
+                                    l_separatorToken.line = (uint)i_lineIndex + 1;
+                                    l_separatorToken.column = (uint)i_characterIndex;
+                                    l_separatorToken.value = l_character;
+
+                                    l_tokenList.Add(l_separatorToken);
+
+                                    l_state = ParserState.Idle;
+                                }
+                            }
+                            else
+                            {
+                                throw new RVAssemblyException("Illegal character.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                            }
+                        }
+                        break;
+
+                        case ParserState.DetectingBin:
+                        {
+                            if (Char.IsWhiteSpace(l_character))
+                            {
+                                if (l_data == null)
+                                {
+                                    throw new RVAssemblyException("Incomplete numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+                                else
+                                {
+                                    RVToken l_integerToken;
+                                    l_integerToken.type = RVTokenType.Integer;
+                                    l_integerToken.line = (uint)i_lineIndex + 1;
+                                    l_integerToken.column = l_startIndex;
+                                    l_integerToken.value = l_data;
+
+                                    l_tokenList.Add(l_integerToken);
+
+                                    l_state = ParserState.Idle;
+                                }
+                            }
+                            else if (l_character == '#')
+                            {
+                                if (l_data == null)
+                                {
+                                    throw new RVAssemblyException("Incomplete numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+                                else
+                                {
+                                    RVToken l_integerToken;
+                                    l_integerToken.type = RVTokenType.Integer;
+                                    l_integerToken.line = (uint)i_lineIndex + 1;
+                                    l_integerToken.column = l_startIndex;
+                                    l_integerToken.value = l_data;
+
+                                    l_tokenList.Add(l_integerToken);
+
+                                    l_breakFor = true; // ignore rest of the line
+                                    break;
+                                }
+                            }
+                            else if (l_character == '0' || l_character == '1')
+                            {
+                                UInt64 l_number = l_data == null ? 0 : (UInt64)l_data;
+
+                                if ((l_number & 0x8000000000000000) != 0)
+                                {
+                                    throw new RVAssemblyException("Number exceeds encodable range.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+
+                                l_number <<= 1;
+                                l_number |= (UInt16)(l_character - '0');
+
+                                l_data = l_number;
+                            }
+                            else if (l_character == '_' || l_character == '\"' || l_character == '\'' || l_character == '.' || l_character == '@' || (l_character >= '2' && l_character <= '9') || (l_character >= 'A' && l_character <= 'Z') || (l_character >= 'a' && l_character <= 'z'))
+                            {
+                                throw new RVAssemblyException("Illegal character in numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                            }
+                            else if (l_character == ',' || l_character == ':' || l_character == '-')
+                            {
+                                if (l_data == null)
+                                {
+                                    throw new RVAssemblyException("Incomplete numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+                                else
+                                {
+                                    RVToken l_integerToken;
+                                    l_integerToken.type = RVTokenType.Integer;
+                                    l_integerToken.line = (uint)i_lineIndex + 1;
+                                    l_integerToken.column = l_startIndex;
+                                    l_integerToken.value = l_data;
+
+                                    l_tokenList.Add(l_integerToken);
+
+                                    RVToken l_separatorToken;
+                                    l_separatorToken.type = RVTokenType.Separator;
+                                    l_separatorToken.line = (uint)i_lineIndex + 1;
+                                    l_separatorToken.column = (uint)i_characterIndex;
+                                    l_separatorToken.value = l_character;
+
+                                    l_tokenList.Add(l_separatorToken);
+
+                                    l_state = ParserState.Idle;
+                                }
+                            }
+                            else
+                            {
+                                throw new RVAssemblyException("Illegal character.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                            }
+                        }
+                        break;
+
+                        case ParserState.DetectingDec:
+                        {
+                            if (Char.IsWhiteSpace(l_character))
+                            {
+                                RVToken l_integerToken;
+                                l_integerToken.type = RVTokenType.Integer;
+                                l_integerToken.line = (uint)i_lineIndex + 1;
+                                l_integerToken.column = l_startIndex;
+                                l_integerToken.value = l_data;
+
+                                l_tokenList.Add(l_integerToken);
+
+                                l_state = ParserState.Idle;
+                            }
+                            else if (l_character == '#')
+                            {
+                                RVToken l_integerToken;
+                                l_integerToken.type = RVTokenType.Integer;
+                                l_integerToken.line = (uint)i_lineIndex + 1;
+                                l_integerToken.column = l_startIndex;
+                                l_integerToken.value = l_data;
+
+                                l_tokenList.Add(l_integerToken);
+
+                                l_breakFor = true; // ignore rest of the line
+                                break;
+                            }
+                            else if (l_character >= '0' && l_character <= '9')
+                            {
+                                UInt64 l_number = (UInt64)l_data;
+
+                                if (l_number > 1844674407370955161) // any number larger than that will overflow when multiplying by 10
+                                {
+                                    throw new RVAssemblyException("Number exceeds encodable range.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+
+                                l_number *= 10;
+
+                                if (l_number == 18446744073709551610 && l_character > '5')
+                                {
+                                    throw new RVAssemblyException("Number exceeds encodable range.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+
+                                l_number += (UInt16)(l_character - '0');
+
+                                l_data = l_number;
+                            }
+                            else if (l_character == '_' || l_character == '\"' || l_character == '\'' || l_character == '@' || (l_character >= 'A' && l_character <= 'Z') || (l_character >= 'a' && l_character <= 'z'))
+                            {
+                                throw new RVAssemblyException("Illegal character in numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                            }
+                            else if (l_character == '.')
+                            {
+                                l_data = ((UInt64)l_data).ToString() + ".";
+
+                                l_state = ParserState.DetectingFloat;
+                            }
+                            else if (l_character == ',' || l_character == ':' || l_character == '-')
+                            {
+                                RVToken l_integerToken;
+                                l_integerToken.type = RVTokenType.Integer;
+                                l_integerToken.line = (uint)i_lineIndex + 1;
+                                l_integerToken.column = l_startIndex;
+                                l_integerToken.value = l_data;
+
+                                l_tokenList.Add(l_integerToken);
+
+                                RVToken l_separatorToken;
+                                l_separatorToken.type = RVTokenType.Separator;
+                                l_separatorToken.line = (uint)i_lineIndex + 1;
+                                l_separatorToken.column = (uint)i_characterIndex;
+                                l_separatorToken.value = l_character;
+
+                                l_tokenList.Add(l_separatorToken);
+
+                                l_state = ParserState.Idle;
+                            }
+                            else
+                            {
+                                throw new RVAssemblyException("Illegal character.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                            }
+                        }
+                        break;
+
+                        case ParserState.DetectingFloat:
+                        {
+                            if (Char.IsWhiteSpace(l_character))
+                            {
+                                Decimal l_number;
+                                if (Decimal.TryParse((String)l_data, out l_number) == false)
+                                {
+                                    throw new RVAssemblyException("Invalid number.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+
+                                RVToken l_decimalToken;
+                                l_decimalToken.type = RVTokenType.Decimal;
+                                l_decimalToken.line = (uint)i_lineIndex + 1;
+                                l_decimalToken.column = l_startIndex;
+                                l_decimalToken.value = l_number;
+
+                                l_tokenList.Add(l_decimalToken);
+
+                                l_state = ParserState.Idle;
+                            }
+                            else if (l_character == '#')
+                            {
+                                Decimal l_number;
+                                if (Decimal.TryParse((String)l_data, out l_number) == false)
+                                {
+                                    throw new RVAssemblyException("Invalid number.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+
+                                RVToken l_decimalToken;
+                                l_decimalToken.type = RVTokenType.Decimal;
+                                l_decimalToken.line = (uint)i_lineIndex + 1;
+                                l_decimalToken.column = l_startIndex;
+                                l_decimalToken.value = l_number;
+
+                                l_tokenList.Add(l_decimalToken);
+
+                                l_breakFor = true; // ignore rest of the line
+                                break;
+                            }
+                            else if ((l_character >= '0' && l_character <= '9') || l_character == 'e' || l_character == 'E' || l_character == '+' || l_character == '-' || l_character == '.')
+                            {
+                                l_data = (String)l_data + l_character;
+                            }
+                            else if (l_character == '_' || l_character == '\"' || l_character == '\'' || l_character == '@' || (l_character >= 'A' && l_character <= 'Z') || (l_character >= 'a' && l_character <= 'z'))
+                            {
+                                throw new RVAssemblyException("Illegal character in numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                            }
+                            else if (l_character == ',' || l_character == ':' || l_character == '-')
+                            {
+                                Decimal l_number;
+                                if (Decimal.TryParse((String)l_data, out l_number) == false)
+                                {
+                                    throw new RVAssemblyException("Invalid number.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+
+                                RVToken l_decimalToken;
+                                l_decimalToken.type = RVTokenType.Decimal;
+                                l_decimalToken.line = (uint)i_lineIndex + 1;
+                                l_decimalToken.column = l_startIndex;
+                                l_decimalToken.value = l_number;
+
+                                l_tokenList.Add(l_decimalToken);
+
+                                RVToken l_separatorToken;
+                                l_separatorToken.type = RVTokenType.Separator;
+                                l_separatorToken.line = (uint)i_lineIndex + 1;
+                                l_separatorToken.column = (uint)i_characterIndex;
+                                l_separatorToken.value = l_character;
+
+                                l_tokenList.Add(l_separatorToken);
+
+                                l_state = ParserState.Idle;
+                            }
+                            else
+                            {
+                                throw new RVAssemblyException("Illegal character.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                            }
+                        }
+                        break;
+
+                        case ParserState.DetectingAddr:
+                        {
+                            if (Char.IsWhiteSpace(l_character))
+                            {
+                                if (l_data == null)
+                                {
+                                    throw new RVAssemblyException("Incomplete numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+                                else
+                                {
+                                    RVToken l_addressToken;
+                                    l_addressToken.type = RVTokenType.Address;
+                                    l_addressToken.line = (uint)i_lineIndex + 1;
+                                    l_addressToken.column = l_startIndex;
+                                    l_addressToken.value = l_data;
+
+                                    l_tokenList.Add(l_addressToken);
+
+                                    l_state = ParserState.Idle;
+                                }
+                            }
+                            else if (l_character == '#')
+                            {
+                                if (l_data == null)
+                                {
+                                    throw new RVAssemblyException("Incomplete numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+                                else
+                                {
+                                    RVToken l_addressToken;
+                                    l_addressToken.type = RVTokenType.Address;
+                                    l_addressToken.line = (uint)i_lineIndex + 1;
+                                    l_addressToken.column = l_startIndex;
+                                    l_addressToken.value = l_data;
+
+                                    l_tokenList.Add(l_addressToken);
+
+                                    l_breakFor = true; // ignore rest of the line
+                                    break;
+                                }
+                            }
+                            else if (l_character >= '0' && l_character <= '9')
+                            {
+                                UInt64 l_number = l_data == null ? 0 : (UInt64)l_data;
+
+                                if ((l_number & 0xF000000000000000) != 0)
+                                {
+                                    throw new RVAssemblyException("Number exceeds encodable range.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+
+                                l_number <<= 4;
+                                l_number |= (UInt16)(l_character - '0');
+
+                                l_data = l_number;
+                            }
+                            else if ((l_character >= 'a' && l_character <= 'f') || (l_character >= 'A' && l_character <= 'F'))
+                            {
+                                l_character = Char.ToLower(l_character);
+
+                                UInt64 l_number = l_data == null ? 0 : (UInt64)l_data;
+
+                                if ((l_number & 0xF000000000000000) != 0)
+                                {
+                                    throw new RVAssemblyException("Number exceeds encodable range.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+
+                                l_number <<= 4;
+                                l_number |= (UInt16)(l_character - 'a' + 10);
+
+                                l_data = l_number;
+                            }
+                            else if (l_character == '_' || l_character == '\"' || l_character == '\'' || l_character == '.' || l_character == '@' || (l_character >= 'G' && l_character <= 'Z') || (l_character >= 'g' && l_character <= 'z'))
+                            {
+                                throw new RVAssemblyException("Illegal character in numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                            }
+                            else if (l_character == ',' || l_character == ':' || l_character == '-')
+                            {
+                                if (l_data == null)
+                                {
+                                    throw new RVAssemblyException("Incomplete numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+                                else
+                                {
+                                    RVToken l_addressToken;
+                                    l_addressToken.type = RVTokenType.Address;
+                                    l_addressToken.line = (uint)i_lineIndex + 1;
+                                    l_addressToken.column = l_startIndex;
+                                    l_addressToken.value = l_data;
+
+                                    l_tokenList.Add(l_addressToken);
+
+                                    RVToken l_separatorToken;
+                                    l_separatorToken.type = RVTokenType.Separator;
+                                    l_separatorToken.line = (uint)i_lineIndex + 1;
+                                    l_separatorToken.column = (uint)i_characterIndex;
+                                    l_separatorToken.value = l_character;
+
+                                    l_tokenList.Add(l_separatorToken);
+
+                                    l_state = ParserState.Idle;
+                                }
+                            }
+                            else
+                            {
+                                throw new RVAssemblyException("Illegal character.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                            }
+                        }
+                        break;
+
+                        case ParserState.Read0:
+                        {
+                            if (Char.IsWhiteSpace(l_character))
+                            {
+                                RVToken l_integerToken;
+                                l_integerToken.type = RVTokenType.Integer;
+                                l_integerToken.line = (uint)i_lineIndex + 1;
+                                l_integerToken.column = l_startIndex;
+                                l_integerToken.value = (UInt64)0;
+
+                                l_tokenList.Add(l_integerToken);
+
+                                l_state = ParserState.Idle;
+                            }
+                            else if (l_character == '#')
+                            {
+                                RVToken l_integerToken;
+                                l_integerToken.type = RVTokenType.Integer;
+                                l_integerToken.line = (uint)i_lineIndex + 1;
+                                l_integerToken.column = l_startIndex;
+                                l_integerToken.value = (UInt64)0;
+
+                                l_tokenList.Add(l_integerToken);
+
+                                l_breakFor = true; // ignore rest of the line
+                                break;
+                            }
+                            else if (l_character == 'b')
+                            {
                                 l_data = null;
 
-                                l_state = ParserState.DetectingChar;
+                                l_state = ParserState.DetectingBin;
+                            }
+                            else if (l_character == 'o')
+                            {
+                                l_data = null;
+
+                                l_state = ParserState.DetectingOct;
+                            }
+                            else if (l_character == 'x')
+                            {
+                                l_data = null;
+
+                                l_state = ParserState.DetectingHex;
+                            }
+                            else if (l_character == '_' || l_character == '\"' || l_character == '\'' || (l_character >= 'A' && l_character <= 'Z') || (l_character >= 'a' && l_character <= 'z'))
+                            {
+                                throw new RVAssemblyException("Illegal character in numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                            }
+                            else if (l_character == ',' || l_character == ':' || l_character == '-')
+                            {
+                                RVToken l_integerToken;
+                                l_integerToken.type = RVTokenType.Integer;
+                                l_integerToken.line = (uint)i_lineIndex + 1;
+                                l_integerToken.column = l_startIndex;
+                                l_integerToken.value = (UInt64)0;
+
+                                l_tokenList.Add(l_integerToken);
+
+                                RVToken l_separatorToken;
+                                l_separatorToken.type = RVTokenType.Separator;
+                                l_separatorToken.line = (uint)i_lineIndex + 1;
+                                l_separatorToken.column = (uint)i_characterIndex;
+                                l_separatorToken.value = l_character;
+
+                                l_tokenList.Add(l_separatorToken);
+
+                                l_state = ParserState.Idle;
+                            }
+                            else if (l_character >= '0' && l_character <= '9')
+                            {
+                                l_data = (UInt64)(l_character - '0');
+
+                                l_state = ParserState.DetectingDec;
+                            }
+                            else if (l_character == '.')
+                            {
+                                l_data = "0.";
+
+                                l_state = ParserState.DetectingFloat;
                             }
                             else
                             {
