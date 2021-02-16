@@ -69,9 +69,9 @@ namespace Emu5
                 uint l_startIndex = 0;
                 object l_data = null;
 
-                for (int i_characterIndex = 0; i_characterIndex < l_lines[i_lineIndex].Length; ++i_characterIndex)
+                for (int i_characterIndex = 0; i_characterIndex <= l_lines[i_lineIndex].Length; ++i_characterIndex)
                 {
-                    char l_character = l_lines[i_lineIndex][i_characterIndex];
+                    char l_character = i_characterIndex == l_lines[i_lineIndex].Length ? ' ' : l_lines[i_lineIndex][i_characterIndex];
 
                     bool l_breakFor = false;
 
@@ -783,6 +783,147 @@ namespace Emu5
                         }
                         break;
 
+                        case ParserState.DetectingString:
+                        {
+                            if (l_character == '\"')
+                            {
+                                RVToken l_stringToken;
+                                l_stringToken.type = RVTokenType.String;
+                                l_stringToken.line = (uint)i_lineIndex + 1;
+                                l_stringToken.column = l_startIndex;
+                                l_stringToken.value = l_data;
+
+                                l_tokenList.Add(l_stringToken);
+
+                                l_state = ParserState.Idle;
+                            }
+                            else if (l_character == '\\')
+                            {
+                                l_state = ParserState.DetectingEscapeS;
+                            }
+                            else
+                            {
+                                l_data = (String)l_data + l_character;
+                            }
+                        }
+                        break;
+
+                        case ParserState.DetectingChar:
+                        {
+                            if (l_character == '\'')
+                            {
+                                if (l_data == null)
+                                {
+                                    throw new RVAssemblyException("Empty character.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                }
+                                else
+                                {
+                                    RVToken l_charToken;
+                                    l_charToken.type = RVTokenType.Char;
+                                    l_charToken.line = (uint)i_lineIndex + 1;
+                                    l_charToken.column = l_startIndex;
+                                    l_charToken.value = l_data;
+
+                                    l_tokenList.Add(l_charToken);
+
+                                    l_state = ParserState.Idle;
+                                }
+                            }
+                            else if (l_character == '\\')
+                            {
+                                if (l_data != null)
+                                {
+                                    throw new RVAssemblyException("Character stream too long.", (uint)i_lineIndex + 1, l_startIndex);
+                                }
+                                else
+                                {
+                                    l_state = ParserState.DetectingEscapeC;
+                                }
+                            }
+                            else
+                            {
+                                if (l_data != null)
+                                {
+                                    throw new RVAssemblyException("Character stream too long.", (uint)i_lineIndex + 1, l_startIndex);
+                                }
+                                else
+                                {
+                                    l_data = l_character;
+                                }
+                            }
+                        }
+                        break;
+
+                        case ParserState.DetectingEscapeS:
+                        {
+                            if (l_character == '0')
+                            {
+                                l_data = (String)l_data + '\0';
+                            }
+                            else if (l_character == 'n')
+                            {
+                                l_data = (String)l_data + '\n';
+                            }
+                            else if (l_character == 'r')
+                            {
+                                l_data = (String)l_data + '\r';
+                            }
+                            else if (l_character == 't')
+                            {
+                                l_data = (String)l_data + '\t';
+                            }
+                            else if (l_character == 'b')
+                            {
+                                l_data = (String)l_data + '\b';
+                            }
+                            else if (l_character == 'f')
+                            {
+                                l_data = (String)l_data + '\f';
+                            }
+                            else
+                            {
+                                l_data = (String)l_data + l_character;
+                            }
+
+                            l_state = ParserState.DetectingString;
+                        }
+                        break;
+
+                        case ParserState.DetectingEscapeC:
+                        {
+                            if (l_character == '0')
+                            {
+                                l_data = '\0';
+                            }
+                            else if (l_character == 'n')
+                            {
+                                l_data = '\n';
+                            }
+                            else if (l_character == 'r')
+                            {
+                                l_data = '\r';
+                            }
+                            else if (l_character == 't')
+                            {
+                                l_data = '\t';
+                            }
+                            else if (l_character == 'b')
+                            {
+                                l_data = '\b';
+                            }
+                            else if (l_character == 'f')
+                            {
+                                l_data = '\f';
+                            }
+                            else
+                            {
+                                l_data = l_character;
+                            }
+
+                            l_state = ParserState.DetectingChar;
+                        }
+                        break;
+
                         case ParserState.Read0:
                         {
                             if (Char.IsWhiteSpace(l_character))
@@ -877,6 +1018,8 @@ namespace Emu5
                         break;
                     }
                 }
+
+                l_tokensVect[i_lineIndex] = l_tokenList.ToArray();
             }
 
             return l_tokensVect;

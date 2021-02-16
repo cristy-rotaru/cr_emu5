@@ -17,6 +17,14 @@
             </RuleSet>
         </Span>
 
+        <Span color="String">
+            <Begin>'</Begin>
+            <End>'</End>
+            <RuleSet>
+                <Span begin="\\" end="." />
+            </RuleSet>
+        </Span>
+
         <Keywords color="Instruction">
             <Word>lui</Word> <Word>LUI</Word>
             <Word>auipc</Word> <Word>AUIPC</Word>

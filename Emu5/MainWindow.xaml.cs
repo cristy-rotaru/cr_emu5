@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -19,6 +20,9 @@ namespace Emu5
         #region r_windowEvents
         private void MainWindow_Initialized(object sender, EventArgs e)
         {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("En-US");
+            CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("En-US");
+
             TabItem l_welcomeTab = new TabItem();
             l_welcomeTab.Header = new TabHeader("Welcome", false, () => RemoveTab(l_welcomeTab));
             l_welcomeTab.Content = new WelcomePage();
