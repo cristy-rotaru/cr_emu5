@@ -46,7 +46,7 @@ namespace Emu5
                         tabControlMain.SelectedItem = i_tab;
                         tabControlMain.UpdateLayout();
 
-                        MessageBoxResult l_result =  MessageBox.Show(l_message, "File not saved", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                        MessageBoxResult l_result = MessageBox.Show(l_message, "File not saved", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
                         if (l_result == MessageBoxResult.Yes)
                         {
                             if (((PerspectivePage)i_tab.Content).Save() == false)

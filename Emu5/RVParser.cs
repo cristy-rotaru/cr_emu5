@@ -601,7 +601,7 @@ namespace Emu5
                                 Decimal l_number;
                                 if (Decimal.TryParse((String)l_data, out l_number) == false)
                                 {
-                                    throw new RVAssemblyException("Invalid number.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                    throw new RVAssemblyException("Invalid number.", (uint)i_lineIndex + 1, (uint)l_startIndex);
                                 }
 
                                 RVToken l_decimalToken;
@@ -619,7 +619,7 @@ namespace Emu5
                                 Decimal l_number;
                                 if (Decimal.TryParse((String)l_data, out l_number) == false)
                                 {
-                                    throw new RVAssemblyException("Invalid number.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                    throw new RVAssemblyException("Invalid number.", (uint)i_lineIndex + 1, (uint)l_startIndex);
                                 }
 
                                 RVToken l_decimalToken;
@@ -646,7 +646,7 @@ namespace Emu5
                                 Decimal l_number;
                                 if (Decimal.TryParse((String)l_data, out l_number) == false)
                                 {
-                                    throw new RVAssemblyException("Invalid number.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
+                                    throw new RVAssemblyException("Invalid number.", (uint)i_lineIndex + 1, (uint)l_startIndex);
                                 }
 
                                 RVToken l_decimalToken;
@@ -1016,6 +1016,48 @@ namespace Emu5
                     if (l_breakFor)
                     {
                         break;
+                    }
+                }
+
+                for (int i_listIndex = l_tokenList.Count - 1; i_listIndex >= 0; --i_listIndex)
+                {
+                    RVToken l_token = l_tokenList[i_listIndex];
+
+                    if (l_token.type == RVTokenType.Label)
+                    {
+                        // TODO: recognize instruction, registers and data types
+                    }
+                    else if (l_token.type == RVTokenType.Separator && (Char)l_token.value == '-')
+                    {
+                        if (i_listIndex + 1 < l_tokenList.Count)
+                        {
+                            RVToken l_nextToken = l_tokenList[i_listIndex + 1];
+
+                            if (l_nextToken.type == RVTokenType.Integer)
+                            {
+                                UInt64 l_number = (UInt64)l_nextToken.value;
+                                if (l_number > 0x8000000000000000)
+                                {
+                                    throw new RVAssemblyException("Number exceeds encodable range.", l_token.line, l_token.column);
+                                }
+                                else if (l_number < 0x8000000000000000)
+                                {
+                                    l_number = (UInt64)(-(Int64)l_number);
+                                }
+
+                                l_nextToken.value = l_number;
+                                l_tokenList[i_listIndex + 1] = l_nextToken;
+
+                                l_tokenList.RemoveAt(i_listIndex);
+                            }
+                            else if (l_nextToken.type == RVTokenType.Decimal)
+                            {
+                                l_nextToken.value = -(Decimal)l_nextToken.value;
+                                l_tokenList[i_listIndex + 1] = l_nextToken;
+
+                                l_tokenList.RemoveAt(i_listIndex);
+                            }
+                        }
                     }
                 }
 

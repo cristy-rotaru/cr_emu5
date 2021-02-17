@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Emu5
@@ -159,7 +160,14 @@ namespace Emu5
                 m_rvEmulator = new RVEmulator();
             }
 
-            m_rvEmulator.Assemble(m_editor.GetText());
+            try
+            {
+                m_rvEmulator.Assemble(m_editor.GetText());
+            }
+            catch (RVAssemblyException e_assemblyException)
+            {
+                MessageBox.Show("L: " + e_assemblyException.Line + "; C: " + e_assemblyException.Column + "\n" + e_assemblyException.Message, "Compilation error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }
