@@ -67,6 +67,7 @@
     </Compile>
     <Compile Include="RVAssembler.cs" />
     <Compile Include="RVEmulator.cs" />
+    <Compile Include="RVInstructions.cs" />
     <Compile Include="RVParser.cs" />
     <Compile Include="TabHeader.xaml.cs">
       <DependentUpon>TabHeader.xaml</DependentUpon>
