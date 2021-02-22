@@ -29,6 +29,8 @@ namespace Emu5
         B,
         U,
         J,
+        Load,
+        Shift,
         Fence,
         System,
         Pseudo
@@ -59,6 +61,8 @@ namespace Emu5
         public byte opcode;
         public byte func3;
         public byte func7;
+        public short func12;
+        public byte shamt;
         public UInt32 imm;
         public RVRegister rs1;
         public RVRegister rs2;
@@ -103,6 +107,286 @@ namespace Emu5
             get
             {
                 return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.I, opcode = 0b1100111, func3 = 0b000 };
+            }
+        }
+
+        public static RVInstructionDescription BEQ
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.B, opcode = 0b1100011, func3 = 0b000 };
+            }
+        }
+
+        public static RVInstructionDescription BNE
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.B, opcode = 0b1100011, func3 = 0b001 };
+            }
+        }
+
+        public static RVInstructionDescription BLT
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.B, opcode = 0b1100011, func3 = 0b100 };
+            }
+        }
+
+        public static RVInstructionDescription BGE
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.B, opcode = 0b1100011, func3 = 0b101 };
+            }
+        }
+
+        public static RVInstructionDescription BLTU
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.B, opcode = 0b1100011, func3 = 0b110 };
+            }
+        }
+
+        public static RVInstructionDescription BGEU
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.B, opcode = 0b1100011, func3 = 0b111 };
+            }
+        }
+
+        public static RVInstructionDescription LB
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.Load, opcode = 0b0000011, func3 = 0b000 };
+            }
+        }
+
+        public static RVInstructionDescription LH
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.Load, opcode = 0b0000011, func3 = 0b001 };
+            }
+        }
+
+        public static RVInstructionDescription LW
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.Load, opcode = 0b0000011, func3 = 0b010 };
+            }
+        }
+
+        public static RVInstructionDescription LBU
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.Load, opcode = 0b0000011, func3 = 0b100 };
+            }
+        }
+
+        public static RVInstructionDescription LHU
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.Load, opcode = 0b0000011, func3 = 0b101 };
+            }
+        }
+
+        public static RVInstructionDescription SB
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.S, opcode = 0b0100011, func3 = 0b000 };
+            }
+        }
+
+        public static RVInstructionDescription SH
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.S, opcode = 0b0100011, func3 = 0b001 };
+            }
+        }
+
+        public static RVInstructionDescription SW
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.S, opcode = 0b0100011, func3 = 0b010 };
+            }
+        }
+
+        public static RVInstructionDescription ADDI
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.I, opcode = 0b0010011, func3 = 0b000 };
+            }
+        }
+
+        public static RVInstructionDescription SLTI
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.I, opcode = 0b0010011, func3 = 0b010 };
+            }
+        }
+
+        public static RVInstructionDescription SLTIU
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.I, opcode = 0b0010011, func3 = 0b011 };
+            }
+        }
+
+        public static RVInstructionDescription XORI
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.I, opcode = 0b0010011, func3 = 0b100 };
+            }
+        }
+
+        public static RVInstructionDescription ORI
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.I, opcode = 0b0010011, func3 = 0b110 };
+            }
+        }
+
+        public static RVInstructionDescription ANDI
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.I, opcode = 0b0010011, func3 = 0b111 };
+            }
+        }
+
+        public static RVInstructionDescription SLLI
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.Shift, opcode = 0b0010011, func3 = 0b001, func7 = 0b0000000 };
+            }
+        }
+
+        public static RVInstructionDescription SRLI
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.Shift, opcode = 0b0010011, func3 = 0b101, func7 = 0b0000000 };
+            }
+        }
+
+        public static RVInstructionDescription SRAI
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.Shift, opcode = 0b0010011, func3 = 0b101, func7 = 0b0100000 };
+            }
+        }
+
+        public static RVInstructionDescription ADD
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b000, func7 = 0b0000000 };
+            }
+        }
+
+        public static RVInstructionDescription SUB
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b000, func7 = 0b0100000 };
+            }
+        }
+
+        public static RVInstructionDescription SLL
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b001, func7 = 0b0000000 };
+            }
+        }
+
+        public static RVInstructionDescription SLT
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b010, func7 = 0b0000000 };
+            }
+        }
+
+        public static RVInstructionDescription SLTU
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b011, func7 = 0b0000000 };
+            }
+        }
+
+        public static RVInstructionDescription XOR
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b100, func7 = 0b0000000 };
+            }
+        }
+
+        public static RVInstructionDescription SRL
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b101, func7 = 0b0000000 };
+            }
+        }
+
+        public static RVInstructionDescription SRA
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b101, func7 = 0b0100000 };
+            }
+        }
+
+        public static RVInstructionDescription OR
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b110, func7 = 0b0000000 };
+            }
+        }
+
+        public static RVInstructionDescription AND
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b111, func7 = 0b0000000 };
+            }
+        }
+
+        public static RVInstructionDescription ECALL
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.System, opcode = 0b1110011, func3 = 0b000, func12 = 0x000 };
+            }
+        }
+
+        public static RVInstructionDescription EBREAK
+        {
+            get
+            {
+                return new RVInstructionDescription { subSet = RVSubSet.RV32I, type = RVInstructionType.System, opcode = 0b1110011, func3 = 0b000, func12 = 0x001 };
             }
         }
     }
