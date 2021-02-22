@@ -36,7 +36,6 @@ namespace Emu5
             DetectingOct,
             DetectingBin,
             DetectingDec,
-            DetectingFloat,
             DetectingAddr,
             DetectingString,
             DetectingChar,
@@ -88,7 +87,7 @@ namespace Emu5
                                 l_breakFor = true; // ignore rest of the line
                                 break;
                             }
-                            else if (l_character == '_' || (l_character >= 'A' && l_character <= 'Z') || (l_character >= 'a' && l_character <= 'z'))
+                            else if (l_character == '_' || l_character == '.' || (l_character >= 'A' && l_character <= 'Z') || (l_character >= 'a' && l_character <= 'z'))
                             {
                                 l_startIndex = (uint)i_characterIndex;
                                 l_data = new String(l_character, 1);
@@ -124,13 +123,6 @@ namespace Emu5
                                 l_data = (UInt64)(l_character - '0');
 
                                 l_state = ParserState.DetectingDec;
-                            }
-                            else if (l_character == '.')
-                            {
-                                l_startIndex = (uint)i_characterIndex;
-                                l_data = ".";
-
-                                l_state = ParserState.DetectingFloat;
                             }
                             else if (l_character == '\"')
                             {
@@ -557,15 +549,9 @@ namespace Emu5
 
                                 l_data = l_number;
                             }
-                            else if (l_character == '_' || l_character == '\"' || l_character == '\'' || l_character == '@' || (l_character >= 'A' && l_character <= 'Z') || (l_character >= 'a' && l_character <= 'z'))
+                            else if (l_character == '_' || l_character == '.' || l_character == '\"' || l_character == '\'' || l_character == '@' || (l_character >= 'A' && l_character <= 'Z') || (l_character >= 'a' && l_character <= 'z'))
                             {
                                 throw new RVAssemblyException("Illegal character in numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
-                            }
-                            else if (l_character == '.')
-                            {
-                                l_data = ((UInt64)l_data).ToString() + ".";
-
-                                l_state = ParserState.DetectingFloat;
                             }
                             else if (l_character == ',' || l_character == ':' || l_character == '-')
                             {
@@ -576,86 +562,6 @@ namespace Emu5
                                 l_integerToken.value = l_data;
 
                                 l_tokenList.Add(l_integerToken);
-
-                                RVToken l_separatorToken;
-                                l_separatorToken.type = RVTokenType.Separator;
-                                l_separatorToken.line = (uint)i_lineIndex + 1;
-                                l_separatorToken.column = (uint)i_characterIndex;
-                                l_separatorToken.value = l_character;
-
-                                l_tokenList.Add(l_separatorToken);
-
-                                l_state = ParserState.Idle;
-                            }
-                            else
-                            {
-                                throw new RVAssemblyException("Illegal character.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
-                            }
-                        }
-                        break;
-
-                        case ParserState.DetectingFloat:
-                        {
-                            if (Char.IsWhiteSpace(l_character))
-                            {
-                                Decimal l_number;
-                                if (Decimal.TryParse((String)l_data, out l_number) == false)
-                                {
-                                    throw new RVAssemblyException("Invalid number.", (uint)i_lineIndex + 1, (uint)l_startIndex);
-                                }
-
-                                RVToken l_decimalToken;
-                                l_decimalToken.type = RVTokenType.Decimal;
-                                l_decimalToken.line = (uint)i_lineIndex + 1;
-                                l_decimalToken.column = l_startIndex;
-                                l_decimalToken.value = l_number;
-
-                                l_tokenList.Add(l_decimalToken);
-
-                                l_state = ParserState.Idle;
-                            }
-                            else if (l_character == '#')
-                            {
-                                Decimal l_number;
-                                if (Decimal.TryParse((String)l_data, out l_number) == false)
-                                {
-                                    throw new RVAssemblyException("Invalid number.", (uint)i_lineIndex + 1, (uint)l_startIndex);
-                                }
-
-                                RVToken l_decimalToken;
-                                l_decimalToken.type = RVTokenType.Decimal;
-                                l_decimalToken.line = (uint)i_lineIndex + 1;
-                                l_decimalToken.column = l_startIndex;
-                                l_decimalToken.value = l_number;
-
-                                l_tokenList.Add(l_decimalToken);
-
-                                l_breakFor = true; // ignore rest of the line
-                                break;
-                            }
-                            else if ((l_character >= '0' && l_character <= '9') || l_character == 'e' || l_character == 'E' || l_character == '+' || l_character == '-' || l_character == '.')
-                            {
-                                l_data = (String)l_data + l_character;
-                            }
-                            else if (l_character == '_' || l_character == '\"' || l_character == '\'' || l_character == '@' || (l_character >= 'A' && l_character <= 'Z') || (l_character >= 'a' && l_character <= 'z'))
-                            {
-                                throw new RVAssemblyException("Illegal character in numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
-                            }
-                            else if (l_character == ',' || l_character == ':' || l_character == '-')
-                            {
-                                Decimal l_number;
-                                if (Decimal.TryParse((String)l_data, out l_number) == false)
-                                {
-                                    throw new RVAssemblyException("Invalid number.", (uint)i_lineIndex + 1, (uint)l_startIndex);
-                                }
-
-                                RVToken l_decimalToken;
-                                l_decimalToken.type = RVTokenType.Decimal;
-                                l_decimalToken.line = (uint)i_lineIndex + 1;
-                                l_decimalToken.column = l_startIndex;
-                                l_decimalToken.value = l_number;
-
-                                l_tokenList.Add(l_decimalToken);
 
                                 RVToken l_separatorToken;
                                 l_separatorToken.type = RVTokenType.Separator;
@@ -969,7 +875,7 @@ namespace Emu5
 
                                 l_state = ParserState.DetectingHex;
                             }
-                            else if (l_character == '_' || l_character == '\"' || l_character == '\'' || (l_character >= 'A' && l_character <= 'Z') || (l_character >= 'a' && l_character <= 'z'))
+                            else if (l_character == '_' || l_character == '.' || l_character == '\"' || l_character == '\'' || (l_character >= 'A' && l_character <= 'Z') || (l_character >= 'a' && l_character <= 'z'))
                             {
                                 throw new RVAssemblyException("Illegal character in numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
                             }
@@ -998,12 +904,6 @@ namespace Emu5
                                 l_data = (UInt64)(l_character - '0');
 
                                 l_state = ParserState.DetectingDec;
-                            }
-                            else if (l_character == '.')
-                            {
-                                l_data = "0.";
-
-                                l_state = ParserState.DetectingFloat;
                             }
                             else
                             {

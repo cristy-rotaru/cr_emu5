@@ -34,7 +34,7 @@ namespace Emu5
     {
         private RVAssembler() { }
 
-        static public void Assemble(String code, Dictionary<UInt64, UInt64> memoryMap)
+        static public void Assemble(String code, Dictionary<UInt32, UInt64> memoryMap)
         {
             RVToken[][] l_tokens = RVParser.Tokenize(code);
         }
