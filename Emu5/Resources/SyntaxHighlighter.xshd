@@ -3,8 +3,9 @@
     <Color name="String" foreground="#FFDA0808" />
     <Color name="Label" foreground="#FFB0B0B0" />
     <Color name="Adnotation" foreground="#FFB0B0B0" fontStyle="italic" />
-    <Color name="Instruction" foreground="#FF000ADA" />
-    <Color name="PseudoInstruction" foreground="#FF00C0B7" />
+    <Color name="Instruction" foreground="#FF000ADA" fontWeight="bold" />
+    <Color name="PseudoInstruction" foreground="#FF00C0B7" fontWeight="bold" />
+    <Color name="DataType" foreground="#FF00C0B7" />
 
     <RuleSet>
         <Span color="Comment" begin="#" />
@@ -107,6 +108,14 @@
             <Word>tail</Word> <Word>TAIL</Word>
         </Keywords>
 
+        <Keywords color="DataType">
+            <Word>db</Word> <Word>DB</Word>
+            <Word>dh</Word> <Word>DH</Word>
+            <Word>dw</Word> <Word>DW</Word>
+            <Word>str</Word> <Word>STR</Word>
+            <Word>strz</Word> <Word>STRZ</Word>
+        </Keywords>
+        
         <Rule color="Label">
             ([_a-zA-z][_a-zA-Z0-9]+|[a-zA-z]):
         </Rule>
