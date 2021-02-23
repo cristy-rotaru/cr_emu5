@@ -925,7 +925,53 @@ namespace Emu5
 
                     if (l_token.type == RVTokenType.Label)
                     {
-                        // TODO: recognize instruction, registers and data types
+                        RVInstructionDescription? l_instructionDescription = RVInstructions.GetInstructionByString((String)l_token.value);
+                        if (l_instructionDescription != null)
+                        {
+                            RVToken l_instructionToken;
+                            l_instructionToken.type = RVTokenType.Instruction;
+                            l_instructionToken.line = l_token.line;
+                            l_instructionToken.column = l_token.column;
+                            l_instructionToken.value = (RVInstructionDescription)l_instructionDescription;
+
+                            l_tokenList[i_listIndex] = l_instructionToken;
+                            continue;
+                        }
+
+                        RVRegister? l_register = RVInstructions.GetRegisterByString((String)l_token.value);
+                        if (l_register != null)
+                        {
+                            RVToken l_registerToken;
+                            l_registerToken.type = RVTokenType.Register;
+                            l_registerToken.line = l_token.line;
+                            l_registerToken.column = l_token.column;
+                            l_registerToken.value = (RVRegister)l_register;
+
+                            l_tokenList[i_listIndex] = l_registerToken;
+                            continue;
+                        }
+
+                        RVDataType? l_dataType = RVAssembler.GetDataTypeByString((String)l_token.value);
+                        if (l_dataType != null)
+                        {
+                            RVToken l_dataTypeToken;
+                            l_dataTypeToken.type = RVTokenType.DataType;
+                            l_dataTypeToken.line = l_token.line;
+                            l_dataTypeToken.column = l_token.column;
+                            l_dataTypeToken.value = (RVDataType)l_dataType;
+
+                            l_tokenList[i_listIndex] = l_dataTypeToken;
+                            continue;
+                        }
+
+                        String l_identifier = (String)l_token.value;
+                        for (int i_stringIndex = 0; i_stringIndex < l_identifier.Length; ++i_stringIndex)
+                        {
+                            if (l_identifier[i_stringIndex] == '.')
+                            {
+                                throw new RVAssemblyException("Illegal character in identifier name.", l_token.line, l_token.column + (uint)i_stringIndex);
+                            }
+                        }
                     }
                     else if (l_token.type == RVTokenType.Separator && (Char)l_token.value == '-')
                     {
