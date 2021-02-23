@@ -26,6 +26,7 @@ namespace Emu5
     struct RVInstructionDescription
     {
         public RVInstructionType type;
+        public byte size;
         public byte opcode;
         public byte func3;
         public byte func7;
@@ -34,7 +35,6 @@ namespace Emu5
         public UInt32 imm;
         public RVRegister rs1;
         public RVRegister rs2;
-        public RVRegister rs3;
         public RVRegister rd;
     }
 
@@ -49,7 +49,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.U, opcode = 0b0110111 };
+                return new RVInstructionDescription { type = RVInstructionType.U, size = 4, opcode = 0b0110111 };
             }
         }
 
@@ -57,7 +57,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.U, opcode = 0b0010111 };
+                return new RVInstructionDescription { type = RVInstructionType.U, size = 4, opcode = 0b0010111 };
             }
         }
 
@@ -65,7 +65,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.J, opcode = 0b1101111 };
+                return new RVInstructionDescription { type = RVInstructionType.J, size = 4, opcode = 0b1101111 };
             }
         }
 
@@ -73,7 +73,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.I, opcode = 0b1100111, func3 = 0b000 };
+                return new RVInstructionDescription { type = RVInstructionType.I, size = 4, opcode = 0b1100111, func3 = 0b000 };
             }
         }
 
@@ -81,7 +81,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.B, opcode = 0b1100011, func3 = 0b000 };
+                return new RVInstructionDescription { type = RVInstructionType.B, size = 4, opcode = 0b1100011, func3 = 0b000 };
             }
         }
 
@@ -89,7 +89,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.B, opcode = 0b1100011, func3 = 0b001 };
+                return new RVInstructionDescription { type = RVInstructionType.B, size = 4, opcode = 0b1100011, func3 = 0b001 };
             }
         }
 
@@ -97,7 +97,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.B, opcode = 0b1100011, func3 = 0b100 };
+                return new RVInstructionDescription { type = RVInstructionType.B, size = 4, opcode = 0b1100011, func3 = 0b100 };
             }
         }
 
@@ -105,7 +105,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.B, opcode = 0b1100011, func3 = 0b101 };
+                return new RVInstructionDescription { type = RVInstructionType.B, size = 4, opcode = 0b1100011, func3 = 0b101 };
             }
         }
 
@@ -113,7 +113,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.B, opcode = 0b1100011, func3 = 0b110 };
+                return new RVInstructionDescription { type = RVInstructionType.B, size = 4, opcode = 0b1100011, func3 = 0b110 };
             }
         }
 
@@ -121,7 +121,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.B, opcode = 0b1100011, func3 = 0b111 };
+                return new RVInstructionDescription { type = RVInstructionType.B, size = 4, opcode = 0b1100011, func3 = 0b111 };
             }
         }
 
@@ -129,7 +129,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.Load, opcode = 0b0000011, func3 = 0b000 };
+                return new RVInstructionDescription { type = RVInstructionType.Load, size = 4, opcode = 0b0000011, func3 = 0b000 };
             }
         }
 
@@ -137,7 +137,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.Load, opcode = 0b0000011, func3 = 0b001 };
+                return new RVInstructionDescription { type = RVInstructionType.Load, size = 4, opcode = 0b0000011, func3 = 0b001 };
             }
         }
 
@@ -145,7 +145,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.Load, opcode = 0b0000011, func3 = 0b010 };
+                return new RVInstructionDescription { type = RVInstructionType.Load, size = 4, opcode = 0b0000011, func3 = 0b010 };
             }
         }
 
@@ -153,7 +153,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.Load, opcode = 0b0000011, func3 = 0b100 };
+                return new RVInstructionDescription { type = RVInstructionType.Load, size = 4, opcode = 0b0000011, func3 = 0b100 };
             }
         }
 
@@ -161,7 +161,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.Load, opcode = 0b0000011, func3 = 0b101 };
+                return new RVInstructionDescription { type = RVInstructionType.Load, size = 4, opcode = 0b0000011, func3 = 0b101 };
             }
         }
 
@@ -169,7 +169,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.S, opcode = 0b0100011, func3 = 0b000 };
+                return new RVInstructionDescription { type = RVInstructionType.S, size = 4, opcode = 0b0100011, func3 = 0b000 };
             }
         }
 
@@ -177,7 +177,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.S, opcode = 0b0100011, func3 = 0b001 };
+                return new RVInstructionDescription { type = RVInstructionType.S, size = 4, opcode = 0b0100011, func3 = 0b001 };
             }
         }
 
@@ -185,7 +185,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.S, opcode = 0b0100011, func3 = 0b010 };
+                return new RVInstructionDescription { type = RVInstructionType.S, size = 4, opcode = 0b0100011, func3 = 0b010 };
             }
         }
 
@@ -193,7 +193,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.I, opcode = 0b0010011, func3 = 0b000 };
+                return new RVInstructionDescription { type = RVInstructionType.I, size = 4, opcode = 0b0010011, func3 = 0b000 };
             }
         }
 
@@ -201,7 +201,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.I, opcode = 0b0010011, func3 = 0b010 };
+                return new RVInstructionDescription { type = RVInstructionType.I, size = 4, opcode = 0b0010011, func3 = 0b010 };
             }
         }
 
@@ -209,7 +209,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.I, opcode = 0b0010011, func3 = 0b011 };
+                return new RVInstructionDescription { type = RVInstructionType.I, size = 4, opcode = 0b0010011, func3 = 0b011 };
             }
         }
 
@@ -217,7 +217,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.I, opcode = 0b0010011, func3 = 0b100 };
+                return new RVInstructionDescription { type = RVInstructionType.I, size = 4, opcode = 0b0010011, func3 = 0b100 };
             }
         }
 
@@ -225,7 +225,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.I, opcode = 0b0010011, func3 = 0b110 };
+                return new RVInstructionDescription { type = RVInstructionType.I, size = 4, opcode = 0b0010011, func3 = 0b110 };
             }
         }
 
@@ -233,7 +233,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.I, opcode = 0b0010011, func3 = 0b111 };
+                return new RVInstructionDescription { type = RVInstructionType.I, size = 4, opcode = 0b0010011, func3 = 0b111 };
             }
         }
 
@@ -241,7 +241,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.Shift, opcode = 0b0010011, func3 = 0b001, func7 = 0b0000000 };
+                return new RVInstructionDescription { type = RVInstructionType.Shift, size = 4, opcode = 0b0010011, func3 = 0b001, func7 = 0b0000000 };
             }
         }
 
@@ -249,7 +249,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.Shift, opcode = 0b0010011, func3 = 0b101, func7 = 0b0000000 };
+                return new RVInstructionDescription { type = RVInstructionType.Shift, size = 4, opcode = 0b0010011, func3 = 0b101, func7 = 0b0000000 };
             }
         }
 
@@ -257,7 +257,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.Shift, opcode = 0b0010011, func3 = 0b101, func7 = 0b0100000 };
+                return new RVInstructionDescription { type = RVInstructionType.Shift, size = 4, opcode = 0b0010011, func3 = 0b101, func7 = 0b0100000 };
             }
         }
 
@@ -265,7 +265,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b000, func7 = 0b0000000 };
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b000, func7 = 0b0000000 };
             }
         }
 
@@ -273,7 +273,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b000, func7 = 0b0100000 };
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b000, func7 = 0b0100000 };
             }
         }
 
@@ -281,7 +281,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b001, func7 = 0b0000000 };
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b001, func7 = 0b0000000 };
             }
         }
 
@@ -289,7 +289,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b010, func7 = 0b0000000 };
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b010, func7 = 0b0000000 };
             }
         }
 
@@ -297,7 +297,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b011, func7 = 0b0000000 };
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b011, func7 = 0b0000000 };
             }
         }
 
@@ -305,7 +305,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b100, func7 = 0b0000000 };
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b100, func7 = 0b0000000 };
             }
         }
 
@@ -313,7 +313,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b101, func7 = 0b0000000 };
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b101, func7 = 0b0000000 };
             }
         }
 
@@ -321,7 +321,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b101, func7 = 0b0100000 };
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b101, func7 = 0b0100000 };
             }
         }
 
@@ -329,7 +329,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b110, func7 = 0b0000000 };
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b110, func7 = 0b0000000 };
             }
         }
 
@@ -337,7 +337,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.R, opcode = 0b0110011, func3 = 0b111, func7 = 0b0000000 };
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b111, func7 = 0b0000000 };
             }
         }
 
@@ -345,7 +345,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.System, opcode = 0b1110011, func3 = 0b000, func12 = 0x000 };
+                return new RVInstructionDescription { type = RVInstructionType.System, size = 4, opcode = 0b1110011, func3 = 0b000, func12 = 0x000 };
             }
         }
 
@@ -353,7 +353,111 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.System, opcode = 0b1110011, func3 = 0b000, func12 = 0x001 };
+                return new RVInstructionDescription { type = RVInstructionType.System, size = 4, opcode = 0b1110011, func3 = 0b000, func12 = 0x001 };
+            }
+        }
+
+        public static RVInstructionDescription MUL
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b000, func7 = 0b0000001 };
+            }
+        }
+
+        public static RVInstructionDescription MULH
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b001, func7 = 0b0000001 };
+            }
+        }
+
+        public static RVInstructionDescription MULHSU
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b010, func7 = 0b0000001 };
+            }
+        }
+
+        public static RVInstructionDescription MULHU
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b011, func7 = 0b0000001 };
+            }
+        }
+
+        public static RVInstructionDescription DIV
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b100, func7 = 0b0000001 };
+            }
+        }
+
+        public static RVInstructionDescription DIVU
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b101, func7 = 0b0000001 };
+            }
+        }
+
+        public static RVInstructionDescription REM
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b110, func7 = 0b0000001 };
+            }
+        }
+
+        public static RVInstructionDescription REMU
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.R, size = 4, opcode = 0b0110011, func3 = 0b111, func7 = 0b0000001 };
+            }
+        }
+
+        public static RVInstructionDescription HLT
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.System, size = 4, opcode = 0b1110011, func3 = 0b000, func12 = 0xFFF };
+            }
+        }
+
+        public static RVInstructionDescription RST
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.System, size = 4, opcode = 0b1110011, func3 = 0b000, func12 = 0xFFE };
+            }
+        }
+
+        public static RVInstructionDescription IEN
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.System, size = 4, opcode = 0b1110011, func3 = 0b000, func12 = 0x107 };
+            }
+        }
+
+        public static RVInstructionDescription IDIS
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.System, size = 4, opcode = 0b1110011, func3 = 0b000, func12 = 0x106 };
+            }
+        }
+
+        public static RVInstructionDescription WFI
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.System, size = 4, opcode = 0b1110011, func3 = 0b000, func12 = 0x105 };
             }
         }
     }
