@@ -94,7 +94,7 @@ namespace Emu5
 
                                 l_state = ParserState.DetectingIdentifier;
                             }
-                            else if (l_character == ',' || l_character == ':' || l_character == '-') // detected a separator
+                            else if (l_character == ',' || l_character == ':' || l_character == '-' || l_character == '(' || l_character == ')') // detected a separator
                             {
                                 RVToken l_separatorToken;
                                 l_separatorToken.type = RVTokenType.Separator;
@@ -176,7 +176,7 @@ namespace Emu5
                             {
                                 l_data = ((String)l_data) + l_character;
                             }
-                            else if (l_character == ',' || l_character == ':' || l_character == '-')
+                            else if (l_character == ',' || l_character == ':' || l_character == '-' || l_character == '(' || l_character == ')')
                             {
                                 RVToken l_identifierToken;
                                 l_identifierToken.type = RVTokenType.Label;
@@ -282,7 +282,7 @@ namespace Emu5
                             {
                                 throw new RVAssemblyException("Illegal character in numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
                             }
-                            else if (l_character == ',' || l_character == ':' || l_character == '-')
+                            else if (l_character == ',' || l_character == ':' || l_character == '-' || l_character == '(' || l_character == ')')
                             {
                                 if (l_data == null)
                                 {
@@ -375,7 +375,7 @@ namespace Emu5
                             {
                                 throw new RVAssemblyException("Illegal character in numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
                             }
-                            else if (l_character == ',' || l_character == ':' || l_character == '-')
+                            else if (l_character == ',' || l_character == ':' || l_character == '-' || l_character == '(' || l_character == ')')
                             {
                                 if (l_data == null)
                                 {
@@ -468,7 +468,7 @@ namespace Emu5
                             {
                                 throw new RVAssemblyException("Illegal character in numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
                             }
-                            else if (l_character == ',' || l_character == ':' || l_character == '-')
+                            else if (l_character == ',' || l_character == ':' || l_character == '-' || l_character == '(' || l_character == ')')
                             {
                                 if (l_data == null)
                                 {
@@ -553,7 +553,7 @@ namespace Emu5
                             {
                                 throw new RVAssemblyException("Illegal character in numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
                             }
-                            else if (l_character == ',' || l_character == ':' || l_character == '-')
+                            else if (l_character == ',' || l_character == ':' || l_character == '-' || l_character == '(' || l_character == ')')
                             {
                                 RVToken l_integerToken;
                                 l_integerToken.type = RVTokenType.Integer;
@@ -655,7 +655,7 @@ namespace Emu5
                             {
                                 throw new RVAssemblyException("Illegal character in numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
                             }
-                            else if (l_character == ',' || l_character == ':' || l_character == '-')
+                            else if (l_character == ',' || l_character == ':' || l_character == '-' || l_character == '(' || l_character == ')')
                             {
                                 if (l_data == null)
                                 {
@@ -879,7 +879,7 @@ namespace Emu5
                             {
                                 throw new RVAssemblyException("Illegal character in numeric sequence.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
                             }
-                            else if (l_character == ',' || l_character == ':' || l_character == '-')
+                            else if (l_character == ',' || l_character == ':' || l_character == '-' || l_character == '(' || l_character == ')')
                             {
                                 RVToken l_integerToken;
                                 l_integerToken.type = RVTokenType.Integer;
