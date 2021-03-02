@@ -9,7 +9,6 @@ namespace Emu5
         Label,
         Address,
         Integer,
-        Decimal,
         String,
         Char,
         Separator,
@@ -250,9 +249,9 @@ namespace Emu5
                             }
                             else if (l_character >= '0' && l_character <= '9')
                             {
-                                UInt64 l_number = l_data == null ? 0 : (UInt64)l_data;
+                                UInt32 l_number = l_data == null ? 0 : (UInt32)l_data;
 
-                                if ((l_number & 0xF000000000000000) != 0)
+                                if ((l_number & 0xF0000000) != 0)
                                 {
                                     throw new RVAssemblyException("Number exceeds encodable range.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
                                 }
@@ -266,9 +265,9 @@ namespace Emu5
                             {
                                 l_character = Char.ToLower(l_character);
 
-                                UInt64 l_number = l_data == null ? 0 : (UInt64)l_data;
+                                UInt32 l_number = l_data == null ? 0 : (UInt32)l_data;
 
-                                if ((l_number & 0xF000000000000000) != 0)
+                                if ((l_number & 0xF0000000) != 0)
                                 {
                                     throw new RVAssemblyException("Number exceeds encodable range.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
                                 }
@@ -359,9 +358,9 @@ namespace Emu5
                             }
                             else if (l_character >= '0' && l_character <= '7')
                             {
-                                UInt64 l_number = l_data == null ? 0 : (UInt64)l_data;
+                                UInt32 l_number = l_data == null ? 0 : (UInt32)l_data;
 
-                                if ((l_number & 0xE000000000000000) != 0)
+                                if ((l_number & 0xE0000000) != 0)
                                 {
                                     throw new RVAssemblyException("Number exceeds encodable range.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
                                 }
@@ -454,7 +453,7 @@ namespace Emu5
                             {
                                 UInt64 l_number = l_data == null ? 0 : (UInt64)l_data;
 
-                                if ((l_number & 0x8000000000000000) != 0)
+                                if ((l_number & 0x80000000) != 0)
                                 {
                                     throw new RVAssemblyException("Number exceeds encodable range.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
                                 }
@@ -623,9 +622,9 @@ namespace Emu5
                             }
                             else if (l_character >= '0' && l_character <= '9')
                             {
-                                UInt64 l_number = l_data == null ? 0 : (UInt64)l_data;
+                                UInt32 l_number = l_data == null ? 0 : (UInt32)l_data;
 
-                                if ((l_number & 0xF000000000000000) != 0)
+                                if ((l_number & 0xF0000000) != 0)
                                 {
                                     throw new RVAssemblyException("Number exceeds encodable range.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
                                 }
@@ -639,7 +638,7 @@ namespace Emu5
                             {
                                 l_character = Char.ToLower(l_character);
 
-                                UInt64 l_number = l_data == null ? 0 : (UInt64)l_data;
+                                UInt32 l_number = l_data == null ? 0 : (UInt32)l_data;
 
                                 if ((l_number & 0xF000000000000000) != 0)
                                 {
@@ -992,13 +991,6 @@ namespace Emu5
                                 }
 
                                 l_nextToken.value = l_number;
-                                l_tokenList[i_listIndex + 1] = l_nextToken;
-
-                                l_tokenList.RemoveAt(i_listIndex);
-                            }
-                            else if (l_nextToken.type == RVTokenType.Decimal)
-                            {
-                                l_nextToken.value = -(Decimal)l_nextToken.value;
                                 l_tokenList[i_listIndex + 1] = l_nextToken;
 
                                 l_tokenList.RemoveAt(i_listIndex);
