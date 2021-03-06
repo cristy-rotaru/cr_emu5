@@ -119,7 +119,7 @@ namespace Emu5
                             else if (l_character >= '1' && l_character <= '9')
                             {
                                 l_startIndex = (uint)i_characterIndex;
-                                l_data = (UInt64)(l_character - '0');
+                                l_data = (UInt32)(l_character - '0');
 
                                 l_state = ParserState.DetectingDec;
                             }
@@ -451,7 +451,7 @@ namespace Emu5
                             }
                             else if (l_character == '0' || l_character == '1')
                             {
-                                UInt64 l_number = l_data == null ? 0 : (UInt64)l_data;
+                                UInt32 l_number = l_data == null ? 0 : (UInt32)l_data;
 
                                 if ((l_number & 0x80000000) != 0)
                                 {
@@ -530,16 +530,16 @@ namespace Emu5
                             }
                             else if (l_character >= '0' && l_character <= '9')
                             {
-                                UInt64 l_number = (UInt64)l_data;
+                                UInt32 l_number = (UInt32)l_data;
 
-                                if (l_number > 1844674407370955161) // any number larger than that will overflow when multiplying by 10
+                                if (l_number > 429496729) // any number larger than that will overflow when multiplying by 10
                                 {
                                     throw new RVAssemblyException("Number exceeds encodable range.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
                                 }
 
                                 l_number *= 10;
 
-                                if (l_number == 18446744073709551610 && l_character > '5')
+                                if (l_number == 429497290 && l_character > '5')
                                 {
                                     throw new RVAssemblyException("Number exceeds encodable range.", (uint)i_lineIndex + 1, (uint)i_characterIndex);
                                 }
@@ -837,7 +837,7 @@ namespace Emu5
                                 l_integerToken.type = RVTokenType.Integer;
                                 l_integerToken.line = (uint)i_lineIndex + 1;
                                 l_integerToken.column = l_startIndex;
-                                l_integerToken.value = (UInt64)0;
+                                l_integerToken.value = (UInt32)0;
 
                                 l_tokenList.Add(l_integerToken);
 
@@ -849,7 +849,7 @@ namespace Emu5
                                 l_integerToken.type = RVTokenType.Integer;
                                 l_integerToken.line = (uint)i_lineIndex + 1;
                                 l_integerToken.column = l_startIndex;
-                                l_integerToken.value = (UInt64)0;
+                                l_integerToken.value = (UInt32)0;
 
                                 l_tokenList.Add(l_integerToken);
 
@@ -884,7 +884,7 @@ namespace Emu5
                                 l_integerToken.type = RVTokenType.Integer;
                                 l_integerToken.line = (uint)i_lineIndex + 1;
                                 l_integerToken.column = l_startIndex;
-                                l_integerToken.value = (UInt64)0;
+                                l_integerToken.value = (UInt32)0;
 
                                 l_tokenList.Add(l_integerToken);
 
@@ -900,7 +900,7 @@ namespace Emu5
                             }
                             else if (l_character >= '0' && l_character <= '9')
                             {
-                                l_data = (UInt64)(l_character - '0');
+                                l_data = (UInt32)(l_character - '0');
 
                                 l_state = ParserState.DetectingDec;
                             }
@@ -980,14 +980,14 @@ namespace Emu5
 
                             if (l_nextToken.type == RVTokenType.Integer)
                             {
-                                UInt64 l_number = (UInt64)l_nextToken.value;
-                                if (l_number > 0x8000000000000000)
+                                UInt32 l_number = (UInt32)l_nextToken.value;
+                                if (l_number > 0x80000000)
                                 {
                                     throw new RVAssemblyException("Number exceeds encodable range.", l_token.line, l_token.column);
                                 }
-                                else if (l_number < 0x8000000000000000)
+                                else if (l_number < 0x80000000)
                                 {
-                                    l_number = (UInt64)(-(Int64)l_number);
+                                    l_number = (UInt32)(-(Int32)l_number);
                                 }
 
                                 l_nextToken.value = l_number;
