@@ -11,7 +11,7 @@ namespace Emu5
         B,
         U,
         J,
-        Load,
+        IOffset,
         Shift,
         System,
         Pseudo
@@ -470,7 +470,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.I, size = 4, opcode = 0b1100111, func3 = 0b000 };
+                return new RVInstructionDescription { type = RVInstructionType.IOffset, size = 4, opcode = 0b1100111, func3 = 0b000 };
             }
         }
 
@@ -526,7 +526,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.Load, size = 4, opcode = 0b0000011, func3 = 0b000 };
+                return new RVInstructionDescription { type = RVInstructionType.IOffset, size = 4, opcode = 0b0000011, func3 = 0b000 };
             }
         }
 
@@ -534,7 +534,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.Load, size = 4, opcode = 0b0000011, func3 = 0b001 };
+                return new RVInstructionDescription { type = RVInstructionType.IOffset, size = 4, opcode = 0b0000011, func3 = 0b001 };
             }
         }
 
@@ -542,7 +542,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.Load, size = 4, opcode = 0b0000011, func3 = 0b010 };
+                return new RVInstructionDescription { type = RVInstructionType.IOffset, size = 4, opcode = 0b0000011, func3 = 0b010 };
             }
         }
 
@@ -550,7 +550,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.Load, size = 4, opcode = 0b0000011, func3 = 0b100 };
+                return new RVInstructionDescription { type = RVInstructionType.IOffset, size = 4, opcode = 0b0000011, func3 = 0b100 };
             }
         }
 
@@ -558,7 +558,7 @@ namespace Emu5
         {
             get
             {
-                return new RVInstructionDescription { type = RVInstructionType.Load, size = 4, opcode = 0b0000011, func3 = 0b101 };
+                return new RVInstructionDescription { type = RVInstructionType.IOffset, size = 4, opcode = 0b0000011, func3 = 0b101 };
             }
         }
 
