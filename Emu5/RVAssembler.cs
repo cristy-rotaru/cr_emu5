@@ -734,7 +734,89 @@ namespace Emu5
                             }
                             break;
 
-                            // TODO: other instruction types
+                            case RVInstructionType.J:
+                            {
+                                if (l_tokenLine.Length != 4)
+                                {
+                                    throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
+                                }
+
+                                if (l_tokenLine[1].type != RVTokenType.Register)
+                                {
+                                    throw new RVAssemblyException("Expected register identifier.", l_tokenLine[1].line, l_tokenLine[1].column);
+                                }
+                                l_instructionDescription.rd = (RVRegister)l_tokenLine[1].value;
+
+                                if (l_tokenLine[2].type != RVTokenType.Separator || (char)l_tokenLine[2].value != ',')
+                                {
+                                    throw new RVAssemblyException("Expected separator ','.", l_tokenLine[2].line, l_tokenLine[2].column);
+                                }
+
+                                if (l_tokenLine[3].type == RVTokenType.Integer)
+                                {
+                                    UInt32 l_immediate = (UInt32)l_tokenLine[3].value;
+                                    UInt32 l_mask = 0xFFF00000;
+                                    if ((l_immediate & l_mask) != l_mask && (l_immediate & l_mask) != 0)
+                                    {
+                                        throw new RVAssemblyException("Number exceeds encodable range.", l_tokenLine[3].line, l_tokenLine[3].column);
+                                    }
+                                    if ((l_immediate & 0x1) != 0)
+                                    {
+                                        throw new RVAssemblyException("Branch offset must not be an odd number.", l_tokenLine[3].line, l_tokenLine[3].column);
+                                    }
+                                    l_instructionDescription.imm = l_immediate;
+
+                                    UInt32 l_encodedInstruction = 0x0;
+                                    l_encodedInstruction |= ((UInt32)l_instructionDescription.opcode) & 0x7F;
+                                    l_encodedInstruction |= (((UInt32)l_instructionDescription.rd) & 0x1F) << 7;
+                                    l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0xFF000);
+                                    l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x800) << (20 - 11);
+                                    l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x7FE) << (21 - 1);
+                                    l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x100000) << (31 - 20);
+
+                                    RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, data = new byte[4], pendingLabel = false };
+                                    for (int i_byteIndex = 0; i_byteIndex < 4; ++i_byteIndex)
+                                    {
+                                        l_instructionBuilder.data[i_byteIndex] = (byte)(l_encodedInstruction & 0xFF);
+                                        l_encodedInstruction >>= 8;
+                                    }
+                                    l_instructionList.Add(l_instructionBuilder);
+                                }
+                                else if (l_tokenLine[3].type == RVTokenType.Label)
+                                {
+                                    RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[5].value };
+                                    l_instructionList.Add(l_instructionBuilder);
+                                }
+                                else
+                                {
+                                    throw new RVAssemblyException("Expected integer immediate or label identifier.", l_tokenLine[3].line, l_tokenLine[3].column);
+                                }
+                            }
+                            break;
+
+                            case RVInstructionType.System:
+                            {
+                                if (l_tokenLine.Length != 1)
+                                {
+                                    throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
+                                }
+
+                                UInt32 l_encodedInstruction = 0x0;
+                                l_encodedInstruction |= ((UInt32)l_instructionDescription.opcode) & 0x7F;
+                                l_encodedInstruction |= (((UInt32)l_instructionDescription.func3) & 0x1F) << 12;
+                                l_encodedInstruction |= (((UInt32)l_instructionDescription.func12) & 0xFFF) << 20;
+
+                                RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, data = new byte[4], pendingLabel = false };
+                                for (int i_byteIndex = 0; i_byteIndex < 4; ++i_byteIndex)
+                                {
+                                    l_instructionBuilder.data[i_byteIndex] = (byte)(l_encodedInstruction & 0xFF);
+                                    l_encodedInstruction >>= 8;
+                                }
+                                l_instructionList.Add(l_instructionBuilder);
+                            }
+                            break;
+
+                            // TODO: pseudo instructions
                         }
 
                         l_currentAddress += l_instructionDescription.size;
