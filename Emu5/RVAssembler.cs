@@ -55,6 +55,8 @@ namespace Emu5
             public bool pendingLabel;
             public RVInstructionDescription description;
             public String label;
+            public uint labelLine;
+            public uint labelColumn;
         }
 
         private struct RVDataBuilder
@@ -63,6 +65,8 @@ namespace Emu5
             public byte[] data;
             public bool pendingLabel;
             public String label;
+            public uint labelLine;
+            public uint labelColumn;
         }
 
         private RVAssembler()
@@ -179,7 +183,7 @@ namespace Emu5
                                             throw new RVAssemblyException("Memory location defined more than once", l_tokenLine[i_data].line, 0);
                                         }
 
-                                        RVDataBuilder l_dataBuilder = new RVDataBuilder { startAddress = l_currentAddress, pendingLabel = true, label = (String)l_tokenLine[i_data].value };
+                                        RVDataBuilder l_dataBuilder = new RVDataBuilder { startAddress = l_currentAddress, pendingLabel = true, label = (String)l_tokenLine[i_data].value, labelLine = l_tokenLine[i_data].line, labelColumn = l_tokenLine[i_data].column };
                                         l_dataList.Add(l_dataBuilder);
 
                                         l_currentAddress += 4;
@@ -679,7 +683,7 @@ namespace Emu5
                                 }
                                 else if (l_tokenLine[5].type == RVTokenType.Label)
                                 {
-                                    RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[5].value };
+                                    RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[5].value, labelLine = l_tokenLine[5].line, labelColumn = l_tokenLine[5].column };
                                     l_instructionList.Add(l_instructionBuilder);
                                 }
                                 else
@@ -784,7 +788,7 @@ namespace Emu5
                                 }
                                 else if (l_tokenLine[3].type == RVTokenType.Label)
                                 {
-                                    RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[5].value };
+                                    RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[3].value, labelLine = l_tokenLine[3].line, labelColumn = l_tokenLine[3].column };
                                     l_instructionList.Add(l_instructionBuilder);
                                 }
                                 else
@@ -827,6 +831,98 @@ namespace Emu5
                     {
                         throw new RVAssemblyException("Unexpected token at this location.", l_tokenLine[0].line, l_tokenLine[0].column);
                     }
+                }
+            }
+
+            // handle label dependent entries
+            for (int i_index = 0; i_index < l_dataList.Count; ++i_index)
+            {
+                RVDataBuilder l_dataBuilder = l_dataList[i_index];
+                if (l_dataBuilder.pendingLabel == true)
+                {
+                    if (l_labelDictionary.ContainsKey(l_dataBuilder.label) == false)
+                    {
+                        throw new RVAssemblyException("Undefined label \"" + l_dataBuilder.label + "\"", l_dataBuilder.labelLine, l_dataBuilder.labelColumn);
+                    }
+
+                    UInt32 l_labelValue = l_labelDictionary[l_dataBuilder.label];
+
+                    l_dataBuilder.data = new byte[4];
+                    for (int i_byteIndex = 0; i_byteIndex < 4; ++i_byteIndex)
+                    {
+                        l_dataBuilder.data[i_byteIndex] = (byte)(l_labelValue & 0xFF);
+                        l_labelValue >>= 8;
+                    }
+                    l_dataBuilder.pendingLabel = false;
+
+                    l_dataList[i_index] = l_dataBuilder;
+                }
+            }
+
+            for (int i_index = 0; i_index < l_instructionList.Count; ++i_index)
+            {
+                RVInstructionBuilder l_instructionBuilder = l_instructionList[i_index];
+                if (l_instructionBuilder.pendingLabel == true)
+                {
+                    if (l_labelDictionary.ContainsKey(l_instructionBuilder.label) == false)
+                    {
+                        throw new RVAssemblyException("Undefined label \"" + l_instructionBuilder.label + "\"", l_instructionBuilder.labelLine, l_instructionBuilder.labelColumn);
+                    }
+
+                    UInt32 l_offset = l_labelDictionary[l_instructionBuilder.label] - l_instructionBuilder.startAddress;
+                    UInt32 l_mask;
+                    RVInstructionDescription l_instructionDescription = l_instructionBuilder.description;
+
+                    if (l_instructionDescription.type == RVInstructionType.B)
+                    {
+                        l_mask = 0xFFFFF000;
+                    }
+                    else if (l_instructionDescription.type == RVInstructionType.J)
+                    {
+                        l_mask = 0xFFF00000;
+                    }
+                    else
+                    {
+                        throw new Exception("If you see this, I definetely fucked something up.");
+                    }
+
+                    if ((l_offset & l_mask) != l_mask && (l_offset & l_mask) != 0)
+                    {
+                        throw new RVAssemblyException("Target is too far.", l_instructionBuilder.labelLine, l_instructionBuilder.labelColumn);
+                    }
+                    l_instructionDescription.imm = l_offset;
+
+                    UInt32 l_encodedInstruction = 0x0;
+                    if (l_instructionDescription.type == RVInstructionType.B)
+                    {
+                        l_encodedInstruction |= ((UInt32)l_instructionDescription.opcode) & 0x7F;
+                        l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x800) >> (11 - 7);
+                        l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x1E) << (8 - 1);
+                        l_encodedInstruction |= (((UInt32)l_instructionDescription.func3) & 0x7) << 12;
+                        l_encodedInstruction |= (((UInt32)l_instructionDescription.rs1) & 0x1F) << 15;
+                        l_encodedInstruction |= (((UInt32)l_instructionDescription.rs2) & 0x1F) << 20;
+                        l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x7E0) << (25 - 5);
+                        l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x1000) << (31 - 12);
+                    }
+                    else if (l_instructionDescription.type == RVInstructionType.J)
+                    {
+                        l_encodedInstruction |= ((UInt32)l_instructionDescription.opcode) & 0x7F;
+                        l_encodedInstruction |= (((UInt32)l_instructionDescription.rd) & 0x1F) << 7;
+                        l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0xFF000);
+                        l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x800) << (20 - 11);
+                        l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x7FE) << (21 - 1);
+                        l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x100000) << (31 - 20);
+                    }
+
+                    l_instructionBuilder.pendingLabel = false;
+                    l_instructionBuilder.data = new byte[4];
+                    for (int i_byteIndex = 0; i_byteIndex < 4; ++i_byteIndex)
+                    {
+                        l_instructionBuilder.data[i_byteIndex] = (byte)(l_encodedInstruction & 0xFF);
+                        l_encodedInstruction >>= 8;
+                    }
+
+                    l_instructionList[i_index] = l_instructionBuilder;
                 }
             }
         }
