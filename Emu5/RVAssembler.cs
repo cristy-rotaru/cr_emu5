@@ -35,18 +35,18 @@ namespace Emu5
         }
     }
 
+    struct Interval
+    {
+        public UInt32 start;
+        public UInt32 end;
+    }
+
     class RVAssembler
     {
         private static object s_lock = new object();
         private static RVAssembler s_instance;
 
         Dictionary<String, RVDataType> m_dataTypeDictionary;
-
-        private struct Interval
-        {
-            public UInt32 start;
-            public UInt32 end;
-        }
 
         private struct RVInstructionBuilder
         {
@@ -89,7 +89,7 @@ namespace Emu5
             m_dataTypeDictionary.Add("STRZ", RVDataType.STRZ);
         }
 
-        static public void Assemble(String code, Dictionary<UInt32, UInt64> memoryMap)
+        static public void Assemble(String code, RVMemoryMap memoryMap)
         {
             RVToken[][] l_tokens = RVParser.Tokenize(code);
             

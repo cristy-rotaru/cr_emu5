@@ -5,11 +5,11 @@ namespace Emu5
 {
     class RVEmulator
     {
-        Dictionary<UInt32, UInt64> m_memoryMap; // mapped on 8 bytes to reduce memory consumption
+       RVMemoryMap m_memoryMap;
 
         public RVEmulator()
         {
-            m_memoryMap = new Dictionary<UInt32, UInt64>();
+            m_memoryMap = new RVMemoryMap();
         }
 
         public void Assemble(String code)
