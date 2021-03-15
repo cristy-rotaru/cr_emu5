@@ -62,6 +62,9 @@
     <Compile Include="EditorPerspective.xaml.cs">
       <DependentUpon>EditorPerspective.xaml</DependentUpon>
     </Compile>
+    <Compile Include="EmulatorPerspective.xaml.cs">
+      <DependentUpon>EmulatorPerspective.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PerspectivePage.xaml.cs">
       <DependentUpon>PerspectivePage.xaml</DependentUpon>
     </Compile>
@@ -77,6 +80,10 @@
       <DependentUpon>WelcomePage.xaml</DependentUpon>
     </Compile>
     <Page Include="EditorPerspective.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EmulatorPerspective.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

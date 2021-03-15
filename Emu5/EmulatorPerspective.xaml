@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="Emu5.EmulatorPerspective"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Emu5"
+             mc:Ignorable="d" FontFamily="Consolas">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="270" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Grid.Column="0" Background="White">
+            <Grid DockPanel.Dock="Bottom" ShowGridLines="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="3*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="24" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" FontSize="16" FontWeight="Bold" Text="PC" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <TextBlock Name="textBlockRegisterPC" Grid.Row="0" Grid.Column="1" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Grid>
+            <StackPanel>
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</UserControl>
