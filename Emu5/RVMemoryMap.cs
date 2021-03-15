@@ -36,7 +36,7 @@ namespace Emu5
             m_memoryRanges.Add(new Interval { start = 0x00000000, end = 0x9FFFFFFF }); // default ranges
             m_memoryRanges.Add(new Interval { start = 0xC0000000, end = 0xFFFFFFFF }); // will be replaced in the future
 
-            m_uninitializedValue = 0xFF;
+            m_uninitializedValue = 0xFFFFFFFFFFFFFFFF;
         }
 
         public byte UninitializedMemoryValue

@@ -925,6 +925,16 @@ namespace Emu5
                     l_instructionList[i_index] = l_instructionBuilder;
                 }
             }
+
+            foreach (RVDataBuilder i_dataBuilder in l_dataList)
+            {
+                memoryMap.Write(i_dataBuilder.startAddress, i_dataBuilder.data);
+            }
+
+            foreach (RVInstructionBuilder i_instructionBuilder in l_instructionList)
+            {
+                memoryMap.Write(i_instructionBuilder.startAddress, i_instructionBuilder.data);
+            }
         }
 
         static private bool CheckInterval(List<Interval> existingIntervals, Interval newInterval)
