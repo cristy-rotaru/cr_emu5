@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -21,8 +23,9 @@ namespace Emu5
         TabHeader m_tabHeader = null;
 
         EditorPerspective m_editor = new EditorPerspective();
+        EmulatorPerspective m_processor = new EmulatorPerspective();
 
-        RVEmulator m_rvEmulator = null;
+        RVEmulator m_rvEmulator = new RVEmulator();
 
         public PerspectivePage()
         {
@@ -155,19 +158,27 @@ namespace Emu5
 
         public void StartEmulator()
         {
-            if (m_rvEmulator == null)
-            {
-                m_rvEmulator = new RVEmulator();
-            }
+            String l_code = m_editor.GetText();
 
-            try
-            {
-                m_rvEmulator.Assemble(m_editor.GetText());
-            }
-            catch (RVAssemblyException e_assemblyException)
-            {
-                MessageBox.Show("L: " + e_assemblyException.Line + "; C: " + e_assemblyException.Column + "\n" + e_assemblyException.Message, "Compilation error!", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            ThreadStart l_startEmulatorThreadFunction = new ThreadStart(
+            () => {
+                try
+                {
+                    m_rvEmulator.Assemble(l_code);
+                }
+                catch (RVAssemblyException e_assemblyException)
+                {
+                    Delegate l_exceptionDelegate = new Action(
+                    () => {
+                        MessageBox.Show("L: " + e_assemblyException.Line + "; C: " + e_assemblyException.Column + "\n" + e_assemblyException.Message, "Compilation error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                    });
+
+                    Dispatcher.BeginInvoke(l_exceptionDelegate);
+                }
+            });
+
+            Thread l_worker = new Thread(l_startEmulatorThreadFunction);
+            l_worker.Start();
         }
     }
 }
