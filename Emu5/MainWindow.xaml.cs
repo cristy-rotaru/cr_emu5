@@ -487,7 +487,99 @@ namespace Emu5
 
         private void tabControlMain_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            int l_selectedIntex = tabControlMain.SelectedIndex;
+            if (l_selectedIntex >= 0)
+            {
+                TabItem l_tab = (TabItem)tabControlMain.Items[l_selectedIntex];
 
+                if (l_tab.Content.GetType() == typeof(WelcomePage))
+                {
+                    ShowPerspectiveState(Perspective.None);
+                }
+                else
+                {
+                    PerspectivePage l_perspectivePage = (PerspectivePage)l_tab.Content;
+                    ShowPerspectiveState(l_perspectivePage.GetCurrentPerspective());
+                }
+            }
+        }
+        #endregion
+
+        #region r_PerspectiveHandling
+        private void ShowPerspectiveState(Perspective perspective)
+        {
+            buttonPerspectiveEditor.Background = SystemColors.ControlBrush;
+            buttonPerspectiveEmulator.Background = SystemColors.ControlBrush;
+            buttonPerspectiveLog.Background = SystemColors.ControlBrush;
+
+            if (perspective == Perspective.None)
+            {
+                buttonPerspectiveEditor.IsEnabled = false;
+                buttonPerspectiveEmulator.IsEnabled = false;
+                buttonPerspectiveLog.IsEnabled = false;
+            }
+            else
+            {
+                buttonPerspectiveEditor.IsEnabled = true;
+                buttonPerspectiveEmulator.IsEnabled = true;
+                buttonPerspectiveLog.IsEnabled = true;
+            }
+
+            switch (perspective)
+            {
+                case Perspective.Editor:
+                {
+                    buttonPerspectiveEditor.Background = SystemColors.AppWorkspaceBrush;
+                }
+                break;
+
+                case Perspective.Emulator:
+                {
+                    buttonPerspectiveEmulator.Background = SystemColors.AppWorkspaceBrush;
+                }
+                break;
+
+                case Perspective.Log:
+                {
+                    buttonPerspectiveLog.Background = SystemColors.AppWorkspaceBrush;
+                }
+                break;
+            }
+        }
+
+        private void buttonPerspective_Click(object sender, RoutedEventArgs e)
+        {
+            Perspective l_newPerspective = Perspective.None;
+            if (sender == buttonPerspectiveEditor)
+            {
+                l_newPerspective = Perspective.Editor;
+            }
+            else if (sender == buttonPerspectiveEmulator)
+            {
+                l_newPerspective = Perspective.Emulator;
+            }
+            else if (sender == buttonPerspectiveLog)
+            {
+                l_newPerspective = Perspective.Log;
+            }
+            else
+            {
+                return;
+            }
+
+            int l_selectedIntex = tabControlMain.SelectedIndex;
+            if (l_selectedIntex < 0)
+            {
+                return;
+            }
+
+            TabItem l_tab = (TabItem)tabControlMain.Items[l_selectedIntex];
+            if (l_tab.Content.GetType() == typeof(PerspectivePage))
+            {
+                PerspectivePage l_perspectivePage = (PerspectivePage)l_tab.Content;
+                l_perspectivePage.ChangePerspective(l_newPerspective);
+                ShowPerspectiveState(l_newPerspective);
+            }
         }
         #endregion
     }

@@ -178,13 +178,13 @@
         </Menu>
         <DockPanel DockPanel.Dock="Top" Background="#72C7C7C7">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" FlowDirection="LeftToRight"> <!--Used to host perspectives -->
-                <Button Name="buttonPerspectiveEditor" Width="24" Height="24" Margin="3" ToolTip="Editor Perspective">
+                <Button Name="buttonPerspectiveEditor" Width="24" Height="24" Margin="3" ToolTip="Editor Perspective" Click="buttonPerspective_Click">
                     <Image Source="Icons/perspective_editor.png" />
                 </Button>
-                <Button Name="buttonPerspectiveEmulator" Width="24" Height="24" Margin="3" ToolTip="Emulator Perspective">
+                <Button Name="buttonPerspectiveEmulator" Width="24" Height="24" Margin="3" ToolTip="Emulator Perspective" Click="buttonPerspective_Click">
                     <Image Source="Icons/perspective_emulator.png" />
                 </Button>
-                <Button Name="buttonPerspectiveLog" Width="24" Height="24" Margin="3" ToolTip="Log Perspective">
+                <Button Name="buttonPerspectiveLog" Width="24" Height="24" Margin="3" ToolTip="Log Perspective" Click="buttonPerspective_Click">
                     <Image Source="Icons/perspective_log.png" />
                 </Button>
             </StackPanel>

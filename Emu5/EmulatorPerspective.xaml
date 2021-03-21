@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Emu5"
-             mc:Ignorable="d" FontFamily="Consolas" Width="1000">
+             mc:Ignorable="d" FontFamily="Consolas">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="270" />
@@ -626,7 +626,7 @@
                 </Border>
 
                 <Border Grid.Row="0" Grid.Column="4" BorderThickness="1" BorderBrush="#FFACACAC">
-                    <TextBlock Margin="2" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold" Text="Meta" />
+                    <TextBlock Margin="2" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold" Text="Annotation" />
                 </Border>
             </Grid>
 

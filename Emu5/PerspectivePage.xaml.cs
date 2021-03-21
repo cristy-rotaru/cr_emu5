@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -43,6 +42,36 @@ namespace Emu5
         public Perspective GetCurrentPerspective()
         {
             return m_currentPerspective;
+        }
+
+        public void ChangePerspective(Perspective newPerspective)
+        {
+            if (newPerspective != Perspective.None)
+            {
+                m_currentPerspective = newPerspective;
+                dockPanelMain.Children.Clear();
+
+                switch(m_currentPerspective)
+                {
+                    case Perspective.Editor:
+                    {
+                        dockPanelMain.Children.Add(m_editor);
+                    }
+                    break;
+
+                    case Perspective.Emulator:
+                    {
+                        dockPanelMain.Children.Add(m_processor);
+                    }
+                    break;
+
+                    case Perspective.Log:
+                    {
+                        // will add log perspective once implemented
+                    }
+                    break;
+                }
+            }
         }
 
         public bool CanUndo()
