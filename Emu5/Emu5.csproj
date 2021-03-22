@@ -59,11 +59,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DataViewEntry.xaml.cs">
+      <DependentUpon>DataViewEntry.xaml</DependentUpon>
+    </Compile>
     <Compile Include="EditorPerspective.xaml.cs">
       <DependentUpon>EditorPerspective.xaml</DependentUpon>
     </Compile>
     <Compile Include="EmulatorPerspective.xaml.cs">
       <DependentUpon>EmulatorPerspective.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="InstructionViewEntry.xaml.cs">
+      <DependentUpon>InstructionViewEntry.xaml</DependentUpon>
     </Compile>
     <Compile Include="PerspectivePage.xaml.cs">
       <DependentUpon>PerspectivePage.xaml</DependentUpon>
@@ -79,11 +85,19 @@
     <Compile Include="WelcomePage.xaml.cs">
       <DependentUpon>WelcomePage.xaml</DependentUpon>
     </Compile>
+    <Page Include="DataViewEntry.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="EditorPerspective.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="EmulatorPerspective.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="InstructionViewEntry.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
