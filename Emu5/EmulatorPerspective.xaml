@@ -630,7 +630,7 @@
                 </Border>
             </Grid>
 
-            <StackPanel>
+            <StackPanel Name="stackPanelInstructionView">
             </StackPanel>
         </DockPanel>
 
@@ -703,7 +703,7 @@
                 </Border>
             </Grid>
 
-            <StackPanel>
+            <StackPanel Name="stackPanelMemoryView">
             </StackPanel>
         </DockPanel>
     </Grid>

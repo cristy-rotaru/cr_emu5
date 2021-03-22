@@ -188,12 +188,21 @@ namespace Emu5
         public void StartEmulator()
         {
             String l_code = m_editor.GetText();
+            m_processor.BindEmulator(m_rvEmulator);
 
             ThreadStart l_startEmulatorThreadFunction = new ThreadStart(
             () => {
                 try
                 {
                     m_rvEmulator.Assemble(l_code);
+                    m_rvEmulator.ResetProcessor();
+
+                    Delegate l_compilationFinishedDelegate = new Action(
+                    () => {
+                        m_processor.UpdateInfo();
+                    });
+
+                    Dispatcher.BeginInvoke(l_compilationFinishedDelegate);
                 }
                 catch (RVAssemblyException e_assemblyException)
                 {
