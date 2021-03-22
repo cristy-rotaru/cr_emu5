@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace Emu5
@@ -22,6 +23,14 @@ namespace Emu5
             textBlockInstruction.Text = instruction;
             textBlockRawValue.Text = rawValue;
             textBlockAnnotation.Text = annotation;
+        }
+
+        public bool Highlighted
+        {
+            set
+            {
+                this.Background = value ? Brushes.Yellow : Brushes.Transparent;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -11,6 +12,10 @@ namespace Emu5
     {
         RVEmulator m_emulator = null;
 
+        List<InstructionViewEntry> m_instructionEntries;
+        List<DataViewEntry> m_dataEntries;
+
+        UInt32 m_currentPC;
         UInt32[] m_previousRegisterValues;
         TextBlock[] m_registerTextBoxes;
 
@@ -18,6 +23,10 @@ namespace Emu5
         {
             InitializeComponent();
 
+            m_instructionEntries = new List<InstructionViewEntry>();
+            m_dataEntries = new List<DataViewEntry>();
+
+            m_currentPC = 0x0;
             m_previousRegisterValues = new UInt32[32];
             m_registerTextBoxes = new TextBlock[32];
 
@@ -81,6 +90,9 @@ namespace Emu5
 
                 textBlockRegisterPC.Text = "";
 
+                m_instructionEntries.Clear();
+                m_dataEntries.Clear();
+
                 stackPanelInstructionView.Children.Clear();
                 stackPanelMemoryView.Children.Clear();
             }
@@ -95,8 +107,116 @@ namespace Emu5
                     m_previousRegisterValues[i_index] = l_registerValues[i_index];
                 }
 
-                textBlockRegisterPC.Text = String.Format("0x{0,8:X8}", m_emulator.GetProgramCounter());
+                m_currentPC = m_emulator.GetProgramCounter();
+                textBlockRegisterPC.Text = String.Format("0x{0,8:X8}", m_currentPC);
+
+                if (m_instructionEntries.Count == 0)
+                {
+                    RefreshInstructionView();
+                }
+                else
+                {
+                    UpdateInstructionView();
+                }
+
+                if (m_dataEntries.Count == 0)
+                {
+                    RefreshDataView();
+                }
+                else
+                {
+                    UpdateDataView();
+                }
             }
+        }
+
+        private void RefreshInstructionView()
+        {
+            stackPanelInstructionView.Children.Clear();
+            m_instructionEntries.Clear();
+
+            int l_entryCount = (int)(stackPanelInstructionView.ActualHeight / 24);
+            for (int i_index = 0; i_index < l_entryCount; ++i_index)
+            {
+                InstructionViewEntry l_viewEntry = new InstructionViewEntry();
+
+                UInt32 l_address = m_currentPC + (UInt32)(i_index << 2);
+                byte?[] l_rawData = m_emulator.GetMemoryMapReference().Read(l_address, 4);
+                UInt32 l_data = 0x0;
+                bool l_validInstructionData = true;
+
+                for (int i_byteIndex = 0; i_byteIndex < 4; ++i_byteIndex)
+                {
+                    if (l_rawData[i_byteIndex] == null)
+                    {
+                        l_validInstructionData = false;
+                        break;
+                    }
+                    byte l_byte = (byte)l_rawData[i_byteIndex];
+                    l_data <<= 8;
+                    l_data |= (UInt32)l_byte;
+                }
+
+                // call decode instruction
+
+                String l_addressString = String.Format("{0,8:X8}", l_address);
+                String l_instructionString = "";
+                String l_dataString = l_validInstructionData ? String.Format("0x{0,8:X8}", l_data) : "";
+                String l_annotationString = "";
+
+                l_viewEntry.DisplayData(false, l_addressString, l_instructionString, l_dataString, l_annotationString);
+
+                l_viewEntry.Highlighted = i_index == 0;
+
+                stackPanelInstructionView.Children.Add(l_viewEntry);
+                m_instructionEntries.Add(l_viewEntry);
+            }
+        }
+
+        private void RefreshDataView()
+        {
+            stackPanelMemoryView.Children.Clear();
+            m_dataEntries.Clear();
+
+            int l_entryCount = (int)(stackPanelMemoryView.ActualHeight / 24);
+            for (int i_index = 0; i_index < l_entryCount; ++i_index)
+            {
+                DataViewEntry l_viewEntry = new DataViewEntry();
+
+                UInt32 l_baseAddress = (UInt32)(i_index << 3);
+                byte?[] l_rawData = m_emulator.GetMemoryMapReference().Read(l_baseAddress, 8);
+                String[] l_dataString = new String[8];
+
+                for (int i_byteIndex = 0; i_byteIndex < 8; ++i_byteIndex)
+                {
+                    if (l_rawData[i_byteIndex] == null)
+                    {
+                        l_dataString[i_byteIndex] = "??";
+                    }
+                    else
+                    {
+                        byte l_byte = (byte)l_rawData[i_byteIndex];
+                        l_dataString[i_byteIndex] = String.Format("{0,2:X2}", (UInt32)l_byte);
+                    }
+                }
+
+                String l_baseAddressString = String.Format("{0,8:X8}", l_baseAddress);
+
+                l_viewEntry.DisplayData(l_baseAddressString, l_dataString[0], l_dataString[1], l_dataString[2], l_dataString[3], l_dataString[4], l_dataString[5], l_dataString[6], l_dataString[7]);
+
+                stackPanelMemoryView.Children.Add(l_viewEntry);
+                m_dataEntries.Add(l_viewEntry);
+            }
+        }
+
+        private void UpdateInstructionView()
+        {
+
+        }
+
+        private void UpdateDataView()
+        {
+
         }
     }
 }
