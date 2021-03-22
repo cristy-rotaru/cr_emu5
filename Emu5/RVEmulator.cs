@@ -2,12 +2,12 @@
 
 namespace Emu5
 {
-    class RVEmulationException : Exception
+    public class RVEmulationException : Exception
     {
         public RVEmulationException(String message) : base(message) { }
     }
 
-    class RVEmulator
+    public class RVEmulator
     {
         RVMemoryMap m_memoryMap;
         UInt32[] m_registerFile;

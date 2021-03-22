@@ -25,7 +25,7 @@ namespace Emu5
         public object value;
     }
 
-    class RVParser
+    public class RVParser
     {
         private enum ParserState
         {

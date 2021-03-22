@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Emu5
 {
-    enum RVDataType
+    public enum RVDataType
     {
         DB, DH, DW, STR, STRZ
     }
@@ -35,13 +35,13 @@ namespace Emu5
         }
     }
 
-    struct Interval
+    public struct Interval
     {
         public UInt32 start;
         public UInt32 end;
     }
 
-    class RVAssembler
+    public class RVAssembler
     {
         private static object s_lock = new object();
         private static RVAssembler s_instance;

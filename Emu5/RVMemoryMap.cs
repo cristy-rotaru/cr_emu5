@@ -21,7 +21,7 @@ namespace Emu5
         }
     }
 
-    class RVMemoryMap
+    public class RVMemoryMap
     {
         Dictionary<UInt32, UInt64> m_memoryDictionary; // mapped to 8 bytes to reduce memory consumption
         List<Interval> m_memoryRanges;
