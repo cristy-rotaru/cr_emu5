@@ -8,23 +8,52 @@ namespace Emu5
     /// </summary>
     public partial class DataViewEntry : UserControl
     {
+        UInt32 m_address;
+        TextBlock[] m_dataTextBlocks;
+
         public DataViewEntry()
         {
             InitializeComponent();
+
+            m_dataTextBlocks = new TextBlock[8];
+
+            m_dataTextBlocks[0] = textBlockData0;
+            m_dataTextBlocks[1] = textBlockData1;
+            m_dataTextBlocks[2] = textBlockData2;
+            m_dataTextBlocks[3] = textBlockData3;
+            m_dataTextBlocks[4] = textBlockData4;
+            m_dataTextBlocks[5] = textBlockData5;
+            m_dataTextBlocks[6] = textBlockData6;
+            m_dataTextBlocks[7] = textBlockData7;
         }
 
-        public void DisplayData(String baseAddress, String data0, String data1, String data2, String data3, String data4, String data5, String data6, String data7)
+        public void DisplayData(UInt32 baseAddress, byte?[] data)
         {
-            textBlockBaseAddress.Text = baseAddress;
+            if (data.Length != 8)
+            {
+                throw new Exception("Invalid data length.");
+            }
 
-            textBlockData0.Text = data0;
-            textBlockData1.Text = data1;
-            textBlockData2.Text = data2;
-            textBlockData3.Text = data3;
-            textBlockData4.Text = data4;
-            textBlockData5.Text = data5;
-            textBlockData6.Text = data6;
-            textBlockData7.Text = data7;
+            m_address = baseAddress;
+            textBlockBaseAddress.Text = String.Format("{0,8:X8}", baseAddress);
+
+            for (int i_index = 0; i_index < 8; ++i_index)
+            {
+                if (data[i_index] == null)
+                {
+                    m_dataTextBlocks[i_index].Text = "";
+                }
+                else
+                {
+                    byte l_byte = (byte)data[i_index];
+                    m_dataTextBlocks[i_index].Text = String.Format("{0,2:X2}", (UInt32)l_byte);
+                }
+            }
+        }
+
+        public UInt32 GetBaseAddress()
+        {
+            return m_address;
         }
     }
 }
