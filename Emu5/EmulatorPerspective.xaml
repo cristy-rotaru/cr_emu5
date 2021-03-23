@@ -4,12 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Emu5"
-             mc:Ignorable="d" FontFamily="Consolas">
+             mc:Ignorable="d"
+             FontFamily="Consolas" SizeChanged="EmulatorPerspective_SizeChanged">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="270" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="9*" />
+            <ColumnDefinition Width="7*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -34,551 +35,553 @@
                     </Border>
                 </Grid>
             </Border>
-            <StackPanel>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+            <ScrollViewer>
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x0  (zero)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX0" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x0  (zero)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX0" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x1  (ra)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX1" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x1  (ra)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX1" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x2  (sp)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX2" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x2  (sp)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX2" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x3  (gp)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX3" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x3  (gp)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX3" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x4  (tp)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX4" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x4  (tp)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX4" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x5  (t0)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX5" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x5  (t0)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX5" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock  FontSize="16" FontWeight="Bold" Text="x6  (t1)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX6" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock  FontSize="16" FontWeight="Bold" Text="x6  (t1)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX6" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x7  (t2)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX7" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x7  (t2)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX7" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x8  (s0/fp)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX8" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x8  (s0/fp)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX8" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x9  (s1)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX9" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x9  (s1)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX9" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x10 (a0)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX10" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x10 (a0)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX10" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x11 (a1)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX11" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x11 (a1)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX11" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x12 (a2)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX12" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x12 (a2)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX12" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x13 (a3)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX13" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x13 (a3)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX13" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x14 (a4)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX14" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x14 (a4)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX14" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x15 (a5)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX15" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x15 (a5)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX15" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x16 (a6)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX16" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x16 (a6)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX16" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x17 (a7)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX17" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x17 (a7)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX17" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x18 (s2)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX18" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x18 (s2)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX18" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x19 (s3)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX19" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x19 (s3)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX19" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x20 (s4)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX20" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x20 (s4)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX20" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x21 (s5)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX21" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x21 (s5)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX21" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x22 (s6)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX22" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x22 (s6)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX22" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x23 (s7)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX23" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x23 (s7)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX23" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x24 (s8)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX24" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x24 (s8)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX24" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x25 (s9)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX25" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x25 (s9)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX25" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x26 (s10)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX26" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x26 (s10)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX26" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x27 (s11)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX27" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x27 (s11)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX27" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x28 (t3)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX28" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x28 (t3)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX28" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x29 (t4)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX29" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x29 (t4)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX29" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
-                    
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x30 (t5)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX30" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x30 (t5)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX30" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock FontSize="16" FontWeight="Bold" Text="x31 (t6)" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                    </Border>
-                    <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                        <TextBlock Name="textBlockRegisterX31" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                </Grid>
-            </StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock FontSize="16" FontWeight="Bold" Text="x31 (t6)" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
+                            <TextBlock Name="textBlockRegisterX31" FontSize="16" Text="0x00000000" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
         </DockPanel>
 
         <DockPanel Grid.Row="0" Grid.Column="1" Margin="3,0,0,0" Background="White">
@@ -630,7 +633,7 @@
                 </Border>
             </Grid>
 
-            <StackPanel Name="stackPanelInstructionView">
+            <StackPanel Name="stackPanelInstructionView" Height="Auto" MouseWheel="stackPanelInstructionView_MouseWheel">
             </StackPanel>
         </DockPanel>
 
@@ -703,7 +706,7 @@
                 </Border>
             </Grid>
 
-            <StackPanel Name="stackPanelMemoryView">
+            <StackPanel Name="stackPanelMemoryView" Height="Auto" MouseWheel="stackPanelMemoryView_MouseWheel">
             </StackPanel>
         </DockPanel>
     </Grid>

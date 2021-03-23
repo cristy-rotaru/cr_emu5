@@ -135,6 +135,8 @@ namespace Emu5
             stackPanelInstructionView.Children.Clear();
             m_instructionEntries.Clear();
 
+            stackPanelInstructionView.UpdateLayout();
+
             int l_entryCount = (int)(stackPanelInstructionView.ActualHeight / 24);
             for (int i_index = 0; i_index < l_entryCount; ++i_index)
             {
@@ -154,15 +156,23 @@ namespace Emu5
 
         private void RefreshDataView()
         {
+            UInt32 l_startAddress = 0x0;
+            if (m_dataEntries.Count > 0)
+            {
+                l_startAddress = m_dataEntries[0].GetBaseAddress();
+            }
+
             stackPanelMemoryView.Children.Clear();
             m_dataEntries.Clear();
+
+            stackPanelMemoryView.UpdateLayout();
 
             int l_entryCount = (int)(stackPanelMemoryView.ActualHeight / 24);
             for (int i_index = 0; i_index < l_entryCount; ++i_index)
             {
                 DataViewEntry l_viewEntry = new DataViewEntry();
 
-                UInt32 l_baseAddress = (UInt32)(i_index << 3);
+                UInt32 l_baseAddress = (UInt32)(l_startAddress + i_index << 3);
                 byte?[] l_rawData = m_emulator.GetMemoryMapReference().Read(l_baseAddress, 8);
                 
                 l_viewEntry.DisplayData(l_baseAddress, l_rawData);
@@ -180,6 +190,125 @@ namespace Emu5
         private void UpdateDataView()
         {
 
+        }
+
+        private void EmulatorPerspective_SizeChanged(object sender, System.Windows.SizeChangedEventArgs e)
+        {
+            if (e.HeightChanged)
+            {
+                if (m_emulator == null)
+                {
+                    m_instructionEntries.Clear();
+                    stackPanelInstructionView.Children.Clear();
+
+                    m_dataEntries.Clear();
+                    stackPanelMemoryView.Children.Clear();
+                }
+                else
+                {
+                    RefreshInstructionView();
+                    RefreshDataView();
+                }
+            }
+        }
+
+        private void stackPanelInstructionView_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            if (m_instructionEntries.Count == 0)
+            {
+                return;
+            }
+
+            UInt32 l_nextAddress;
+            int l_addIndex;
+
+            if (e.Delta > 0) // scroll up
+            {
+                int l_lastIndex = m_instructionEntries.Count - 1;
+
+                for (int i_index = l_lastIndex; i_index > 0; --i_index)
+                {
+                    m_instructionEntries[i_index] = m_instructionEntries[i_index - 1];
+                }
+
+                l_nextAddress = m_instructionEntries[0].GetAddress() - 4;
+                m_instructionEntries.RemoveAt(0);
+                l_addIndex = 0;
+            }
+            else // scroll down
+            {
+                int l_lastIndex = m_instructionEntries.Count - 1;
+
+                for (int i_index = 0; i_index < l_lastIndex; ++i_index)
+                {
+                    m_instructionEntries[i_index] = m_instructionEntries[i_index + 1];
+                }
+
+                l_nextAddress = m_instructionEntries[l_lastIndex].GetAddress() + 4;
+                m_instructionEntries.RemoveAt(l_lastIndex);
+                l_addIndex = l_lastIndex;
+            }
+
+            InstructionViewEntry l_viewEntry = new InstructionViewEntry();
+            l_viewEntry.DisplayData(false, l_nextAddress, m_emulator.GetMemoryMapReference().Read(l_nextAddress, 4), "");
+            l_viewEntry.Highlighted = l_nextAddress == m_currentPC;
+
+            m_instructionEntries.Insert(l_addIndex, l_viewEntry);
+            stackPanelInstructionView.Children.Clear();
+
+            foreach (InstructionViewEntry i_entry in m_instructionEntries)
+            {
+                stackPanelInstructionView.Children.Add(i_entry);
+            }
+        }
+
+        private void stackPanelMemoryView_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            if (m_dataEntries.Count == 0)
+            {
+                return;
+            }
+
+            UInt32 l_nextAddress;
+            int l_addIndex;
+
+            if (e.Delta > 0) // scroll up
+            {
+                int l_lastIndex = m_dataEntries.Count - 1;
+
+                for (int i_index = l_lastIndex; i_index > 0; --i_index)
+                {
+                    m_dataEntries[i_index] = m_dataEntries[i_index - 1];
+                }
+
+                l_nextAddress = m_dataEntries[0].GetBaseAddress() - 8;
+                m_dataEntries.RemoveAt(0);
+                l_addIndex = 0;
+            }
+            else // scroll down
+            {
+                int l_lastIndex = m_dataEntries.Count - 1;
+
+                for (int i_index = 0; i_index < l_lastIndex; ++i_index)
+                {
+                    m_dataEntries[i_index] = m_dataEntries[i_index + 1];
+                }
+
+                l_nextAddress = m_dataEntries[l_lastIndex].GetBaseAddress() + 8;
+                m_dataEntries.RemoveAt(l_lastIndex);
+                l_addIndex = l_lastIndex;
+            }
+
+            DataViewEntry l_viewEntry = new DataViewEntry();
+            l_viewEntry.DisplayData(l_nextAddress, m_emulator.GetMemoryMapReference().Read(l_nextAddress, 8));
+
+            m_dataEntries.Insert(l_addIndex, l_viewEntry);
+            stackPanelMemoryView.Children.Clear();
+
+            foreach (DataViewEntry i_entry in m_dataEntries)
+            {
+                stackPanelMemoryView.Children.Add(i_entry);
+            }
         }
     }
 }
