@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Timers;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -18,6 +19,8 @@ namespace Emu5
         UInt32 m_currentPC;
         UInt32[] m_previousRegisterValues;
         TextBlock[] m_registerTextBoxes;
+
+        Timer m_resizeTimer;
 
         public EmulatorPerspective()
         {
@@ -67,6 +70,10 @@ namespace Emu5
             m_registerTextBoxes[29] = textBlockRegisterX29;
             m_registerTextBoxes[30] = textBlockRegisterX30;
             m_registerTextBoxes[31] = textBlockRegisterX31;
+
+            m_resizeTimer = new Timer(65);
+            m_resizeTimer.Elapsed += new ElapsedEventHandler(ResizeComplete);
+            m_resizeTimer.AutoReset = false;
 
             UpdateInfo();
         }
@@ -196,6 +203,15 @@ namespace Emu5
         {
             if (e.HeightChanged)
             {
+                m_resizeTimer.Stop();
+                m_resizeTimer.Start();
+            }
+        }
+
+        private void ResizeComplete(object sender, ElapsedEventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(
+            () => {
                 if (m_emulator == null)
                 {
                     m_instructionEntries.Clear();
@@ -209,7 +225,7 @@ namespace Emu5
                     RefreshInstructionView();
                     RefreshDataView();
                 }
-            }
+            }));
         }
 
         private void stackPanelInstructionView_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
