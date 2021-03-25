@@ -49,6 +49,11 @@ namespace Emu5
             m_textChangedHandler = handler;
         }
 
+        public void SetEditable(bool editable)
+        {
+            textEditorMain.IsReadOnly = !editable;
+        }
+
         public bool CanUndo()
         {
             return textEditorMain.CanUndo;

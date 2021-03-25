@@ -86,6 +86,7 @@ namespace Emu5
             TabItem l_newTab = new TabItem();
             l_newTab.Header = new TabHeader("Untitled", true, () => RemoveTab(l_newTab));
             l_newTab.Content = new PerspectivePage((TabHeader)l_newTab.Header);
+            ((PerspectivePage)l_newTab.Content).RegisterPerspectiveChangedCallback(UpdatePerspectiveState);
             tabControlMain.Items.Add(l_newTab);
 
             tabControlMain.SelectedItem = l_newTab;
@@ -96,6 +97,7 @@ namespace Emu5
             TabItem l_newTab = new TabItem();
             l_newTab.Header = new TabHeader("", false, () => RemoveTab(l_newTab));
             l_newTab.Content = new PerspectivePage((TabHeader)l_newTab.Header);
+            ((PerspectivePage)l_newTab.Content).RegisterPerspectiveChangedCallback(UpdatePerspectiveState);
 
             if (((PerspectivePage)l_newTab.Content).Open() == true)
             {
@@ -356,7 +358,9 @@ namespace Emu5
 
                     if (l_tab.Content.GetType() == typeof(PerspectivePage))
                     {
-                        l_canExecute = true;
+                        PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+
+                        l_canExecute = l_page.CanStartEmulator();
                     }
                 }
             }
@@ -492,64 +496,66 @@ namespace Emu5
             {
                 TabItem l_tab = (TabItem)tabControlMain.Items[l_selectedIntex];
 
-                if (l_tab.Content.GetType() == typeof(WelcomePage))
-                {
-                    ShowPerspectiveState(Perspective.None);
-                }
-                else
-                {
-                    PerspectivePage l_perspectivePage = (PerspectivePage)l_tab.Content;
-                    ShowPerspectiveState(l_perspectivePage.GetCurrentPerspective());
-                }
+                UpdatePerspectiveState();
             }
         }
         #endregion
 
         #region r_PerspectiveHandling
-        private void ShowPerspectiveState(Perspective perspective)
+        private void UpdatePerspectiveState()
         {
+            int l_selectedIntex = tabControlMain.SelectedIndex;
+            if (l_selectedIntex < 0)
+            {
+                return;
+            }
+
             buttonPerspectiveEditor.Background = SystemColors.ControlBrush;
             buttonPerspectiveEmulator.Background = SystemColors.ControlBrush;
             buttonPerspectiveLog.Background = SystemColors.ControlBrush;
 
-            if (perspective == Perspective.None)
+            TabItem l_tab = (TabItem)tabControlMain.Items[l_selectedIntex];
+            if (l_tab.Content.GetType() == typeof(PerspectivePage))
+            {
+                PerspectivePage l_perspectivePage = (PerspectivePage)l_tab.Content;
+                Perspective l_perspective = l_perspectivePage.GetCurrentPerspective();
+
+                buttonPerspectiveEditor.IsEnabled = true;
+                buttonPerspectiveEmulator.IsEnabled = true;
+                buttonPerspectiveLog.IsEnabled = true;
+
+                switch (l_perspective)
+                {
+                    case Perspective.Editor:
+                    {
+                        buttonPerspectiveEditor.Background = SystemColors.AppWorkspaceBrush;
+                    }
+                    break;
+
+                    case Perspective.Emulator:
+                    {
+                        buttonPerspectiveEmulator.Background = SystemColors.AppWorkspaceBrush;
+                    }
+                    break;
+
+                    case Perspective.Log:
+                    {
+                        buttonPerspectiveLog.Background = SystemColors.AppWorkspaceBrush;
+                    }
+                    break;
+                }
+            }
+            else
             {
                 buttonPerspectiveEditor.IsEnabled = false;
                 buttonPerspectiveEmulator.IsEnabled = false;
                 buttonPerspectiveLog.IsEnabled = false;
             }
-            else
-            {
-                buttonPerspectiveEditor.IsEnabled = true;
-                buttonPerspectiveEmulator.IsEnabled = true;
-                buttonPerspectiveLog.IsEnabled = true;
-            }
-
-            switch (perspective)
-            {
-                case Perspective.Editor:
-                {
-                    buttonPerspectiveEditor.Background = SystemColors.AppWorkspaceBrush;
-                }
-                break;
-
-                case Perspective.Emulator:
-                {
-                    buttonPerspectiveEmulator.Background = SystemColors.AppWorkspaceBrush;
-                }
-                break;
-
-                case Perspective.Log:
-                {
-                    buttonPerspectiveLog.Background = SystemColors.AppWorkspaceBrush;
-                }
-                break;
-            }
         }
 
         private void buttonPerspective_Click(object sender, RoutedEventArgs e)
         {
-            Perspective l_newPerspective = Perspective.None;
+            Perspective l_newPerspective;
             if (sender == buttonPerspectiveEditor)
             {
                 l_newPerspective = Perspective.Editor;
@@ -578,7 +584,6 @@ namespace Emu5
             {
                 PerspectivePage l_perspectivePage = (PerspectivePage)l_tab.Content;
                 l_perspectivePage.ChangePerspective(l_newPerspective);
-                ShowPerspectiveState(l_newPerspective);
             }
         }
         #endregion

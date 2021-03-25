@@ -17,7 +17,10 @@ namespace Emu5
     /// </summary>
     public partial class PerspectivePage : UserControl
     {
+        public delegate void PerspectiveChangedDelegate();
+
         Perspective m_currentPerspective = Perspective.Editor;
+        PerspectiveChangedDelegate m_perspectiveChangedCallback = null;
 
         TabHeader m_tabHeader = null;
 
@@ -26,11 +29,16 @@ namespace Emu5
 
         RVEmulator m_rvEmulator = new RVEmulator();
 
+        bool m_simulationRunning, m_compiling;
+
         public PerspectivePage()
         {
             InitializeComponent();
 
             dockPanelMain.Children.Add(m_editor);
+
+            m_simulationRunning = false;
+            m_compiling = false;
         }
 
         public PerspectivePage(TabHeader tabHeader) : this()
@@ -42,6 +50,11 @@ namespace Emu5
         public Perspective GetCurrentPerspective()
         {
             return m_currentPerspective;
+        }
+
+        public void RegisterPerspectiveChangedCallback(PerspectiveChangedDelegate handler)
+        {
+            m_perspectiveChangedCallback = handler;
         }
 
         public void ChangePerspective(Perspective newPerspective)
@@ -71,6 +84,8 @@ namespace Emu5
                     }
                     break;
                 }
+
+                m_perspectiveChangedCallback?.Invoke();
             }
         }
 
@@ -82,6 +97,11 @@ namespace Emu5
         public bool CanRedo()
         {
             return m_currentPerspective == Perspective.Editor ? m_editor.CanRedo() : false;
+        }
+
+        public bool CanStartEmulator()
+        {
+            return !m_compiling;
         }
 
         public void Undo()
@@ -187,8 +207,12 @@ namespace Emu5
 
         public void StartEmulator()
         {
+            m_simulationRunning = true;
+            m_compiling = true;
+
             String l_code = m_editor.GetText();
             m_processor.BindEmulator(m_rvEmulator);
+            m_editor.SetEditable(false);
 
             ThreadStart l_startEmulatorThreadFunction = new ThreadStart(
             () => {
@@ -199,7 +223,12 @@ namespace Emu5
 
                     Delegate l_compilationFinishedDelegate = new Action(
                     () => {
+                        m_editor.SetEditable(true);
                         m_processor.UpdateInfo();
+
+                        m_compiling = false;
+
+                        ChangePerspective(Perspective.Emulator);
                     });
 
                     Dispatcher.BeginInvoke(l_compilationFinishedDelegate);
@@ -208,7 +237,13 @@ namespace Emu5
                 {
                     Delegate l_exceptionDelegate = new Action(
                     () => {
+                        ChangePerspective(Perspective.Editor);
+
                         MessageBox.Show("L: " + e_assemblyException.Line + "; C: " + e_assemblyException.Column + "\n" + e_assemblyException.Message, "Compilation error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                        m_editor.SetEditable(true);
+
+                        m_compiling = false;
+                        m_simulationRunning = false;
                     });
 
                     Dispatcher.BeginInvoke(l_exceptionDelegate);
