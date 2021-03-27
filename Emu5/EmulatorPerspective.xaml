@@ -596,7 +596,7 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Go to address:" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                    <TextBox Name="textBoxTargetInstructionAddress" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" FontSize="16" Height="Auto" Width="250" MaxLines="1" />
+                    <TextBox Name="textBoxTargetInstructionAddress" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" FontSize="16" Height="Auto" Width="250" MaxLines="1" KeyDown="textBoxTargetInstructionAddress_KeyDown" />
                 </Grid>
             </Border>
 
@@ -649,7 +649,7 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Go to address:" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                    <TextBox Name="textBoxTargetDataAddress" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" FontSize="16" Height="Auto" Width="250" MaxLines="1" />
+                    <TextBox Name="textBoxTargetDataAddress" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" FontSize="16" Height="Auto" Width="250" MaxLines="1" KeyDown="textBoxTargetDataAddress_KeyDown" />
                 </Grid>
             </Border>
 

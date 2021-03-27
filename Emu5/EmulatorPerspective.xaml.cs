@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Timers;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace Emu5
@@ -144,17 +147,18 @@ namespace Emu5
 
             stackPanelInstructionView.UpdateLayout();
 
+            UInt32 l_normalizedPC = m_currentPC & ~(UInt32)0x3;
             int l_entryCount = (int)(stackPanelInstructionView.ActualHeight / 24);
             for (int i_index = 0; i_index < l_entryCount; ++i_index)
             {
                 InstructionViewEntry l_viewEntry = new InstructionViewEntry();
 
-                UInt32 l_address = m_currentPC + (UInt32)(i_index << 2);
+                UInt32 l_address = l_normalizedPC + (UInt32)(i_index << 2);
                 byte?[] l_rawData = m_emulator.GetMemoryMapReference().Read(l_address, 4);
                 
                 l_viewEntry.DisplayData(false, l_address, l_rawData, "");
 
-                l_viewEntry.Highlighted = i_index == 0;
+                l_viewEntry.Highlighted = l_address == m_currentPC;
 
                 stackPanelInstructionView.Children.Add(l_viewEntry);
                 m_instructionEntries.Add(l_viewEntry);
@@ -199,7 +203,76 @@ namespace Emu5
 
         }
 
-        private void EmulatorPerspective_SizeChanged(object sender, System.Windows.SizeChangedEventArgs e)
+        private void textBoxTargetInstructionAddress_KeyDown(object sender, KeyEventArgs e)
+        { // go to address
+            if (e.Key == Key.Enter)
+            {
+                if (m_emulator == null)
+                {
+                    MessageBox.Show("You need to start a simulation to see memory contents.", "No simulation running", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    try
+                    {
+                        UInt32 l_address = UInt32.Parse(textBoxTargetInstructionAddress.Text, NumberStyles.HexNumber);
+                        l_address &= ~(UInt32)0x3; // normalize address
+
+                        foreach (InstructionViewEntry i_viewEntry in m_instructionEntries)
+                        {
+                            byte?[] l_rawData = m_emulator.GetMemoryMapReference().Read(l_address, 4);
+
+                            i_viewEntry.DisplayData(false, l_address, l_rawData, "");
+                            i_viewEntry.Highlighted = l_address == m_currentPC;
+
+                            l_address += 4;
+                        }    
+                    }
+                    catch (Exception e_numberConversionError)
+                    {
+                        MessageBox.Show(e_numberConversionError.Message, "Invalid input", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
+
+                textBoxTargetInstructionAddress.Clear();
+            }
+        }
+
+        private void textBoxTargetDataAddress_KeyDown(object sender, KeyEventArgs e)
+        { // go to address
+            if (e.Key == Key.Enter)
+            {
+                if (m_emulator == null)
+                {
+                    MessageBox.Show("You need to start a simulation to see memory contents.", "No simulation running", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    try
+                    {
+                        UInt32 l_address = UInt32.Parse(textBoxTargetDataAddress.Text, NumberStyles.HexNumber);
+                        l_address &= ~(UInt32)0x7; // normalize address
+
+                        foreach (DataViewEntry i_viewEntry in m_dataEntries)
+                        {
+                            byte?[] l_rawData = m_emulator.GetMemoryMapReference().Read(l_address, 8);
+
+                            i_viewEntry.DisplayData(l_address, l_rawData);
+
+                            l_address += 8;
+                        }
+                    }
+                    catch (Exception e_numberConversionError)
+                    {
+                        MessageBox.Show(e_numberConversionError.Message, "Invalid input", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
+
+                textBoxTargetDataAddress.Clear();
+            }
+        }
+
+        private void EmulatorPerspective_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (e.HeightChanged)
             {
@@ -228,7 +301,7 @@ namespace Emu5
             }));
         }
 
-        private void stackPanelInstructionView_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        private void stackPanelInstructionView_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (m_instructionEntries.Count == 0)
             {
@@ -278,7 +351,7 @@ namespace Emu5
             }
         }
 
-        private void stackPanelMemoryView_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        private void stackPanelMemoryView_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (m_dataEntries.Count == 0)
             {
