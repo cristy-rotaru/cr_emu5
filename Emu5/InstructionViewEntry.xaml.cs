@@ -19,11 +19,13 @@ namespace Emu5
         static Dictionary<UInt16, String> s_rTypeInstructions = null; // key = {func7, func3}
         static Dictionary<UInt16, String> s_systemInstructions = null; // key = func12
 
-        UInt32 m_address;
+        UInt32? m_address;
+        UInt32 m_previousValue;
 
         public InstructionViewEntry()
         {
             InitializeComponent();
+            m_address = null;
 
             if (s_bTypeInstructions == null)
             {
@@ -123,7 +125,7 @@ namespace Emu5
                 throw new Exception("Invalid data length.");
             }
 
-            m_address = address;
+            bool l_computeValue = false;
 
             UInt32 l_instructionData = 0x0;
             bool l_validInstructionData = true;
@@ -139,21 +141,41 @@ namespace Emu5
                 l_instructionData |= ((UInt32)l_byte) << (8 * i_byteIndex);
             }
 
+            if (m_address == null || m_address != address)
+            {
+                l_computeValue = true;
+
+                textBlockInstruction.Foreground = Brushes.Black;
+                textBlockRawValue.Foreground = new SolidColorBrush(Color.FromRgb(0x9B, 0x9B, 0x9B));
+            }
+            else if (l_validInstructionData && (m_previousValue != l_instructionData))
+            {
+                l_computeValue = true;
+
+                textBlockInstruction.Foreground = Brushes.Red;
+                textBlockRawValue.Foreground = Brushes.Red;
+            }
+            m_address = address;
+            m_previousValue = l_instructionData;
+            
             textBlockAddress.Text = String.Format("{0,8:X8}", address);
             textBlockAnnotation.Text = annotation;
 
-            if (l_validInstructionData)
+            if (l_computeValue) // optimization: dont dissassemble again if data did not change
             {
-                Tuple<String, String> l_decodedInstruction = DecodeIntruction(l_instructionData);
+                if (l_validInstructionData)
+                {
+                    Tuple<String, String> l_decodedInstruction = DecodeIntruction(l_instructionData);
 
-                textBlockInstruction.Text = l_decodedInstruction.Item1;
-                textBlockRawValue.Text = l_decodedInstruction.Item2;
-            }
-            else
-            {
-                textBlockInstruction.Text = "";
-                textBlockRawValue.Text = "";
-            }    
+                    textBlockInstruction.Text = l_decodedInstruction.Item1;
+                    textBlockRawValue.Text = l_decodedInstruction.Item2;
+                }
+                else
+                {
+                    textBlockInstruction.Text = "";
+                    textBlockRawValue.Text = "";
+                }
+            } 
 
             buttonToggleBreakpoint.Content = breakpoint ? new Ellipse { Height = 11, Width = 11 } : null;
         }
@@ -391,7 +413,7 @@ namespace Emu5
 
         public UInt32 GetAddress()
         {
-            return m_address;
+            return (UInt32)m_address;
         }
     }
 }

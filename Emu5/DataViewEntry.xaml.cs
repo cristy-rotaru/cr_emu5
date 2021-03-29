@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace Emu5
 {
@@ -8,12 +9,17 @@ namespace Emu5
     /// </summary>
     public partial class DataViewEntry : UserControl
     {
-        UInt32 m_address;
+        UInt32? m_address;
         TextBlock[] m_dataTextBlocks;
+
+        byte?[] m_previousValues;
 
         public DataViewEntry()
         {
             InitializeComponent();
+
+            m_address = null;
+            m_previousValues = new byte?[8];
 
             m_dataTextBlocks = new TextBlock[8];
 
@@ -34,6 +40,12 @@ namespace Emu5
                 throw new Exception("Invalid data length.");
             }
 
+            bool l_dontHighlight = false;
+            if (m_address == null || m_address != baseAddress)
+            {
+                l_dontHighlight = true;
+            }
+
             m_address = baseAddress;
             textBlockBaseAddress.Text = String.Format("{0,8:X8}", baseAddress);
 
@@ -47,13 +59,27 @@ namespace Emu5
                 {
                     byte l_byte = (byte)data[i_index];
                     m_dataTextBlocks[i_index].Text = String.Format("{0,2:X2}", (UInt32)l_byte);
+
+                    Brush l_foregroudBrush = Brushes.Black;
+                    if (l_dontHighlight == false)
+                    {
+                        byte l_previousByte = (byte)m_previousValues[i_index];
+                        if (l_byte != l_previousByte)
+                        {
+                            l_foregroudBrush = Brushes.Red;
+                        }
+                    }
+
+                    m_dataTextBlocks[i_index].Foreground = l_foregroudBrush;
                 }
             }
+
+            data.CopyTo(m_previousValues, 0);
         }
 
         public UInt32 GetBaseAddress()
         {
-            return m_address;
+            return (UInt32)m_address;
         }
     }
 }
