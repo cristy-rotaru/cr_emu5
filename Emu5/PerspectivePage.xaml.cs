@@ -31,6 +31,14 @@ namespace Emu5
 
         bool m_simulationRunning, m_compiling;
 
+        public bool IsRunning
+        {
+            get
+            {
+                return m_simulationRunning;
+            }
+        }
+
         public PerspectivePage()
         {
             InitializeComponent();
@@ -102,6 +110,11 @@ namespace Emu5
         public bool CanStartEmulator()
         {
             return !m_compiling;
+        }
+
+        public bool CanStep()
+        {
+            return m_simulationRunning;
         }
 
         public void Undo()
@@ -252,6 +265,11 @@ namespace Emu5
 
             Thread l_worker = new Thread(l_startEmulatorThreadFunction);
             l_worker.Start();
+        }
+
+        public void Step()
+        {
+
         }
     }
 }

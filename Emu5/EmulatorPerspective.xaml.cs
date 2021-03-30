@@ -195,12 +195,53 @@ namespace Emu5
 
         private void UpdateInstructionView()
         {
+            int l_entryCount = m_instructionEntries.Count;
+            if (l_entryCount == 0)
+            {
+                RefreshInstructionView();
+            }
 
+            UInt32 l_firstAddress = m_instructionEntries[0].GetAddress();
+            UInt32 l_lastAddress = m_instructionEntries[l_entryCount - 1].GetAddress();
+
+            bool l_refreshRequired = false;
+            if (l_firstAddress < l_lastAddress)
+            {
+                if (m_currentPC < l_firstAddress || m_currentPC > l_lastAddress)
+                {
+                    l_refreshRequired = true;
+                }
+            }
+            else
+            {
+                if (m_currentPC < l_firstAddress && m_currentPC > l_lastAddress)
+                {
+                    l_refreshRequired = true;
+                }
+            }
+
+            if (l_refreshRequired)
+            {
+                RefreshInstructionView();
+            }
+            else
+            {
+                foreach (InstructionViewEntry i_viewEntry in m_instructionEntries)
+                {
+                    UInt32 l_address = i_viewEntry.GetAddress();
+                    i_viewEntry.DisplayData(false, l_address, m_emulator.GetMemoryMapReference().Read(l_address, 4), "");
+                    i_viewEntry.Highlighted = l_address == m_currentPC;
+                }
+            }
         }
 
         private void UpdateDataView()
         {
-
+            foreach (DataViewEntry i_viewEntry in m_dataEntries)
+            {
+                UInt32 l_baseAddress = i_viewEntry.GetBaseAddress();
+                i_viewEntry.DisplayData(l_baseAddress, m_emulator.GetMemoryMapReference().Read(l_baseAddress, 8));
+            }
         }
 
         private void textBoxTargetInstructionAddress_KeyDown(object sender, KeyEventArgs e)

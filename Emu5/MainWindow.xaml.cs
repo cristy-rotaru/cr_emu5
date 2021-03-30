@@ -375,7 +375,24 @@ namespace Emu5
 
         void commandStep_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = false;
+            bool l_canExecute = false;
+
+            if (tabControlMain != null)
+            {
+                if (tabControlMain.SelectedIndex >= 0)
+                {
+                    TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+
+                    if (l_tab.Content.GetType() == typeof(PerspectivePage))
+                    {
+                        PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+
+                        l_canExecute = l_page.CanStep();
+                    }
+                }
+            }
+
+            e.CanExecute = l_canExecute;
         }
 
         void commandRunClocked_Executed(object target, ExecutedRoutedEventArgs e)
@@ -425,7 +442,24 @@ namespace Emu5
 
         void commandStop_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = false;
+            bool l_canExecute = false;
+
+            if (tabControlMain != null)
+            {
+                if (tabControlMain.SelectedIndex >= 0)
+                {
+                    TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+
+                    if (l_tab.Content.GetType() == typeof(PerspectivePage))
+                    {
+                        PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+
+                        l_canExecute = l_page.IsRunning;
+                    }
+                }
+            }
+
+            e.CanExecute = l_canExecute;
         }
 
         void commandOpenTerminal_Executed(object target, ExecutedRoutedEventArgs e)
