@@ -370,7 +370,9 @@ namespace Emu5
 
         void commandStep_Executed(object target, ExecutedRoutedEventArgs e)
         {
-
+            TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+            PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+            l_page.Step();
         }
 
         void commandStep_CanExecute(object sender, CanExecuteRoutedEventArgs e)

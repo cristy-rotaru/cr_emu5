@@ -30,6 +30,7 @@ namespace Emu5
         RVEmulator m_rvEmulator = new RVEmulator();
 
         bool m_simulationRunning, m_compiling;
+        bool m_executingSingleStep;
 
         public bool IsRunning
         {
@@ -47,6 +48,8 @@ namespace Emu5
 
             m_simulationRunning = false;
             m_compiling = false;
+
+            m_executingSingleStep = false;
         }
 
         public PerspectivePage(TabHeader tabHeader) : this()
@@ -114,7 +117,7 @@ namespace Emu5
 
         public bool CanStep()
         {
-            return m_simulationRunning;
+            return m_simulationRunning && !m_executingSingleStep;
         }
 
         public void Undo()
@@ -269,7 +272,24 @@ namespace Emu5
 
         public void Step()
         {
+            m_executingSingleStep = true;
 
+            ThreadStart l_stepThreadFunction = new ThreadStart(
+            () => {
+                m_rvEmulator.SingleStep();
+
+                Delegate l_stepCompleteDelegate = new Action(
+                () => {
+                    m_processor.UpdateInfo();
+
+                    m_executingSingleStep = false;
+                });
+
+                Dispatcher.BeginInvoke(l_stepCompleteDelegate);
+            });
+
+            Thread l_worker = new Thread(l_stepThreadFunction);
+            l_worker.Start();
         }
     }
 }
