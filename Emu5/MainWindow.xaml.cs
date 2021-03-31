@@ -44,6 +44,7 @@ namespace Emu5
                         l_message += "\nDo you want to save before closing?";
 
                         tabControlMain.SelectedItem = i_tab;
+                        ((PerspectivePage)i_tab.Content).ChangePerspective(Perspective.Editor);
                         tabControlMain.UpdateLayout();
 
                         MessageBoxResult l_result = MessageBox.Show(l_message, "File not saved", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);

@@ -142,12 +142,12 @@ namespace Emu5
                 l_instructionData |= ((UInt32)l_byte) << (8 * i_byteIndex);
             }
 
+            textBlockInstruction.Foreground = Brushes.Black;
+            textBlockRawValue.Foreground = new SolidColorBrush(Color.FromRgb(0x9B, 0x9B, 0x9B));
+
             if (m_address == null || m_address != address)
             {
                 l_computeValue = true;
-
-                textBlockInstruction.Foreground = Brushes.Black;
-                textBlockRawValue.Foreground = new SolidColorBrush(Color.FromRgb(0x9B, 0x9B, 0x9B));
             }
             else if (l_validInstructionData && (m_previousValue != l_instructionData))
             {
