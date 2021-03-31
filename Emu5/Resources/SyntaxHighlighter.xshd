@@ -79,6 +79,7 @@
             <Word>ien</Word> <Word>IEN</Word>
             <Word>idis</Word> <Word>IDIS</Word>
             <Word>wfi</Word> <Word>WFI</Word>
+            <Word>iret</Word> <Word>IRET</Word>
         </Keywords>
 
         <Keywords color="PseudoInstruction">

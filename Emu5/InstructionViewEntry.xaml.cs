@@ -115,6 +115,7 @@ namespace Emu5
                 s_systemInstructions.Add(0x107, "ien");
                 s_systemInstructions.Add(0x106, "idis");
                 s_systemInstructions.Add(0x105, "wfi");
+                s_systemInstructions.Add(0x102, "iret");
             }
         }
 

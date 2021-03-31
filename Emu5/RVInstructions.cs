@@ -206,6 +206,9 @@ namespace Emu5
             m_instructionDictionary.Add("wfi", WFI);
             m_instructionDictionary.Add("WFI", WFI);
 
+            m_instructionDictionary.Add("iret", IRET);
+            m_instructionDictionary.Add("IRET", IRET);
+
             m_registerDictionary = new Dictionary<string, RVRegister>();
 
             m_registerDictionary.Add("x0", RVRegister.x0);
@@ -855,6 +858,14 @@ namespace Emu5
             get
             {
                 return new RVInstructionDescription { type = RVInstructionType.System, size = 4, opcode = 0b1110011, func3 = 0b000, func12 = 0x105 };
+            }
+        }
+
+        public static RVInstructionDescription IRET
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.System, size = 4, opcode = 0b1110011, func3 = 0b000, func12 = 0x102 };
             }
         }
     }
