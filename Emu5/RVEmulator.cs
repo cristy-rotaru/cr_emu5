@@ -7,17 +7,59 @@ namespace Emu5
         public RVEmulationException(String message) : base(message) { }
     }
 
+    public enum RVVector
+    {
+        Reset = 0,
+        NMI,
+        ECALL,
+        EBREAK,
+        MisalignedPC,
+        MisalignedMemory,
+        UndefinedMemory,
+        InvalidInstruction,
+        DivisionBy0,
+        External9,
+        External10,
+        External11,
+        External12,
+        External13,
+        External14,
+        External15,
+        External16,
+        External17,
+        External18,
+        External19,
+        External20,
+        External21,
+        External22,
+        External23,
+        External24,
+        External25,
+        External26,
+        External27,
+        External28,
+        External29,
+        External30,
+        External31
+    }
+
     public class RVEmulator
     {
         RVMemoryMap m_memoryMap;
         UInt32[] m_registerFile;
+        UInt32[] m_registerBackup;
 
-        UInt32 m_programCounter;
+        UInt32 m_programCounter = 0x0;
+        bool m_handlingTrap = false;
+        bool m_interruptsEnabled = false;
+        bool[] m_pendingInterrupts;
 
         public RVEmulator()
         {
             m_memoryMap = new RVMemoryMap();
             m_registerFile = new UInt32[32];
+            m_registerBackup = new UInt32[32];
+            m_pendingInterrupts = new bool[32];
         }
 
         public void Assemble(String code)
@@ -32,6 +74,8 @@ namespace Emu5
                 m_registerFile[i_register] = 0x0;
             }
 
+            m_handlingTrap = false;
+            m_interruptsEnabled = false;
             m_programCounter = 0x0;
             byte?[] l_initialProgramCounter = m_memoryMap.Read(0x0, 4);
             for (int i_byteIndex = 3; i_byteIndex >= 0; --i_byteIndex)
@@ -49,7 +93,7 @@ namespace Emu5
         {
             if ((m_programCounter & 0x3) != 0)
             {
-                // misaligned PC fault
+                LoadVector(RVVector.MisalignedPC, CreateByteStream(m_programCounter)); // misaligned PC fault
                 return;
             }
 
@@ -59,7 +103,7 @@ namespace Emu5
             {
                 if (l_rawData[i_byteIndex] == null)
                 {
-                    // undefined memory address fault
+                    LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, m_programCounter)); // undefined memory address fault
                     return;
                 }
 
@@ -83,6 +127,62 @@ namespace Emu5
         public RVMemoryMap GetMemoryMapReference()
         {
             return m_memoryMap;
+        }
+
+        private byte[] CreateByteStream(params UInt32[] data)
+        {
+            byte[] l_toReturn = new byte[data.Length * 4];
+
+            for (int i_index = 0; i_index < data.Length; ++i_index)
+            {
+                l_toReturn[4 * i_index] = (byte)(data[i_index] & 0xFF);
+                l_toReturn[4 * i_index + 1] = (byte)((data[i_index] >> 8) & 0xFF);
+                l_toReturn[4 * i_index + 2] = (byte)((data[i_index] >> 16) & 0xFF);
+                l_toReturn[4 * i_index + 3] = (byte)((data[i_index] >> 24) & 0xFF);
+            }
+
+            return l_toReturn;
+        }
+
+        private void LoadVector(RVVector vectorIndex, byte[] contextInfo)
+        {
+            if (m_handlingTrap)
+            {
+                // halt core
+            }
+
+            m_memoryMap.Write(0x80, contextInfo); // save trap info
+
+            m_registerFile.CopyTo(m_registerBackup, 0); // backup registers
+
+            // load corresponding PC
+            byte?[] l_vector = m_memoryMap.Read(0x4 * (UInt32)vectorIndex, 4);
+            m_programCounter = 0x0;
+            for (int i_byteIndex = 3; i_byteIndex >= 0; --i_byteIndex)
+            {
+                if (l_vector[i_byteIndex] == null)
+                {
+                    throw new RVEmulationException("Vector table memory range is not properly defined.");
+                }
+                m_programCounter <<= 8;
+                m_programCounter |= (UInt32)l_vector[i_byteIndex];
+            }
+
+            /*
+             vectors:
+             * 0x00 = Reset
+             * 0x04 = NMI | saves PC
+             * 0x08 = ECALL | saves PC+4
+             * 0x0C = EBREAK | saves PC+4
+             * 0x10 = Misaligned PC fault | saves PC
+             * 0x14 = Misaligned memory access fault | saves PC, memory address
+             * 0x18 = Access to undefined memory space fault | saves PC, memory address
+             * 0x1C = Invalid instruction fault | saves PC
+             * 0x20 = Division by 0 or division overflow fault | saves PC
+             * 0x24-0x7C - programmable and external interrupts | saves PC
+            */
+
+            m_handlingTrap = true;
         }
 
         private void WriteRegister(byte index, UInt32 data)
@@ -132,7 +232,7 @@ namespace Emu5
                 {
                     if ((address & 0x1) != 0)
                     {
-                        // misaligned access fault
+                        LoadVector(RVVector.MisalignedMemory, CreateByteStream(m_programCounter, address)); // misaligned access fault
                         return false;
                     }
 
@@ -155,7 +255,7 @@ namespace Emu5
                 {
                     if ((address & 0x3) != 0)
                     {
-                        // misaligned access fault
+                        LoadVector(RVVector.MisalignedMemory, CreateByteStream(m_programCounter, address)); // misaligned access fault
                         return false;
                     }
 
@@ -178,7 +278,7 @@ namespace Emu5
 
                 default:
                 {
-                    // invalid instruction fault
+                    LoadVector(RVVector.InvalidInstruction, CreateByteStream(m_programCounter)); // invalid instruction fault
                     return false;
                 }
             }
@@ -195,7 +295,7 @@ namespace Emu5
                     byte?[] l_rawData = m_memoryMap.Read(address, 1);
                     if (l_rawData[0] == null)
                     {
-                        // undefined memory address fault
+                        LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                         return false;
                     }
 
@@ -208,14 +308,14 @@ namespace Emu5
                 {
                     if ((address & 0x1) != 0)
                     {
-                        // misaligned access fault
+                        LoadVector(RVVector.MisalignedMemory, CreateByteStream(m_programCounter, address)); // misaligned access fault
                         return false;
                     }
 
                     byte?[] l_rawData = m_memoryMap.Read(address, 2);
                     if (l_rawData[0] == null || l_rawData[1] == null)
                     {
-                        // undefined memory address fault
+                        LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                         return false;
                     }
 
@@ -228,7 +328,7 @@ namespace Emu5
                 {
                     if ((address & 0x3) != 0)
                     {
-                        // misaligned access fault
+                        LoadVector(RVVector.MisalignedMemory, CreateByteStream(m_programCounter, address)); // misaligned access fault
                         return false;
                     }
 
@@ -238,7 +338,7 @@ namespace Emu5
                     {
                         if (l_rawData[i_byteIndex] == null)
                         {
-                            // undefined memory address fault
+                            LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                             return false;
                         }
                         l_readValue <<= 8;
@@ -252,7 +352,7 @@ namespace Emu5
                     byte?[] l_rawData = m_memoryMap.Read(address, 1);
                     if (l_rawData[0] == null)
                     {
-                        // undefined memory address fault
+                        LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                         return false;
                     }
 
@@ -264,14 +364,14 @@ namespace Emu5
                 {
                     if ((address & 0x1) != 0)
                     {
-                        // misaligned access fault
+                        LoadVector(RVVector.MisalignedMemory, CreateByteStream(m_programCounter, address)); // misaligned access fault
                         return false;
                     }
 
                     byte?[] l_rawData = m_memoryMap.Read(address, 2);
                     if (l_rawData[0] == null || l_rawData[1] == null)
                     {
-                        // undefined memory address fault
+                        LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                         return false;
                     }
 
@@ -281,7 +381,7 @@ namespace Emu5
 
                 default:
                 {
-                    // invalid instruction fault
+                    LoadVector(RVVector.InvalidInstruction, CreateByteStream(m_programCounter)); // invalid instruction fault
                     return false;
                 }
             }
@@ -409,7 +509,7 @@ namespace Emu5
                 {
                     if (operand2 == 0 || (operand1 == 0x80000000 && operand2 == 0xFFFFFFFF))
                     {
-                        // division by 0 or division overflow fault
+                        LoadVector(RVVector.DivisionBy0, CreateByteStream(m_programCounter)); // division by 0 or division overflow fault
                         return false;
                     }
 
@@ -421,7 +521,7 @@ namespace Emu5
                 {
                     if (operand2 == 0)
                     {
-                        // division by 0 or division overflow fault
+                        LoadVector(RVVector.DivisionBy0, CreateByteStream(m_programCounter)); // division by 0 or division overflow fault
                         return false;
                     }
 
@@ -433,7 +533,7 @@ namespace Emu5
                 {
                     if (operand2 == 0)
                     {
-                        // division by 0 or division overflow fault
+                        LoadVector(RVVector.DivisionBy0, CreateByteStream(m_programCounter)); // division by 0 or division overflow fault
                         return false;
                     }
 
@@ -445,7 +545,7 @@ namespace Emu5
                 {
                     if (operand2 == 0)
                     {
-                        // division by 0 or division overflow fault
+                        LoadVector(RVVector.DivisionBy0, CreateByteStream(m_programCounter)); // division by 0 or division overflow fault
                         return false;
                     }
 
@@ -455,7 +555,7 @@ namespace Emu5
 
                 default:
                 {
-                    // invalid instruction fault
+                    LoadVector(RVVector.InvalidInstruction, CreateByteStream(m_programCounter)); // invalid instruction fault
                     return false;
                 }
             }
@@ -507,6 +607,91 @@ namespace Emu5
             }
         }
 
+        private bool ExecuteSystemInstruction(UInt16 opType)
+        {// will return true if no vector has been triggered and false otherwise
+            switch (opType)
+            {
+                case 0x000: // ecall
+                {
+                    LoadVector(RVVector.ECALL, CreateByteStream(m_programCounter + 4));
+                    return false;
+                }
+
+                case 0x001: // ebreak
+                {
+                    LoadVector(RVVector.EBREAK, CreateByteStream(m_programCounter + 4));
+                    return false;
+                }
+
+                case 0xFFF: // hlt
+                {
+                    // halt simulation // NOT YET IMPLEMENTED
+                    return false;
+                }
+
+                case 0xFFE: // rst
+                {
+                    ResetProcessor();
+                    return false;
+                }
+
+                case 0x107: // ien
+                {
+                    m_interruptsEnabled = true;
+                    return true;
+                }
+
+                case 0x106: // idis
+                {
+                    m_interruptsEnabled = false;
+                    return true;
+                }
+
+                case 0x105: // wfi
+                {
+                    // TO BE IMPLEMENTED
+                    return true;
+                }
+
+                case 0x102: // iret
+                {
+                    if (m_handlingTrap)
+                    {
+                        // restore registers
+                        m_registerBackup.CopyTo(m_registerFile, 0);
+
+                        // load return PC
+                        byte?[] l_returnPC = m_memoryMap.Read(0x80, 4);
+                        m_programCounter = 0x0;
+                        for (int i_byteIndex = 3; i_byteIndex >= 0; --i_byteIndex)
+                        {
+                            if (l_returnPC[i_byteIndex] == null)
+                            {
+                                throw new RVEmulationException("Vector table memory range is not properly defined.");
+                            }
+                            m_programCounter <<= 8;
+                            m_programCounter |= (UInt32)l_returnPC[i_byteIndex];
+                        }
+
+                        m_handlingTrap = false;
+                    }
+                    else
+                    {
+                        // instruction is not defined outside of interrupt handlers
+                        LoadVector(RVVector.InvalidInstruction, CreateByteStream(m_programCounter)); // invalid instruction fault
+                    }
+
+                    return false;
+                }
+
+                default:
+                {
+                    LoadVector(RVVector.InvalidInstruction, CreateByteStream(m_programCounter)); // invalid instruction fault
+                    return false;
+                }    
+            }
+        }
+
         private void DecodeAndExecute(UInt32 instruction)
         {
             bool l_branch = false;
@@ -554,7 +739,7 @@ namespace Emu5
                 {
                     if (((instruction >> 12) & 0x7) != 0b000) // check func3
                     {
-                        // invalid instruction fault
+                        LoadVector(RVVector.InvalidInstruction, CreateByteStream(m_programCounter)); // invalid instruction fault
                         return;
                     }
 
@@ -586,7 +771,7 @@ namespace Emu5
                     bool? l_conditionsMet = MeetsBranchConditions(l_func3, l_sourceRegister1, l_sourceRegister2);
                     if (l_conditionsMet == null)
                     {
-                        // invalid instruction fault
+                        LoadVector(RVVector.InvalidInstruction, CreateByteStream(m_programCounter)); // invalid instruction fault
                         return;
                     }
 
@@ -679,13 +864,27 @@ namespace Emu5
 
                 case 0b1110011: // system
                 {
-                    // NOT YET IMPLEMENTED
+                    byte l_func3 = (byte)((instruction >> 12) & 0x7);
+                    byte l_destinationRegister = (byte)((instruction >> 7) & 0x1F);
+                    byte l_sourceRegister1 = (byte)((instruction >> 15) & 0x1F);
+
+                    if (l_func3 != 0 || l_destinationRegister != 0 || l_sourceRegister1 != 0)
+                    {
+                        LoadVector(RVVector.InvalidInstruction, CreateByteStream(m_programCounter)); // invalid instruction fault
+                        return;
+                    }
+
+                    UInt16 l_func12 = (UInt16)(instruction >> 20);
+                    if (ExecuteSystemInstruction(l_func12) == false)
+                    {
+                        return; // PC is handled in ExecuteSystemInstruction
+                    }
                 }
                 break;
 
                 default:
                 {
-                    // invalid instruction fault
+                    LoadVector(RVVector.InvalidInstruction, CreateByteStream(m_programCounter)); // invalid instruction fault
                     return;
                 }
             }
