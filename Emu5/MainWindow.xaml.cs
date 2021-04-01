@@ -440,7 +440,9 @@ namespace Emu5
 
         void commandStop_Executed(object target, ExecutedRoutedEventArgs e)
         {
-
+            TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+            PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+            l_page.StopSimulation();
         }
 
         void commandStop_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -457,7 +459,7 @@ namespace Emu5
                     {
                         PerspectivePage l_page = (PerspectivePage)l_tab.Content;
 
-                        l_canExecute = l_page.IsRunning;
+                        l_canExecute = l_page.CanStopSimulation();
                     }
                 }
             }

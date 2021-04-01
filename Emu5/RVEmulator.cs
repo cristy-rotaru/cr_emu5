@@ -45,6 +45,9 @@ namespace Emu5
 
     public class RVEmulator
     {
+        bool m_halted;
+        String m_haltReason;
+
         RVMemoryMap m_memoryMap;
         UInt32[] m_registerFile;
         UInt32[] m_registerBackup;
@@ -54,8 +57,33 @@ namespace Emu5
         bool m_interruptsEnabled = false;
         bool[] m_pendingInterrupts;
 
+        public bool Halted
+        {
+            get
+            {
+                return m_halted;
+            }
+
+            set
+            {
+                m_halted = value;
+                m_haltReason = "";
+            }
+        }
+
+        public String HaltReason
+        {
+            get
+            {
+                return m_haltReason;
+            }
+        }
+
         public RVEmulator()
         {
+            m_halted = true;
+            m_haltReason = "";
+
             m_memoryMap = new RVMemoryMap();
             m_registerFile = new UInt32[32];
             m_registerBackup = new UInt32[32];
@@ -65,6 +93,7 @@ namespace Emu5
         public void Assemble(String code)
         {
             RVAssembler.Assemble(code, m_memoryMap);
+            m_halted = false;
         }
 
         public void ResetProcessor()
@@ -91,6 +120,11 @@ namespace Emu5
 
         public void SingleStep()
         {
+            if (m_halted)
+            {
+                return;
+            }
+
             if ((m_programCounter & 0x3) != 0)
             {
                 LoadVector(RVVector.MisalignedPC, CreateByteStream(m_programCounter)); // misaligned PC fault
@@ -148,7 +182,9 @@ namespace Emu5
         {
             if (m_handlingTrap)
             {
-                // halt core
+                m_halted = true;
+                m_haltReason = "Fault during exception/interrupt handling";
+                return;
             }
 
             m_memoryMap.Write(0x80, contextInfo); // save trap info
@@ -625,7 +661,8 @@ namespace Emu5
 
                 case 0xFFF: // hlt
                 {
-                    // halt simulation // NOT YET IMPLEMENTED
+                    m_halted = true;
+                    m_haltReason = "Halt instruction executed";
                     return false;
                 }
 
