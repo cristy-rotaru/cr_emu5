@@ -30,9 +30,11 @@ namespace Emu5
         RVEmulator m_rvEmulator = new RVEmulator();
 
         System.Timers.Timer m_clockTimer;
+        Thread m_simulationThread;
+        object m_threadSync;
 
         bool m_simulationRunning, m_compiling;
-        bool m_runningClocked;
+        bool m_runningClocked, m_runningFast;
 
         public bool IsRunning
         {
@@ -51,9 +53,12 @@ namespace Emu5
             m_clockTimer = new System.Timers.Timer(110);
             m_clockTimer.Elapsed += ClockTick;
 
+            m_threadSync = new object();
+
             m_simulationRunning = false;
             m_compiling = false;
             m_runningClocked = false;
+            m_runningFast = false;
         }
 
         public PerspectivePage(TabHeader tabHeader) : this()
@@ -121,12 +126,12 @@ namespace Emu5
 
         public bool CanRun()
         {
-            return m_simulationRunning && !m_compiling && !m_runningClocked;
+            return m_simulationRunning && !m_compiling && !m_runningClocked && !m_runningFast;
         }
 
         public bool CanPause()
         {
-            return m_simulationRunning && m_runningClocked;
+            return m_simulationRunning && (m_runningClocked || m_runningFast);
         }
 
         public bool CanStopSimulation()
@@ -237,8 +242,20 @@ namespace Emu5
 
         public void StartEmulator()
         {
-            m_clockTimer.Stop();
-            m_runningClocked = false;
+            if (m_runningClocked)
+            {
+                m_clockTimer.Stop();
+                m_runningClocked = false;
+            }
+            else if (m_runningFast)
+            {
+                lock (m_threadSync)
+                {
+                    m_runningFast = false;
+                }
+                m_simulationThread.Join();
+                m_simulationThread = null;
+            }
 
             m_simulationRunning = true;
             m_compiling = true;
@@ -307,6 +324,51 @@ namespace Emu5
             m_clockTimer.Start();
         }
 
+        public void Run()
+        {
+            m_runningFast = true;
+
+            ThreadStart l_runThreadFunction = new ThreadStart(
+            () => {
+                for (;;) // simulate in a infinite loop
+                {
+                    bool l_shutdown;
+
+                    lock (m_threadSync)
+                    {
+                        l_shutdown = !m_runningFast;
+                    }
+
+                    if (l_shutdown)
+                    {
+                        return; // stop simulation per external request
+                    }
+
+                    m_rvEmulator.SingleStep();
+
+                    if (m_rvEmulator.Halted)
+                    {
+                        Delegate l_simulationEndedDelegate = new Action(
+                        () => {
+                            m_simulationRunning = false;
+                            m_runningClocked = false;
+
+                            m_processor.UpdateInfo();
+
+                            MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
+                        });
+
+                        Dispatcher.BeginInvoke(l_simulationEndedDelegate);
+
+                        return;
+                    }
+                }
+            });
+
+            m_simulationThread = new Thread(l_runThreadFunction);
+            m_simulationThread.Start();
+        }
+
         public void Pause()
         {
             if (m_runningClocked)
@@ -314,14 +376,35 @@ namespace Emu5
                 m_clockTimer.Stop();
                 m_runningClocked = false;
             }
+            else if (m_runningFast)
+            {
+                lock (m_threadSync)
+                {
+                    m_runningFast = false;
+                }
+                m_simulationThread.Join();
+                m_simulationThread = null;
+            }
         }
 
         public void StopSimulation()
         {
-            m_clockTimer.Stop();
-
+            if (m_runningClocked)
+            {
+                m_clockTimer.Stop();
+                m_runningClocked = false;
+            }
+            else if (m_runningFast)
+            {
+                lock (m_threadSync)
+                {
+                    m_runningFast = false;
+                }
+                m_simulationThread.Join();
+                m_simulationThread = null;
+            }
+            
             m_simulationRunning = false;
-            m_runningClocked = false;
 
             m_rvEmulator.Halted = true;
         }
