@@ -390,7 +390,7 @@ namespace Emu5
                     {
                         PerspectivePage l_page = (PerspectivePage)l_tab.Content;
 
-                        l_canExecute = l_page.CanStep();
+                        l_canExecute = l_page.CanRun();
                     }
                 }
             }
@@ -400,12 +400,31 @@ namespace Emu5
 
         void commandRunClocked_Executed(object target, ExecutedRoutedEventArgs e)
         {
-
+            TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+            PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+            l_page.RunClocked();
         }
 
         void commandRunClocked_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = false;
+            bool l_canExecute = false;
+
+            if (tabControlMain != null)
+            {
+                if (tabControlMain.SelectedIndex >= 0)
+                {
+                    TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+
+                    if (l_tab.Content.GetType() == typeof(PerspectivePage))
+                    {
+                        PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+
+                        l_canExecute = l_page.CanRun();
+                    }
+                }
+            }
+
+            e.CanExecute = l_canExecute;
         }
 
         void commandRun_Executed(object target, ExecutedRoutedEventArgs e)
@@ -420,12 +439,31 @@ namespace Emu5
 
         void commandPause_Executed(object target, ExecutedRoutedEventArgs e)
         {
-
+            TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+            PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+            l_page.Pause();
         }
 
         void commandPause_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = false;
+            bool l_canExecute = false;
+
+            if (tabControlMain != null)
+            {
+                if (tabControlMain.SelectedIndex >= 0)
+                {
+                    TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+
+                    if (l_tab.Content.GetType() == typeof(PerspectivePage))
+                    {
+                        PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+
+                        l_canExecute = l_page.CanPause();
+                    }
+                }
+            }
+
+            e.CanExecute = l_canExecute;
         }
 
         void commandInjectInterrupt_Executed(object target, ExecutedRoutedEventArgs e)

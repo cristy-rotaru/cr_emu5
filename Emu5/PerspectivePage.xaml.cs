@@ -29,7 +29,10 @@ namespace Emu5
 
         RVEmulator m_rvEmulator = new RVEmulator();
 
+        System.Timers.Timer m_clockTimer;
+
         bool m_simulationRunning, m_compiling;
+        bool m_runningClocked;
 
         public bool IsRunning
         {
@@ -45,8 +48,12 @@ namespace Emu5
 
             dockPanelMain.Children.Add(m_editor);
 
+            m_clockTimer = new System.Timers.Timer(110);
+            m_clockTimer.Elapsed += ClockTick;
+
             m_simulationRunning = false;
             m_compiling = false;
+            m_runningClocked = false;
         }
 
         public PerspectivePage(TabHeader tabHeader) : this()
@@ -112,9 +119,14 @@ namespace Emu5
             return !m_compiling;
         }
 
-        public bool CanStep()
+        public bool CanRun()
         {
-            return m_simulationRunning && !m_compiling;
+            return m_simulationRunning && !m_compiling && !m_runningClocked;
+        }
+
+        public bool CanPause()
+        {
+            return m_simulationRunning && m_runningClocked;
         }
 
         public bool CanStopSimulation()
@@ -225,6 +237,9 @@ namespace Emu5
 
         public void StartEmulator()
         {
+            m_clockTimer.Stop();
+            m_runningClocked = false;
+
             m_simulationRunning = true;
             m_compiling = true;
 
@@ -286,11 +301,49 @@ namespace Emu5
             }
         }
 
+        public void RunClocked()
+        {
+            m_runningClocked = true;
+            m_clockTimer.Start();
+        }
+
+        public void Pause()
+        {
+            if (m_runningClocked)
+            {
+                m_clockTimer.Stop();
+                m_runningClocked = false;
+            }
+        }
+
         public void StopSimulation()
         {
+            m_clockTimer.Stop();
+
             m_simulationRunning = false;
+            m_runningClocked = false;
 
             m_rvEmulator.Halted = true;
+        }
+
+        private void ClockTick(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(
+            () => {
+                m_rvEmulator.SingleStep();
+
+                m_processor.UpdateInfo();
+
+                if (m_rvEmulator.Halted)
+                {
+                    m_clockTimer.Stop();
+
+                    m_simulationRunning = false;
+                    m_runningClocked = false;
+
+                    MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }));
         }
     }
 }
