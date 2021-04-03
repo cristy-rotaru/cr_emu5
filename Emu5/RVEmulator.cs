@@ -50,7 +50,6 @@ namespace Emu5
 
         RVMemoryMap m_memoryMap;
         UInt32[] m_registerFile;
-        UInt32[] m_registerBackup;
 
         UInt32 m_programCounter = 0x0;
         bool m_handlingTrap = false;
@@ -86,7 +85,6 @@ namespace Emu5
 
             m_memoryMap = new RVMemoryMap();
             m_registerFile = new UInt32[32];
-            m_registerBackup = new UInt32[32];
             m_pendingInterrupts = new bool[32];
         }
 
@@ -187,9 +185,9 @@ namespace Emu5
                 return;
             }
 
-            m_memoryMap.Write(0x80, contextInfo); // save trap info
+            m_memoryMap.Write(0x100, contextInfo); // save trap info
 
-            m_registerFile.CopyTo(m_registerBackup, 0); // backup registers
+            m_memoryMap.Write(0x80, CreateByteStream(m_registerFile)); // backup registers
 
             // load corresponding PC
             byte?[] l_vector = m_memoryMap.Read(0x4 * (UInt32)vectorIndex, 4);
@@ -719,10 +717,24 @@ namespace Emu5
                     if (m_handlingTrap)
                     {
                         // restore registers
-                        m_registerBackup.CopyTo(m_registerFile, 0);
+                        byte?[] l_registerBackup = m_memoryMap.Read(0x80, 128);
+                        for (int i_registerIndex = 0; i_registerIndex < 32; ++i_registerIndex)
+                        {
+                            UInt32 l_registerValue = 0x0;
+                            for (int i_byteIndex = 3; i_byteIndex >= 0; --i_byteIndex)
+                            {
+                                if (l_registerBackup[i_registerIndex * 4 + i_byteIndex] == null)
+                                {
+                                    throw new RVEmulationException("Vector table memory range is not properly defined.");
+                                }
+                                l_registerValue <<= 8;
+                                l_registerValue |= (UInt32)l_registerBackup[i_registerIndex * 4 + i_byteIndex];
+                            }
+                            WriteRegister((byte)i_registerIndex, l_registerValue);
+                        }
 
                         // load return PC
-                        byte?[] l_returnPC = m_memoryMap.Read(0x80, 4);
+                        byte?[] l_returnPC = m_memoryMap.Read(0x100, 4);
                         m_programCounter = 0x0;
                         for (int i_byteIndex = 3; i_byteIndex >= 0; --i_byteIndex)
                         {
