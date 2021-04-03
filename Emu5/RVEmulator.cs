@@ -254,7 +254,15 @@ namespace Emu5
                     {
                         byte[] l_writeData = new byte[1];
                         l_writeData[0] = (byte)(data & 0xFF);
-                        m_memoryMap.Write(address, l_writeData);
+                        try
+                        {
+                            m_memoryMap.Write(address, l_writeData);
+                        }
+                        catch (RVMemoryException)
+                        {
+                            LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
+                            return false;
+                        }
 
                         return true;
                     }
@@ -277,7 +285,15 @@ namespace Emu5
                         byte[] l_writeData = new byte[2];
                         l_writeData[0] = (byte)(data & 0xFF);
                         l_writeData[1] = (byte)((data >> 8) & 0xFF);
-                        m_memoryMap.Write(address, l_writeData);
+                        try
+                        {
+                            m_memoryMap.Write(address, l_writeData);
+                        }
+                        catch (RVMemoryException)
+                        {
+                            LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
+                            return false;
+                        }
 
                         return true;
                     }
@@ -302,7 +318,15 @@ namespace Emu5
                         l_writeData[1] = (byte)((data >> 8) & 0xFF);
                         l_writeData[2] = (byte)((data >> 16) & 0xFF);
                         l_writeData[3] = (byte)((data >> 24) & 0xFF);
-                        m_memoryMap.Write(address, l_writeData);
+                        try
+                        {
+                            m_memoryMap.Write(address, l_writeData);
+                        }
+                        catch (RVMemoryException)
+                        {
+                            LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
+                            return false;
+                        }
 
                         return true;
                     }
