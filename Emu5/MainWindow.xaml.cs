@@ -33,6 +33,44 @@ namespace Emu5
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
+            bool l_stopAllSimulations = false;
+
+            foreach (TabItem i_tab in tabControlMain.Items)
+            {
+                if (i_tab.Content.GetType() == typeof(PerspectivePage))
+                {
+                    PerspectivePage l_perspectivePage = (PerspectivePage)i_tab.Content;
+                    if (l_perspectivePage.IsRunning)
+                    {
+                        if (l_stopAllSimulations)
+                        {
+                            if (l_perspectivePage.CanStopSimulation())
+                            {
+                                l_perspectivePage.StopSimulation();
+                            }
+                        }
+                        else
+                        {
+                            String l_message = "One or more simulations are running.\nDo you want to stop them?";
+                            MessageBoxResult l_result = MessageBox.Show(l_message, "Simulations running", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                            if (l_result != MessageBoxResult.Yes)
+                            {
+                                e.Cancel = true;
+                                return;
+                            }
+
+                            l_stopAllSimulations = true;
+
+                            if (l_perspectivePage.CanStopSimulation())
+                            {
+                                l_perspectivePage.StopSimulation();
+                            }
+                        }
+                    }
+                }
+            }
+
             foreach (TabItem i_tab in tabControlMain.Items)
             {
                 if (i_tab.Content.GetType() == typeof(PerspectivePage))
@@ -40,7 +78,7 @@ namespace Emu5
                     if (((TabHeader)i_tab.Header).IsUnsaved())
                     {
                         String l_fileName = ((PerspectivePage)i_tab.Content).GetFileName();
-                        String l_message = l_fileName == null ? "File was not saved." : "Latest changes to " + l_fileName + " were not saved";
+                        String l_message = l_fileName == null ? "File was not saved." : "Latest changes to " + l_fileName + " were not saved.";
                         l_message += "\nDo you want to save before closing?";
 
                         tabControlMain.SelectedItem = i_tab;

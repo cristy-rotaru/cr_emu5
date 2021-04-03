@@ -242,6 +242,9 @@ namespace Emu5
 
         public void StartEmulator()
         {
+            bool l_wasRunningClocked = m_runningClocked;
+            bool l_wasRunningFast = m_runningFast;
+
             if (m_runningClocked)
             {
                 m_clockTimer.Stop();
@@ -255,6 +258,32 @@ namespace Emu5
                 }
                 m_simulationThread.Join();
                 m_simulationThread = null;
+            }
+
+            if (m_simulationRunning)
+            {
+                String l_message = "The simulation is running.\nDo you want to stop it and launch a new one?";
+                MessageBoxResult l_result = MessageBox.Show(l_message, "Simulation already running", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                if (l_result != MessageBoxResult.Yes)
+                { // resume where we left off
+                    if (l_wasRunningClocked)
+                    {
+                        m_runningClocked = true;
+                        m_clockTimer.Start();
+                    }
+                    else if (l_wasRunningFast)
+                    {
+                        m_runningFast = true;
+
+                        ThreadStart l_runThreadFunction = new ThreadStart(RunFastSimulation);
+
+                        m_simulationThread = new Thread(l_runThreadFunction);
+                        m_simulationThread.Start();
+                    }
+
+                    return;
+                }
             }
 
             m_simulationRunning = true;
@@ -275,6 +304,7 @@ namespace Emu5
                     () => {
                         m_editor.SetEditable(true);
                         m_processor.UpdateInfo();
+                        m_processor.HighlightingEnabled = true;
 
                         m_compiling = false;
 
@@ -328,42 +358,9 @@ namespace Emu5
         {
             m_runningFast = true;
 
-            ThreadStart l_runThreadFunction = new ThreadStart(
-            () => {
-                for (;;) // simulate in a infinite loop
-                {
-                    bool l_shutdown;
+            m_processor.HighlightingEnabled = false;
 
-                    lock (m_threadSync)
-                    {
-                        l_shutdown = !m_runningFast;
-                    }
-
-                    if (l_shutdown)
-                    {
-                        return; // stop simulation per external request
-                    }
-
-                    m_rvEmulator.SingleStep();
-
-                    if (m_rvEmulator.Halted)
-                    {
-                        Delegate l_simulationEndedDelegate = new Action(
-                        () => {
-                            m_simulationRunning = false;
-                            m_runningClocked = false;
-
-                            m_processor.UpdateInfo();
-
-                            MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
-                        });
-
-                        Dispatcher.BeginInvoke(l_simulationEndedDelegate);
-
-                        return;
-                    }
-                }
-            });
+            ThreadStart l_runThreadFunction = new ThreadStart(RunFastSimulation);
 
             m_simulationThread = new Thread(l_runThreadFunction);
             m_simulationThread.Start();
@@ -384,6 +381,9 @@ namespace Emu5
                 }
                 m_simulationThread.Join();
                 m_simulationThread = null;
+
+                m_processor.UpdateInfo();
+                m_processor.HighlightingEnabled = true;
             }
         }
 
@@ -402,6 +402,9 @@ namespace Emu5
                 }
                 m_simulationThread.Join();
                 m_simulationThread = null;
+
+                m_processor.UpdateInfo();
+                m_processor.HighlightingEnabled = true;
             }
             
             m_simulationRunning = false;
@@ -427,6 +430,44 @@ namespace Emu5
                     MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }));
+        }
+
+        private void RunFastSimulation()
+        {
+            for (; ; ) // simulate in a infinite loop
+            {
+                bool l_shutdown;
+
+                lock (m_threadSync)
+                {
+                    l_shutdown = !m_runningFast;
+                }
+
+                if (l_shutdown)
+                {
+                    return; // stop simulation per external request
+                }
+
+                m_rvEmulator.SingleStep();
+
+                if (m_rvEmulator.Halted)
+                {
+                    Delegate l_simulationEndedDelegate = new Action(
+                    () => {
+                        m_simulationRunning = false;
+                        m_runningClocked = false;
+
+                        m_processor.UpdateInfo();
+                        m_processor.HighlightingEnabled = true;
+
+                        MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
+                    });
+
+                    Dispatcher.BeginInvoke(l_simulationEndedDelegate);
+
+                    return;
+                }
+            }
         }
     }
 }

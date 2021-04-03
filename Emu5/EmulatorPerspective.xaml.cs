@@ -25,6 +25,23 @@ namespace Emu5
 
         Timer m_resizeTimer;
 
+        bool m_highlightingEnabled = true;
+
+        public bool HighlightingEnabled
+        {
+            set
+            {
+                m_highlightingEnabled = value;
+
+                foreach (InstructionViewEntry i_viewEntry in m_instructionEntries)
+                {
+                    UInt32 l_address = i_viewEntry.GetAddress();
+
+                    i_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
+                }
+            }
+        }
+
         public EmulatorPerspective()
         {
             InitializeComponent();
@@ -158,7 +175,7 @@ namespace Emu5
                 
                 l_viewEntry.DisplayData(false, l_address, l_rawData, "");
 
-                l_viewEntry.Highlighted = l_address == m_currentPC;
+                l_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
 
                 stackPanelInstructionView.Children.Add(l_viewEntry);
                 m_instructionEntries.Add(l_viewEntry);
@@ -230,7 +247,7 @@ namespace Emu5
                 {
                     UInt32 l_address = i_viewEntry.GetAddress();
                     i_viewEntry.DisplayData(false, l_address, m_emulator.GetMemoryMapReference().Read(l_address, 4), "");
-                    i_viewEntry.Highlighted = l_address == m_currentPC;
+                    i_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
                 }
             }
         }
@@ -264,7 +281,7 @@ namespace Emu5
                             byte?[] l_rawData = m_emulator.GetMemoryMapReference().Read(l_address, 4);
 
                             i_viewEntry.DisplayData(false, l_address, l_rawData, "");
-                            i_viewEntry.Highlighted = l_address == m_currentPC;
+                            i_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
 
                             l_address += 4;
                         }    
@@ -381,7 +398,7 @@ namespace Emu5
 
             InstructionViewEntry l_viewEntry = new InstructionViewEntry();
             l_viewEntry.DisplayData(false, l_nextAddress, m_emulator.GetMemoryMapReference().Read(l_nextAddress, 4), "");
-            l_viewEntry.Highlighted = l_nextAddress == m_currentPC;
+            l_viewEntry.Highlighted = m_highlightingEnabled && (l_nextAddress == m_currentPC);
 
             m_instructionEntries.Insert(l_addIndex, l_viewEntry);
             stackPanelInstructionView.Children.Clear();
