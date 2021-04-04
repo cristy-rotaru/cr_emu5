@@ -297,12 +297,15 @@ namespace Emu5
             () => {
                 try
                 {
-                    m_rvEmulator.Assemble(l_code);
+                    RVLabelReferenceMap l_labelMap = new RVLabelReferenceMap();
+
+                    m_rvEmulator.Assemble(l_code, l_labelMap);
                     m_rvEmulator.ResetProcessor();
 
                     Delegate l_compilationFinishedDelegate = new Action(
                     () => {
                         m_editor.SetEditable(true);
+                        m_processor.SetLabelReferences(l_labelMap);
                         m_processor.UpdateInfo();
                         m_processor.HighlightingEnabled = true;
 

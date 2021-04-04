@@ -19,6 +19,8 @@ namespace Emu5
         List<InstructionViewEntry> m_instructionEntries;
         List<DataViewEntry> m_dataEntries;
 
+        RVLabelReferenceMap m_labelMap;
+
         UInt32 m_currentPC;
         UInt32[] m_previousRegisterValues;
         TextBlock[] m_registerTextBoxes;
@@ -48,6 +50,8 @@ namespace Emu5
 
             m_instructionEntries = new List<InstructionViewEntry>();
             m_dataEntries = new List<DataViewEntry>();
+
+            m_labelMap = new RVLabelReferenceMap();
 
             m_currentPC = 0x0;
             m_previousRegisterValues = new UInt32[32];
@@ -101,6 +105,11 @@ namespace Emu5
         public void BindEmulator(RVEmulator emulator)
         {
             m_emulator = emulator;
+        }
+
+        public void SetLabelReferences(RVLabelReferenceMap labelMap)
+        {
+            m_labelMap = labelMap;
         }
 
         public void UpdateInfo()
@@ -173,7 +182,7 @@ namespace Emu5
                 UInt32 l_address = l_normalizedPC + (UInt32)(i_index << 2);
                 byte?[] l_rawData = m_emulator.GetMemoryMapReference().Read(l_address, 4);
                 
-                l_viewEntry.DisplayData(false, l_address, l_rawData, "");
+                l_viewEntry.DisplayData(false, l_address, l_rawData, m_labelMap);
 
                 l_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
 
@@ -246,7 +255,7 @@ namespace Emu5
                 foreach (InstructionViewEntry i_viewEntry in m_instructionEntries)
                 {
                     UInt32 l_address = i_viewEntry.GetAddress();
-                    i_viewEntry.DisplayData(false, l_address, m_emulator.GetMemoryMapReference().Read(l_address, 4), "");
+                    i_viewEntry.DisplayData(false, l_address, m_emulator.GetMemoryMapReference().Read(l_address, 4), m_labelMap);
                     i_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
                 }
             }
@@ -280,7 +289,7 @@ namespace Emu5
                         {
                             byte?[] l_rawData = m_emulator.GetMemoryMapReference().Read(l_address, 4);
 
-                            i_viewEntry.DisplayData(false, l_address, l_rawData, "");
+                            i_viewEntry.DisplayData(false, l_address, l_rawData, m_labelMap);
                             i_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
 
                             l_address += 4;
@@ -397,7 +406,7 @@ namespace Emu5
             }
 
             InstructionViewEntry l_viewEntry = new InstructionViewEntry();
-            l_viewEntry.DisplayData(false, l_nextAddress, m_emulator.GetMemoryMapReference().Read(l_nextAddress, 4), "");
+            l_viewEntry.DisplayData(false, l_nextAddress, m_emulator.GetMemoryMapReference().Read(l_nextAddress, 4), m_labelMap);
             l_viewEntry.Highlighted = m_highlightingEnabled && (l_nextAddress == m_currentPC);
 
             m_instructionEntries.Insert(l_addIndex, l_viewEntry);

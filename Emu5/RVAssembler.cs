@@ -89,7 +89,7 @@ namespace Emu5
             m_dataTypeDictionary.Add("STRZ", RVDataType.STRZ);
         }
 
-        static public void Assemble(String code, RVMemoryMap memoryMap)
+        static public void Assemble(String code, RVMemoryMap memoryMap, RVLabelReferenceMap labelMap)
         {
             RVToken[][] l_tokens = RVParser.Tokenize(code);
             
@@ -934,6 +934,12 @@ namespace Emu5
             foreach (RVInstructionBuilder i_instructionBuilder in l_instructionList)
             {
                 memoryMap.Write(i_instructionBuilder.startAddress, i_instructionBuilder.data);
+            }
+
+            labelMap.Clear();
+            foreach (String i_label in l_labelDictionary.Keys)
+            {
+                labelMap.Add(l_labelDictionary[i_label], i_label);
             }
         }
 

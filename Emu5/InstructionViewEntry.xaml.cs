@@ -119,7 +119,7 @@ namespace Emu5
             }
         }
 
-        public void DisplayData(bool breakpoint, UInt32 address, byte?[] rawData, String annotation)
+        public void DisplayData(bool breakpoint, UInt32 address, byte?[] rawData, RVLabelReferenceMap labelMap)
         {
             if (rawData.Length != 4)
             {
@@ -160,10 +160,26 @@ namespace Emu5
             m_previousValue = l_instructionData;
             
             textBlockAddress.Text = String.Format("{0,8:X8}", address);
-            textBlockAnnotation.Text = annotation;
 
             if (l_computeValue) // optimization: dont dissassemble again if data did not change
             {
+                String l_annotation = "";
+                String[] l_labels = labelMap.FindByAddress(address);
+                for (int i_labelIndex = 0; i_labelIndex < l_labels.Length; ++i_labelIndex)
+                {
+                    if (i_labelIndex != 0)
+                    {
+                        l_annotation += ", ";
+                    }
+                    l_annotation += l_labels[i_labelIndex];
+                }
+                if (String.IsNullOrEmpty(l_annotation) == false)
+                {
+                    l_annotation += ":";
+                }
+
+                textBlockAnnotation.Text = l_annotation;
+
                 if (l_validInstructionData)
                 {
                     Tuple<String, String> l_decodedInstruction = DecodeIntruction(l_instructionData);

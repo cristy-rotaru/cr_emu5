@@ -88,9 +88,9 @@ namespace Emu5
             m_pendingInterrupts = new bool[32];
         }
 
-        public void Assemble(String code)
+        public void Assemble(String code, RVLabelReferenceMap labelMap)
         {
-            RVAssembler.Assemble(code, m_memoryMap);
+            RVAssembler.Assemble(code, m_memoryMap, labelMap);
             m_halted = false;
         }
 

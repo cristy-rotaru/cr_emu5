@@ -77,6 +77,7 @@
     <Compile Include="RVAssembler.cs" />
     <Compile Include="RVEmulator.cs" />
     <Compile Include="RVInstructions.cs" />
+    <Compile Include="RVLabelReferenceMap.cs" />
     <Compile Include="RVMemoryMap.cs" />
     <Compile Include="RVParser.cs" />
     <Compile Include="TabHeader.xaml.cs">
