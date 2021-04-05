@@ -26,6 +26,7 @@ namespace Emu5
     public struct RVInstructionDescription
     {
         public RVInstructionType type;
+        public String mnemonic;
         public byte size;
         public byte opcode;
         public byte func3;
@@ -208,6 +209,78 @@ namespace Emu5
 
             m_instructionDictionary.Add("iret", IRET);
             m_instructionDictionary.Add("IRET", IRET);
+
+            m_instructionDictionary.Add("la", LA);
+            m_instructionDictionary.Add("LA", LA);
+
+            m_instructionDictionary.Add("li", LI);
+            m_instructionDictionary.Add("LI", LI);
+
+            m_instructionDictionary.Add("nop", NOP);
+            m_instructionDictionary.Add("NOP", NOP);
+
+            m_instructionDictionary.Add("mv", MV);
+            m_instructionDictionary.Add("MV", MV);
+
+            m_instructionDictionary.Add("not", NOT);
+            m_instructionDictionary.Add("NOT", NOT);
+
+            m_instructionDictionary.Add("neg", NEG);
+            m_instructionDictionary.Add("NEG", NEG);
+
+            m_instructionDictionary.Add("seqz", SEQZ);
+            m_instructionDictionary.Add("SEQZ", SEQZ);
+
+            m_instructionDictionary.Add("snez", SNEZ);
+            m_instructionDictionary.Add("SNEZ", SNEZ);
+
+            m_instructionDictionary.Add("sltz", SLTZ);
+            m_instructionDictionary.Add("SLTZ", SLTZ);
+
+            m_instructionDictionary.Add("sgtz", SGTZ);
+            m_instructionDictionary.Add("SGTZ", SGTZ);
+
+            m_instructionDictionary.Add("beqz", BEQZ);
+            m_instructionDictionary.Add("BEQZ", BEQZ);
+
+            m_instructionDictionary.Add("bnez", BNEZ);
+            m_instructionDictionary.Add("BNEZ", BNEZ);
+
+            m_instructionDictionary.Add("blez", BLEZ);
+            m_instructionDictionary.Add("BLEZ", BLEZ);
+
+            m_instructionDictionary.Add("bltz", BLTZ);
+            m_instructionDictionary.Add("BLTZ", BLTZ);
+
+            m_instructionDictionary.Add("bgtz", BGTZ);
+            m_instructionDictionary.Add("BGTZ", BGTZ);
+
+            m_instructionDictionary.Add("bgt", BGT);
+            m_instructionDictionary.Add("BGT", BGT);
+
+            m_instructionDictionary.Add("ble", BLE);
+            m_instructionDictionary.Add("BLE", BLE);
+
+            m_instructionDictionary.Add("bgtu", BGTU);
+            m_instructionDictionary.Add("BGTU", BGTU);
+
+            m_instructionDictionary.Add("bleu", BLEU);
+            m_instructionDictionary.Add("BLEU", BLEU);
+
+            m_instructionDictionary.Add("j", J);
+            m_instructionDictionary.Add("J", J);
+
+            m_instructionDictionary.Add("jr", JR);
+            m_instructionDictionary.Add("JR", JR);
+
+            m_instructionDictionary.Add("ret", RET);
+            m_instructionDictionary.Add("RET", RET);
+
+            m_instructionDictionary.Add("call", CALL);
+            m_instructionDictionary.Add("CALL", CALL);
+
+            m_instructionDictionary.Add("tail", TAIL);
+            m_instructionDictionary.Add("TAIL", TAIL);
 
             m_registerDictionary = new Dictionary<string, RVRegister>();
 
@@ -866,6 +939,198 @@ namespace Emu5
             get
             {
                 return new RVInstructionDescription { type = RVInstructionType.System, size = 4, opcode = 0b1110011, func3 = 0b000, func12 = 0x102 };
+            }
+        }
+
+        public static RVInstructionDescription LA
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 8, mnemonic = "la" };
+            }
+        }
+
+        public static RVInstructionDescription LI
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 8, mnemonic = "li" };
+            }
+        }
+
+        public static RVInstructionDescription NOP
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "nop" };
+            }
+        }
+
+        public static RVInstructionDescription MV
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "mv" };
+            }
+        }
+
+        public static RVInstructionDescription NOT
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "not" };
+            }
+        }
+
+        public static RVInstructionDescription NEG
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "neg" };
+            }
+        }
+
+        public static RVInstructionDescription SEQZ
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "seqz" };
+            }
+        }
+
+        public static RVInstructionDescription SNEZ
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "snez" };
+            }
+        }
+
+        public static RVInstructionDescription SLTZ
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "sltz" };
+            }
+        }
+
+        public static RVInstructionDescription SGTZ
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "sgtz" };
+            }
+        }
+
+        public static RVInstructionDescription BEQZ
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "beqz" };
+            }
+        }
+
+        public static RVInstructionDescription BNEZ
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "bnez" };
+            }
+        }
+
+        public static RVInstructionDescription BLEZ
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "blez" };
+            }
+        }
+
+        public static RVInstructionDescription BLTZ
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "bltz" };
+            }
+        }
+
+        public static RVInstructionDescription BGTZ
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "bgtz" };
+            }
+        }
+
+        public static RVInstructionDescription BGT
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "bgt" };
+            }
+        }
+
+        public static RVInstructionDescription BLE
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "ble" };
+            }
+        }
+
+        public static RVInstructionDescription BGTU
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "bgtu" };
+            }
+        }
+
+        public static RVInstructionDescription BLEU
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "bleu" };
+            }
+        }
+
+        public static RVInstructionDescription J
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "j" };
+            }
+        }
+
+        public static RVInstructionDescription JR
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "jr" };
+            }
+        }
+
+        public static RVInstructionDescription RET
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "ret" };
+            }
+        }
+
+        public static RVInstructionDescription CALL
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 8, mnemonic = "call" };
+            }
+        }
+
+        public static RVInstructionDescription TAIL
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 8, mnemonic = "tail" };
             }
         }
     }

@@ -820,7 +820,348 @@ namespace Emu5
                             }
                             break;
 
-                            // TODO: pseudo instructions
+                            case RVInstructionType.Pseudo:
+                            {
+                                switch (l_instructionDescription.mnemonic)
+                                {
+                                    case "la":
+                                    {
+                                        if (l_tokenLine.Length != 4)
+                                        {
+                                            throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
+                                        }
+
+                                        if (l_tokenLine[1].type != RVTokenType.Register)
+                                        {
+                                            throw new RVAssemblyException("Expected register identifier.", l_tokenLine[1].line, l_tokenLine[1].column);
+                                        }
+                                        l_instructionDescription.rd = (RVRegister)l_tokenLine[1].value;
+
+                                        if (l_tokenLine[2].type != RVTokenType.Separator || (char)l_tokenLine[2].value != ',')
+                                        {
+                                            throw new RVAssemblyException("Expected separator ','.", l_tokenLine[2].line, l_tokenLine[2].column);
+                                        }
+
+                                        if (l_tokenLine[3].type != RVTokenType.Label)
+                                        {
+                                            throw new RVAssemblyException("Expected label identifier.", l_tokenLine[3].line, l_tokenLine[3].column);
+                                        }
+
+                                        RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[3].value, labelLine = l_tokenLine[3].line, labelColumn = l_tokenLine[3].column };
+                                        l_instructionList.Add(l_instructionBuilder);
+                                    }
+                                    break;
+
+                                    case "li":
+                                    {
+                                        if (l_tokenLine.Length != 4)
+                                        {
+                                            throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
+                                        }
+
+                                        if (l_tokenLine[1].type != RVTokenType.Register)
+                                        {
+                                            throw new RVAssemblyException("Expected register identifier.", l_tokenLine[1].line, l_tokenLine[1].column);
+                                        }
+                                        l_instructionDescription.rd = (RVRegister)l_tokenLine[1].value;
+
+                                        if (l_tokenLine[2].type != RVTokenType.Separator || (char)l_tokenLine[2].value != ',')
+                                        {
+                                            throw new RVAssemblyException("Expected separator ','.", l_tokenLine[2].line, l_tokenLine[2].column);
+                                        }
+
+                                        if (l_tokenLine[3].type != RVTokenType.Integer)
+                                        {
+                                            throw new RVAssemblyException("Expected integer immediate.", l_tokenLine[3].line, l_tokenLine[3].column);
+                                        }
+                                        UInt32 l_immediate = (UInt32)l_tokenLine[3].value;
+
+                                        UInt32 l_actualInstruction1, l_actualInstruction2;
+
+                                        l_actualInstruction1 = 0x37; // LUI instruction
+                                        l_actualInstruction1 |= (((UInt32)l_instructionDescription.rd) & 0x1F) << 7;
+                                        if ((l_immediate & 0x800) == 0) // checking bit 12 of the immediate
+                                        {
+                                            l_actualInstruction1 |= l_immediate & 0xFFFFF000;
+                                            l_actualInstruction2 = 0x13; // ADDI
+                                        }
+                                        else
+                                        {
+                                            l_actualInstruction1 |= ~l_immediate & 0xFFFFF000;
+                                            l_actualInstruction2 = 0x4013; // XORI
+                                        }
+                                        l_actualInstruction2 |= (((UInt32)l_instructionDescription.rd) & 0x1F) << 7;
+                                        l_actualInstruction2 |= (((UInt32)l_instructionDescription.rd) & 0x1F) << 15;
+                                        l_actualInstruction2 |= (l_immediate & 0xFFF) << 20;
+
+                                        RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, data = new byte[8], pendingLabel = false };
+                                        for (int i_byteIndex = 0; i_byteIndex < 4; ++i_byteIndex)
+                                        {
+                                            l_instructionBuilder.data[i_byteIndex] = (byte)(l_actualInstruction1 & 0xFF);
+                                            l_instructionBuilder.data[i_byteIndex + 4] = (byte)(l_actualInstruction2 & 0xFF);
+                                            l_actualInstruction1 >>= 8;
+                                            l_actualInstruction2 >>= 8;
+                                        }
+                                        l_instructionList.Add(l_instructionBuilder);
+                                    }
+                                    break;
+
+                                    case "nop":
+                                    {
+                                        if (l_tokenLine.Length != 1)
+                                        {
+                                            throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
+                                        }
+
+                                        UInt32 l_actualInstruction = 0x7033; // AND x0, x0, x0
+
+                                        RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, data = new byte[4], pendingLabel = false };
+                                        for (int i_byteIndex = 0; i_byteIndex < 4; ++i_byteIndex)
+                                        {
+                                            l_instructionBuilder.data[i_byteIndex] = (byte)(l_actualInstruction & 0xFF);
+                                            l_actualInstruction >>= 8;
+                                        }
+                                        l_instructionList.Add(l_instructionBuilder);
+                                    }
+                                    break;
+
+                                    case "mv":
+                                    {
+                                        if (l_tokenLine.Length != 4)
+                                        {
+                                            throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
+                                        }
+
+                                        if (l_tokenLine[1].type != RVTokenType.Register)
+                                        {
+                                            throw new RVAssemblyException("Expected register identifier.", l_tokenLine[1].line, l_tokenLine[1].column);
+                                        }
+                                        l_instructionDescription.rd = (RVRegister)l_tokenLine[1].value;
+
+                                        if (l_tokenLine[2].type != RVTokenType.Separator || (char)l_tokenLine[2].value != ',')
+                                        {
+                                            throw new RVAssemblyException("Expected separator ','.", l_tokenLine[2].line, l_tokenLine[2].column);
+                                        }
+
+                                        if (l_tokenLine[3].type != RVTokenType.Register)
+                                        {
+                                            throw new RVAssemblyException("Expected register identifier.", l_tokenLine[3].line, l_tokenLine[3].column);
+                                        }
+                                        l_instructionDescription.rs1 = (RVRegister)l_tokenLine[3].value;
+
+                                        UInt32 l_actualInstruction = 0x33; // ADD
+                                        l_actualInstruction |= (((UInt32)l_instructionDescription.rd) & 0x1F) << 7;
+                                        l_actualInstruction |= (((UInt32)l_instructionDescription.rs1) & 0x1F) << 15;
+
+                                        RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, data = new byte[4], pendingLabel = false };
+                                        for (int i_byteIndex = 0; i_byteIndex < 4; ++i_byteIndex)
+                                        {
+                                            l_instructionBuilder.data[i_byteIndex] = (byte)(l_actualInstruction & 0xFF);
+                                            l_actualInstruction >>= 8;
+                                        }
+                                        l_instructionList.Add(l_instructionBuilder);
+                                    }
+                                    break;
+
+                                    case "not":
+                                    {
+                                        if (l_tokenLine.Length != 4)
+                                        {
+                                            throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
+                                        }
+
+                                        if (l_tokenLine[1].type != RVTokenType.Register)
+                                        {
+                                            throw new RVAssemblyException("Expected register identifier.", l_tokenLine[1].line, l_tokenLine[1].column);
+                                        }
+                                        l_instructionDescription.rd = (RVRegister)l_tokenLine[1].value;
+
+                                        if (l_tokenLine[2].type != RVTokenType.Separator || (char)l_tokenLine[2].value != ',')
+                                        {
+                                            throw new RVAssemblyException("Expected separator ','.", l_tokenLine[2].line, l_tokenLine[2].column);
+                                        }
+
+                                        if (l_tokenLine[3].type != RVTokenType.Register)
+                                        {
+                                            throw new RVAssemblyException("Expected register identifier.", l_tokenLine[3].line, l_tokenLine[3].column);
+                                        }
+                                        l_instructionDescription.rs1 = (RVRegister)l_tokenLine[3].value;
+
+                                        UInt32 l_actualInstruction = 0xFFF04013; // XORI .., .., -1
+                                        l_actualInstruction |= (((UInt32)l_instructionDescription.rd) & 0x1F) << 7;
+                                        l_actualInstruction |= (((UInt32)l_instructionDescription.rs1) & 0x1F) << 15;
+
+                                        RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, data = new byte[4], pendingLabel = false };
+                                        for (int i_byteIndex = 0; i_byteIndex < 4; ++i_byteIndex)
+                                        {
+                                            l_instructionBuilder.data[i_byteIndex] = (byte)(l_actualInstruction & 0xFF);
+                                            l_actualInstruction >>= 8;
+                                        }
+                                        l_instructionList.Add(l_instructionBuilder);
+                                    }
+                                    break;
+
+                                    case "neg":
+                                    {
+                                        if (l_tokenLine.Length != 4)
+                                        {
+                                            throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
+                                        }
+
+                                        if (l_tokenLine[1].type != RVTokenType.Register)
+                                        {
+                                            throw new RVAssemblyException("Expected register identifier.", l_tokenLine[1].line, l_tokenLine[1].column);
+                                        }
+                                        l_instructionDescription.rd = (RVRegister)l_tokenLine[1].value;
+
+                                        if (l_tokenLine[2].type != RVTokenType.Separator || (char)l_tokenLine[2].value != ',')
+                                        {
+                                            throw new RVAssemblyException("Expected separator ','.", l_tokenLine[2].line, l_tokenLine[2].column);
+                                        }
+
+                                        if (l_tokenLine[3].type != RVTokenType.Register)
+                                        {
+                                            throw new RVAssemblyException("Expected register identifier.", l_tokenLine[3].line, l_tokenLine[3].column);
+                                        }
+                                        l_instructionDescription.rs2 = (RVRegister)l_tokenLine[3].value;
+
+                                        UInt32 l_actualInstruction = 0x40000033; // SUB .., .., ..
+                                        l_actualInstruction |= (((UInt32)l_instructionDescription.rd) & 0x1F) << 7;
+                                        l_actualInstruction |= (((UInt32)l_instructionDescription.rs2) & 0x1F) << 20;
+
+                                        RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, data = new byte[4], pendingLabel = false };
+                                        for (int i_byteIndex = 0; i_byteIndex < 4; ++i_byteIndex)
+                                        {
+                                            l_instructionBuilder.data[i_byteIndex] = (byte)(l_actualInstruction & 0xFF);
+                                            l_actualInstruction >>= 8;
+                                        }
+                                        l_instructionList.Add(l_instructionBuilder);
+                                    }
+                                    break;
+
+                                    case "seqz":
+                                    {
+                                        if (l_tokenLine.Length != 4)
+                                        {
+                                            throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
+                                        }
+
+                                        if (l_tokenLine[1].type != RVTokenType.Register)
+                                        {
+                                            throw new RVAssemblyException("Expected register identifier.", l_tokenLine[1].line, l_tokenLine[1].column);
+                                        }
+                                        l_instructionDescription.rd = (RVRegister)l_tokenLine[1].value;
+
+                                        if (l_tokenLine[2].type != RVTokenType.Separator || (char)l_tokenLine[2].value != ',')
+                                        {
+                                            throw new RVAssemblyException("Expected separator ','.", l_tokenLine[2].line, l_tokenLine[2].column);
+                                        }
+
+                                        if (l_tokenLine[3].type != RVTokenType.Register)
+                                        {
+                                            throw new RVAssemblyException("Expected register identifier.", l_tokenLine[3].line, l_tokenLine[3].column);
+                                        }
+                                        l_instructionDescription.rs1 = (RVRegister)l_tokenLine[3].value;
+
+                                        UInt32 l_actualInstruction = 0x00103013; // SLTIU .., .., 1
+                                        l_actualInstruction |= (((UInt32)l_instructionDescription.rd) & 0x1F) << 7;
+                                        l_actualInstruction |= (((UInt32)l_instructionDescription.rs1) & 0x1F) << 15;
+
+                                        RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, data = new byte[4], pendingLabel = false };
+                                        for (int i_byteIndex = 0; i_byteIndex < 4; ++i_byteIndex)
+                                        {
+                                            l_instructionBuilder.data[i_byteIndex] = (byte)(l_actualInstruction & 0xFF);
+                                            l_actualInstruction >>= 8;
+                                        }
+                                        l_instructionList.Add(l_instructionBuilder);
+                                    }
+                                    break;
+
+                                    case "snez":
+                                    {
+                                        if (l_tokenLine.Length != 4)
+                                        {
+                                            throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
+                                        }
+
+                                        if (l_tokenLine[1].type != RVTokenType.Register)
+                                        {
+                                            throw new RVAssemblyException("Expected register identifier.", l_tokenLine[1].line, l_tokenLine[1].column);
+                                        }
+                                        l_instructionDescription.rd = (RVRegister)l_tokenLine[1].value;
+
+                                        if (l_tokenLine[2].type != RVTokenType.Separator || (char)l_tokenLine[2].value != ',')
+                                        {
+                                            throw new RVAssemblyException("Expected separator ','.", l_tokenLine[2].line, l_tokenLine[2].column);
+                                        }
+
+                                        if (l_tokenLine[3].type != RVTokenType.Register)
+                                        {
+                                            throw new RVAssemblyException("Expected register identifier.", l_tokenLine[3].line, l_tokenLine[3].column);
+                                        }
+                                        l_instructionDescription.rs2 = (RVRegister)l_tokenLine[3].value;
+
+                                        UInt32 l_actualInstruction = 0x3033; // SLTU .., x0, ..
+                                        l_actualInstruction |= (((UInt32)l_instructionDescription.rd) & 0x1F) << 7;
+                                        l_actualInstruction |= (((UInt32)l_instructionDescription.rs2) & 0x1F) << 20;
+
+                                        RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, data = new byte[4], pendingLabel = false };
+                                        for (int i_byteIndex = 0; i_byteIndex < 4; ++i_byteIndex)
+                                        {
+                                            l_instructionBuilder.data[i_byteIndex] = (byte)(l_actualInstruction & 0xFF);
+                                            l_actualInstruction >>= 8;
+                                        }
+                                        l_instructionList.Add(l_instructionBuilder);
+                                    }
+                                    break;
+
+                                    case "sltz":
+                                    {
+                                        if (l_tokenLine.Length != 4)
+                                        {
+                                            throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
+                                        }
+
+                                        if (l_tokenLine[1].type != RVTokenType.Register)
+                                        {
+                                            throw new RVAssemblyException("Expected register identifier.", l_tokenLine[1].line, l_tokenLine[1].column);
+                                        }
+                                        l_instructionDescription.rd = (RVRegister)l_tokenLine[1].value;
+
+                                        if (l_tokenLine[2].type != RVTokenType.Separator || (char)l_tokenLine[2].value != ',')
+                                        {
+                                            throw new RVAssemblyException("Expected separator ','.", l_tokenLine[2].line, l_tokenLine[2].column);
+                                        }
+
+                                        if (l_tokenLine[3].type != RVTokenType.Register)
+                                        {
+                                            throw new RVAssemblyException("Expected register identifier.", l_tokenLine[3].line, l_tokenLine[3].column);
+                                        }
+                                        l_instructionDescription.rs1 = (RVRegister)l_tokenLine[3].value;
+
+                                        UInt32 l_actualInstruction = 0x2033; // SLT .., .., x0
+                                        l_actualInstruction |= (((UInt32)l_instructionDescription.rd) & 0x1F) << 7;
+                                        l_actualInstruction |= (((UInt32)l_instructionDescription.rs1) & 0x1F) << 15;
+
+                                        RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, data = new byte[4], pendingLabel = false };
+                                        for (int i_byteIndex = 0; i_byteIndex < 4; ++i_byteIndex)
+                                        {
+                                            l_instructionBuilder.data[i_byteIndex] = (byte)(l_actualInstruction & 0xFF);
+                                            l_actualInstruction >>= 8;
+                                        }
+                                        l_instructionList.Add(l_instructionBuilder);
+                                    }
+                                    break;
+
+                                    // left here | continue with sgtz
+
+                                    default:
+                                    {
+                                        throw new Exception("If you see this, I definetely fucked something up.");
+                                    }
+                                }
+                            }
+                            break;
                         }
 
                         l_currentAddress += l_instructionDescription.size;
