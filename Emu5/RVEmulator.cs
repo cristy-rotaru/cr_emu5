@@ -13,12 +13,12 @@ namespace Emu5
         Reset = 0,
         NMI,
         ECALL,
-        EBREAK,
         MisalignedPC,
         MisalignedMemory,
         UndefinedMemory,
         InvalidInstruction,
         DivisionBy0,
+        External8,
         External9,
         External10,
         External11,
@@ -58,6 +58,7 @@ namespace Emu5
         bool[] m_pendingInterrupts;
 
         List<UInt32> m_breakpoints;
+        bool m_ebreakExecuted;
 
         public bool Halted
         {
@@ -91,6 +92,7 @@ namespace Emu5
             m_pendingInterrupts = new bool[32];
 
             m_breakpoints = new List<UInt32>();
+            m_ebreakExecuted = false;
         }
 
         public void Assemble(String code, RVLabelReferenceMap labelMap)
@@ -132,6 +134,11 @@ namespace Emu5
 
         public bool BreakpointHit()
         {
+            if (m_ebreakExecuted)
+            {
+                return true;
+            }
+
             bool l_result;
 
             lock (m_breakpoints)
@@ -170,6 +177,8 @@ namespace Emu5
             {
                 return;
             }
+
+            m_ebreakExecuted = false;
 
             if ((m_programCounter & 0x3) != 0)
             {
@@ -255,13 +264,12 @@ namespace Emu5
              * 0x00 = Reset
              * 0x04 = NMI | saves PC
              * 0x08 = ECALL | saves PC+4
-             * 0x0C = EBREAK | saves PC+4
-             * 0x10 = Misaligned PC fault | saves PC
-             * 0x14 = Misaligned memory access fault | saves PC, memory address
-             * 0x18 = Access to undefined memory space fault | saves PC, memory address
-             * 0x1C = Invalid instruction fault | saves PC
-             * 0x20 = Division by 0 or division overflow fault | saves PC
-             * 0x24-0x7C - programmable and external interrupts | saves PC
+             * 0x0C = Misaligned PC fault | saves PC
+             * 0x10 = Misaligned memory access fault | saves PC, memory address
+             * 0x14 = Access to undefined memory space fault | saves PC, memory address
+             * 0x18 = Invalid instruction fault | saves PC
+             * 0x1C = Division by 0 or division overflow fault | saves PC
+             * 0x20-0x7C - programmable and external interrupts | saves PC
             */
 
             m_handlingTrap = true;
@@ -725,8 +733,8 @@ namespace Emu5
 
                 case 0x001: // ebreak
                 {
-                    LoadVector(RVVector.EBREAK, CreateByteStream(m_programCounter + 4));
-                    return false;
+                    m_ebreakExecuted = true;
+                    return true;
                 }
 
                 case 0xFFF: // hlt
