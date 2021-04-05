@@ -177,12 +177,12 @@ namespace Emu5
             int l_entryCount = (int)(stackPanelInstructionView.ActualHeight / 24);
             for (int i_index = 0; i_index < l_entryCount; ++i_index)
             {
-                InstructionViewEntry l_viewEntry = new InstructionViewEntry();
+                InstructionViewEntry l_viewEntry = new InstructionViewEntry(ConfigureBreakpoint);
 
                 UInt32 l_address = l_normalizedPC + (UInt32)(i_index << 2);
                 byte?[] l_rawData = m_emulator.GetMemoryMapReference().Read(l_address, 4);
                 
-                l_viewEntry.DisplayData(false, l_address, l_rawData, m_labelMap);
+                l_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_address), l_address, l_rawData, m_labelMap);
 
                 l_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
 
@@ -255,7 +255,7 @@ namespace Emu5
                 foreach (InstructionViewEntry i_viewEntry in m_instructionEntries)
                 {
                     UInt32 l_address = i_viewEntry.GetAddress();
-                    i_viewEntry.DisplayData(false, l_address, m_emulator.GetMemoryMapReference().Read(l_address, 4), m_labelMap);
+                    i_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_address), l_address, m_emulator.GetMemoryMapReference().Read(l_address, 4), m_labelMap);
                     i_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
                 }
             }
@@ -289,7 +289,7 @@ namespace Emu5
                         {
                             byte?[] l_rawData = m_emulator.GetMemoryMapReference().Read(l_address, 4);
 
-                            i_viewEntry.DisplayData(false, l_address, l_rawData, m_labelMap);
+                            i_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_address), l_address, l_rawData, m_labelMap);
                             i_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
 
                             l_address += 4;
@@ -405,8 +405,8 @@ namespace Emu5
                 l_addIndex = l_lastIndex;
             }
 
-            InstructionViewEntry l_viewEntry = new InstructionViewEntry();
-            l_viewEntry.DisplayData(false, l_nextAddress, m_emulator.GetMemoryMapReference().Read(l_nextAddress, 4), m_labelMap);
+            InstructionViewEntry l_viewEntry = new InstructionViewEntry(ConfigureBreakpoint);
+            l_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_nextAddress), l_nextAddress, m_emulator.GetMemoryMapReference().Read(l_nextAddress, 4), m_labelMap);
             l_viewEntry.Highlighted = m_highlightingEnabled && (l_nextAddress == m_currentPC);
 
             m_instructionEntries.Insert(l_addIndex, l_viewEntry);
@@ -464,6 +464,21 @@ namespace Emu5
             foreach (DataViewEntry i_entry in m_dataEntries)
             {
                 stackPanelMemoryView.Children.Add(i_entry);
+            }
+        }
+
+        private void ConfigureBreakpoint(bool active, UInt32 address)
+        {
+            if (m_emulator != null)
+            {
+                if (active)
+                {
+                    m_emulator.AddBreakpoint(address);
+                }
+                else
+                {
+                    m_emulator.RemoveBreakpoint(address);
+                }
             }
         }
     }

@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Emu5
 {
@@ -431,13 +432,23 @@ namespace Emu5
                     m_runningClocked = false;
 
                     MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    CommandManager.InvalidateRequerySuggested();
+                }
+
+                if (m_rvEmulator.BreakpointHit())
+                {
+                    m_clockTimer.Stop();
+                    m_runningClocked = false;
+
+                    CommandManager.InvalidateRequerySuggested();
                 }
             }));
         }
 
         private void RunFastSimulation()
         {
-            for (; ; ) // simulate in a infinite loop
+            for (;;) // simulate in a infinite loop
             {
                 bool l_shutdown;
 
@@ -458,15 +469,34 @@ namespace Emu5
                     Delegate l_simulationEndedDelegate = new Action(
                     () => {
                         m_simulationRunning = false;
-                        m_runningClocked = false;
+                        m_runningFast = false;
 
                         m_processor.UpdateInfo();
                         m_processor.HighlightingEnabled = true;
 
                         MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        CommandManager.InvalidateRequerySuggested();
                     });
 
                     Dispatcher.BeginInvoke(l_simulationEndedDelegate);
+
+                    return;
+                }
+
+                if (m_rvEmulator.BreakpointHit())
+                {
+                    Delegate l_breakpointHitDelegate = new Action(
+                    () => {
+                        m_runningFast = false;
+
+                        m_processor.UpdateInfo();
+                        m_processor.HighlightingEnabled = true;
+
+                        CommandManager.InvalidateRequerySuggested();
+                    });
+
+                    Dispatcher.BeginInvoke(l_breakpointHitDelegate);
 
                     return;
                 }

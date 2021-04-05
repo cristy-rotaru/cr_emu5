@@ -19,7 +19,7 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-            <Button Name="buttonToggleBreakpoint" ToolTip="Toggle breakpoint" />
+            <Button Name="buttonToggleBreakpoint" ToolTip="Toggle breakpoint" Click="buttonToggleBreakpoint_Click" />
         </Border>
 
         <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">

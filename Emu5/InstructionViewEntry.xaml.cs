@@ -11,6 +11,8 @@ namespace Emu5
     /// </summary>
     public partial class InstructionViewEntry : UserControl
     {
+        public delegate void ToggleBreakpointDelegate(bool active, UInt32 address);
+
         static Dictionary<byte, String> s_bTypeInstructions = null; // key = func3
         static Dictionary<byte, String> s_loadTypeInstructions = null; // key = func3
         static Dictionary<byte, String> s_sTypeInstructions = null; // key = func3
@@ -19,13 +21,18 @@ namespace Emu5
         static Dictionary<UInt16, String> s_rTypeInstructions = null; // key = {func7, func3}
         static Dictionary<UInt16, String> s_systemInstructions = null; // key = func12
 
+        bool m_breakpoint;
         UInt32? m_address;
         UInt32 m_previousValue;
 
-        public InstructionViewEntry()
+        ToggleBreakpointDelegate m_toggleBreakpointCallback;
+
+        public InstructionViewEntry(ToggleBreakpointDelegate handler)
         {
             InitializeComponent();
             m_address = null;
+
+            m_toggleBreakpointCallback = handler;
 
             if (s_bTypeInstructions == null)
             {
@@ -192,9 +199,10 @@ namespace Emu5
                     textBlockInstruction.Text = "";
                     textBlockRawValue.Text = "";
                 }
-            } 
+            }
 
-            buttonToggleBreakpoint.Content = breakpoint ? new Ellipse { Height = 11, Width = 11 } : null;
+            m_breakpoint = breakpoint;
+            buttonToggleBreakpoint.Content = m_breakpoint ? new Ellipse { Height = 11, Width = 11, Fill = Brushes.Red, Stroke = Brushes.Red } : null;
         }
 
         private Tuple<String, String> DecodeIntruction(UInt32 encodedInstruction)
@@ -431,6 +439,14 @@ namespace Emu5
         public UInt32 GetAddress()
         {
             return (UInt32)m_address;
+        }
+
+        private void buttonToggleBreakpoint_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            m_breakpoint = !m_breakpoint;
+
+            buttonToggleBreakpoint.Content = m_breakpoint ? new Ellipse { Height = 11, Width = 11, Fill = Brushes.Red, Stroke = Brushes.Red } : null;
+            m_toggleBreakpointCallback(m_breakpoint, (UInt32)m_address);
         }
     }
 }

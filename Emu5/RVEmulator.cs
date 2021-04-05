@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Emu5
 {
@@ -56,6 +57,8 @@ namespace Emu5
         bool m_interruptsEnabled = false;
         bool[] m_pendingInterrupts;
 
+        List<UInt32> m_breakpoints;
+
         public bool Halted
         {
             get
@@ -86,12 +89,57 @@ namespace Emu5
             m_memoryMap = new RVMemoryMap();
             m_registerFile = new UInt32[32];
             m_pendingInterrupts = new bool[32];
+
+            m_breakpoints = new List<UInt32>();
         }
 
         public void Assemble(String code, RVLabelReferenceMap labelMap)
         {
             RVAssembler.Assemble(code, m_memoryMap, labelMap);
             m_halted = false;
+        }
+
+        public void AddBreakpoint(UInt32 address)
+        {
+            lock (m_breakpoints)
+            {
+                if (m_breakpoints.Contains(address) == false)
+                {
+                    m_breakpoints.Add(address);
+                }
+            }
+        }
+
+        public void RemoveBreakpoint(UInt32 address)
+        {
+            lock (m_breakpoints)
+            {
+                m_breakpoints.Remove(address);
+            }
+        }
+
+        public bool HasBreakpoint(UInt32 address)
+        {
+            bool l_result;
+            
+            lock (m_breakpoints)
+            {
+                l_result = m_breakpoints.Contains(address);
+            }
+
+            return l_result;
+        }
+
+        public bool BreakpointHit()
+        {
+            bool l_result;
+
+            lock (m_breakpoints)
+            {
+                l_result = m_breakpoints.Contains(m_programCounter);
+            }
+
+            return l_result;
         }
 
         public void ResetProcessor()
