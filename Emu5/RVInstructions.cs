@@ -249,6 +249,9 @@ namespace Emu5
             m_instructionDictionary.Add("blez", BLEZ);
             m_instructionDictionary.Add("BLEZ", BLEZ);
 
+            m_instructionDictionary.Add("bgez", BGEZ);
+            m_instructionDictionary.Add("BGEZ", BGEZ);
+
             m_instructionDictionary.Add("bltz", BLTZ);
             m_instructionDictionary.Add("BLTZ", BLTZ);
 
@@ -1043,6 +1046,14 @@ namespace Emu5
             get
             {
                 return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "blez" };
+            }
+        }
+
+        public static RVInstructionDescription BGEZ
+        {
+            get
+            {
+                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 4, mnemonic = "bgez" };
             }
         }
 

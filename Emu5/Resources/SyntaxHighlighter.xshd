@@ -96,6 +96,7 @@
             <Word>beqz</Word> <Word>BEQZ</Word>
             <Word>bnez</Word> <Word>BNEZ</Word>
             <Word>blez</Word> <Word>BLEZ</Word>
+            <Word>bgez</Word> <Word>BGEZ</Word>
             <Word>bltz</Word> <Word>BLTZ</Word>
             <Word>bgtz</Word> <Word>BGTZ</Word>
             <Word>bgt</Word> <Word>BGT</Word>
