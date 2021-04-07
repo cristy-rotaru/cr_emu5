@@ -95,9 +95,9 @@ namespace Emu5
             m_ebreakExecuted = false;
         }
 
-        public void Assemble(String code, RVLabelReferenceMap labelMap)
+        public void Assemble(String code, RVLabelReferenceMap labelMap, Dictionary<UInt32, String> pseudoInstructions)
         {
-            RVAssembler.Assemble(code, m_memoryMap, labelMap);
+            RVAssembler.Assemble(code, m_memoryMap, labelMap, pseudoInstructions);
             m_halted = false;
         }
 

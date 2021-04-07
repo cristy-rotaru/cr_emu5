@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -299,14 +300,16 @@ namespace Emu5
                 try
                 {
                     RVLabelReferenceMap l_labelMap = new RVLabelReferenceMap();
+                    Dictionary<UInt32, String> l_pseudoInstructionMap = new Dictionary<UInt32, String>();
 
-                    m_rvEmulator.Assemble(l_code, l_labelMap);
+                    m_rvEmulator.Assemble(l_code, l_labelMap, l_pseudoInstructionMap);
                     m_rvEmulator.ResetProcessor();
 
                     Delegate l_compilationFinishedDelegate = new Action(
                     () => {
                         m_editor.SetEditable(true);
                         m_processor.SetLabelReferences(l_labelMap);
+                        m_processor.SetPseudoInstructionReference(l_pseudoInstructionMap);
                         m_processor.UpdateInfo();
                         m_processor.HighlightingEnabled = true;
 

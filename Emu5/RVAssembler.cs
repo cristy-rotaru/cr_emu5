@@ -89,7 +89,7 @@ namespace Emu5
             m_dataTypeDictionary.Add("STRZ", RVDataType.STRZ);
         }
 
-        static public void Assemble(String code, RVMemoryMap memoryMap, RVLabelReferenceMap labelMap)
+        static public void Assemble(String code, RVMemoryMap memoryMap, RVLabelReferenceMap labelMap, Dictionary<UInt32, String> pseudoInstructions)
         {
             RVToken[][] l_tokens = RVParser.Tokenize(code);
             
@@ -99,6 +99,8 @@ namespace Emu5
             List<RVInstructionBuilder> l_instructionList = new List<RVInstructionBuilder>();
             List<RVDataBuilder> l_dataList = new List<RVDataBuilder>();
             List<Interval> l_memoryIntervals = new List<Interval>();
+
+            pseudoInstructions.Clear();
 
             for (int i_line = 0; i_line < l_tokens.Length; ++i_line)
             {
@@ -849,6 +851,9 @@ namespace Emu5
 
                                         RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[3].value, labelLine = l_tokenLine[3].line, labelColumn = l_tokenLine[3].column };
                                         l_instructionList.Add(l_instructionBuilder);
+
+                                        pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " " + (String)l_tokenLine[3].value);
+                                        pseudoInstructions.Add(l_currentAddress + 4, l_instructionDescription.mnemonic + " " + (String)l_tokenLine[3].value);
                                     }
                                     break;
 
@@ -903,6 +908,9 @@ namespace Emu5
                                             l_actualInstruction2 >>= 8;
                                         }
                                         l_instructionList.Add(l_instructionBuilder);
+
+                                        pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " 0x" + String.Format("{0:X}", l_immediate));
+                                        pseudoInstructions.Add(l_currentAddress + 4, l_instructionDescription.mnemonic + " 0x" + String.Format("{0:X}", l_immediate));
                                     }
                                     break;
 
@@ -922,6 +930,8 @@ namespace Emu5
                                             l_actualInstruction >>= 8;
                                         }
                                         l_instructionList.Add(l_instructionBuilder);
+
+                                        pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic);
                                     }
                                     break;
 
@@ -960,6 +970,8 @@ namespace Emu5
                                             l_actualInstruction >>= 8;
                                         }
                                         l_instructionList.Add(l_instructionBuilder);
+
+                                        pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rd + ", x" + (int)l_instructionDescription.rs1);
                                     }
                                     break;
 
@@ -998,6 +1010,8 @@ namespace Emu5
                                             l_actualInstruction >>= 8;
                                         }
                                         l_instructionList.Add(l_instructionBuilder);
+
+                                        pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rd + ", x" + (int)l_instructionDescription.rs1);
                                     }
                                     break;
 
@@ -1036,6 +1050,8 @@ namespace Emu5
                                             l_actualInstruction >>= 8;
                                         }
                                         l_instructionList.Add(l_instructionBuilder);
+
+                                        pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rd + ", x" + (int)l_instructionDescription.rs2);
                                     }
                                     break;
 
@@ -1074,6 +1090,8 @@ namespace Emu5
                                             l_actualInstruction >>= 8;
                                         }
                                         l_instructionList.Add(l_instructionBuilder);
+
+                                        pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rd + ", x" + (int)l_instructionDescription.rs1);
                                     }
                                     break;
 
@@ -1112,6 +1130,8 @@ namespace Emu5
                                             l_actualInstruction >>= 8;
                                         }
                                         l_instructionList.Add(l_instructionBuilder);
+
+                                        pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rd + ", x" + (int)l_instructionDescription.rs2);
                                     }
                                     break;
 
@@ -1150,6 +1170,8 @@ namespace Emu5
                                             l_actualInstruction >>= 8;
                                         }
                                         l_instructionList.Add(l_instructionBuilder);
+
+                                        pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rd + ", x" + (int)l_instructionDescription.rs1);
                                     }
                                     break;
 
@@ -1188,6 +1210,8 @@ namespace Emu5
                                             l_actualInstruction >>= 8;
                                         }
                                         l_instructionList.Add(l_instructionBuilder);
+
+                                        pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rd + ", x" + (int)l_instructionDescription.rs2);
                                     }
                                     break;
 
@@ -1244,12 +1268,16 @@ namespace Emu5
                                                 l_encodedInstruction >>= 8;
                                             }
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs1 + ", " + (int)l_immediate);
                                         }
                                         else if (l_tokenLine[3].type == RVTokenType.Label)
                                         {
                                             l_instructionDescription.type = RVInstructionType.B;
                                             RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[3].value, labelLine = l_tokenLine[3].line, labelColumn = l_tokenLine[3].column };
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs1 + ", " + (String)l_tokenLine[3].value);
                                         }
                                         else
                                         {
@@ -1311,12 +1339,16 @@ namespace Emu5
                                                 l_encodedInstruction >>= 8;
                                             }
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs1 + ", " + (int)l_immediate);
                                         }
                                         else if (l_tokenLine[3].type == RVTokenType.Label)
                                         {
                                             l_instructionDescription.type = RVInstructionType.B;
                                             RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[3].value, labelLine = l_tokenLine[3].line, labelColumn = l_tokenLine[3].column };
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs1 + ", " + (String)l_tokenLine[3].value);
                                         }
                                         else
                                         {
@@ -1378,12 +1410,16 @@ namespace Emu5
                                                 l_encodedInstruction >>= 8;
                                             }
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs2 + ", " + (int)l_immediate);
                                         }
                                         else if (l_tokenLine[3].type == RVTokenType.Label)
                                         {
                                             l_instructionDescription.type = RVInstructionType.B;
                                             RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[3].value, labelLine = l_tokenLine[3].line, labelColumn = l_tokenLine[3].column };
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs2 + ", " + (String)l_tokenLine[3].value);
                                         }
                                         else
                                         {
@@ -1445,12 +1481,16 @@ namespace Emu5
                                                 l_encodedInstruction >>= 8;
                                             }
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs1 + ", " + (int)l_immediate);
                                         }
                                         else if (l_tokenLine[3].type == RVTokenType.Label)
                                         {
                                             l_instructionDescription.type = RVInstructionType.B;
                                             RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[3].value, labelLine = l_tokenLine[3].line, labelColumn = l_tokenLine[3].column };
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs1 + ", " + (String)l_tokenLine[3].value);
                                         }
                                         else
                                         {
@@ -1512,12 +1552,16 @@ namespace Emu5
                                                 l_encodedInstruction >>= 8;
                                             }
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs1 + ", " + (int)l_immediate);
                                         }
                                         else if (l_tokenLine[3].type == RVTokenType.Label)
                                         {
                                             l_instructionDescription.type = RVInstructionType.B;
                                             RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[3].value, labelLine = l_tokenLine[3].line, labelColumn = l_tokenLine[3].column };
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs1 + ", " + (String)l_tokenLine[3].value);
                                         }
                                         else
                                         {
@@ -1579,12 +1623,16 @@ namespace Emu5
                                                 l_encodedInstruction >>= 8;
                                             }
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs2 + ", " + (int)l_immediate);
                                         }
                                         else if (l_tokenLine[3].type == RVTokenType.Label)
                                         {
                                             l_instructionDescription.type = RVInstructionType.B;
                                             RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[3].value, labelLine = l_tokenLine[3].line, labelColumn = l_tokenLine[3].column };
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs2 + ", " + (String)l_tokenLine[3].value);
                                         }
                                         else
                                         {
@@ -1656,11 +1704,15 @@ namespace Emu5
                                                 l_encodedInstruction >>= 8;
                                             }
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs2 + ", x" + (int)l_instructionDescription.rs1 + ", " + (int)l_immediate);
                                         }
                                         else if (l_tokenLine[5].type == RVTokenType.Label)
                                         {
                                             RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[5].value, labelLine = l_tokenLine[5].line, labelColumn = l_tokenLine[5].column };
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs2 + ", x" + (int)l_instructionDescription.rs1 + ", " + (String)l_tokenLine[5].value);
                                         }
                                         else
                                         {
@@ -1732,11 +1784,15 @@ namespace Emu5
                                                 l_encodedInstruction >>= 8;
                                             }
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs2 + ", x" + (int)l_instructionDescription.rs1 + ", " + (int)l_immediate);
                                         }
                                         else if (l_tokenLine[5].type == RVTokenType.Label)
                                         {
                                             RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[5].value, labelLine = l_tokenLine[5].line, labelColumn = l_tokenLine[5].column };
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs2 + ", x" + (int)l_instructionDescription.rs1 + ", " + (String)l_tokenLine[5].value);
                                         }
                                         else
                                         {
@@ -1808,11 +1864,15 @@ namespace Emu5
                                                 l_encodedInstruction >>= 8;
                                             }
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs2 + ", x" + (int)l_instructionDescription.rs1 + ", " + (int)l_immediate);
                                         }
                                         else if (l_tokenLine[5].type == RVTokenType.Label)
                                         {
                                             RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[5].value, labelLine = l_tokenLine[5].line, labelColumn = l_tokenLine[5].column };
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs2 + ", x" + (int)l_instructionDescription.rs1 + ", " + (String)l_tokenLine[5].value);
                                         }
                                         else
                                         {
@@ -1884,11 +1944,15 @@ namespace Emu5
                                                 l_encodedInstruction >>= 8;
                                             }
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs2 + ", x" + (int)l_instructionDescription.rs1 + ", " + (int)l_immediate);
                                         }
                                         else if (l_tokenLine[5].type == RVTokenType.Label)
                                         {
                                             RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[5].value, labelLine = l_tokenLine[5].line, labelColumn = l_tokenLine[5].column };
                                             l_instructionList.Add(l_instructionBuilder);
+
+                                            pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs2 + ", x" + (int)l_instructionDescription.rs1 + ", " + (String)l_tokenLine[5].value);
                                         }
                                         else
                                         {
@@ -1914,6 +1978,8 @@ namespace Emu5
 
                                         RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[1].value, labelLine = l_tokenLine[1].line, labelColumn = l_tokenLine[1].column };
                                         l_instructionList.Add(l_instructionBuilder);
+
+                                        pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " " + (String)l_tokenLine[1].value);
                                     }
                                     break;
 
@@ -1940,6 +2006,8 @@ namespace Emu5
                                             l_actualInstruction >>= 8;
                                         }
                                         l_instructionList.Add(l_instructionBuilder);
+
+                                        pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " x" + (int)l_instructionDescription.rs1);
                                     }
                                     break;
 
@@ -1959,6 +2027,8 @@ namespace Emu5
                                             l_actualInstruction >>= 8;
                                         }
                                         l_instructionList.Add(l_instructionBuilder);
+
+                                        pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic);
                                     }
                                     break;
 
@@ -1976,6 +2046,9 @@ namespace Emu5
 
                                         RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[1].value, labelLine = l_tokenLine[1].line, labelColumn = l_tokenLine[1].column };
                                         l_instructionList.Add(l_instructionBuilder);
+
+                                        pseudoInstructions.Add(l_currentAddress, l_instructionDescription.mnemonic + " " + (String)l_tokenLine[1].value);
+                                        pseudoInstructions.Add(l_currentAddress + 4, l_instructionDescription.mnemonic + " " + (String)l_tokenLine[1].value);
                                     }
                                     break;
 

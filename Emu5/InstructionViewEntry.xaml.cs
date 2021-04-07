@@ -126,7 +126,7 @@ namespace Emu5
             }
         }
 
-        public void DisplayData(bool breakpoint, UInt32 address, byte?[] rawData, RVLabelReferenceMap labelMap)
+        public void DisplayData(bool breakpoint, UInt32 address, byte?[] rawData, RVLabelReferenceMap labelMap, Dictionary<UInt32, String> pseudoInstructionMap)
         {
             if (rawData.Length != 4)
             {
@@ -183,6 +183,15 @@ namespace Emu5
                 if (String.IsNullOrEmpty(l_annotation) == false)
                 {
                     l_annotation += ":";
+                }
+                String l_pseudoInstruction;
+                if (pseudoInstructionMap.TryGetValue(address, out l_pseudoInstruction))
+                {
+                    if (String.IsNullOrEmpty(l_annotation) == false)
+                    {
+                        l_annotation += " ";
+                    }
+                    l_annotation += l_pseudoInstruction;
                 }
 
                 textBlockAnnotation.Text = l_annotation;

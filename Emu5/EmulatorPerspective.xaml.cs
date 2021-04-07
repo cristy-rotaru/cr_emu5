@@ -20,6 +20,7 @@ namespace Emu5
         List<DataViewEntry> m_dataEntries;
 
         RVLabelReferenceMap m_labelMap;
+        Dictionary<UInt32, String> m_pseudoInstructionMap;
 
         UInt32 m_currentPC;
         UInt32[] m_previousRegisterValues;
@@ -52,6 +53,7 @@ namespace Emu5
             m_dataEntries = new List<DataViewEntry>();
 
             m_labelMap = new RVLabelReferenceMap();
+            m_pseudoInstructionMap = new Dictionary<UInt32, String>();
 
             m_currentPC = 0x0;
             m_previousRegisterValues = new UInt32[32];
@@ -110,6 +112,11 @@ namespace Emu5
         public void SetLabelReferences(RVLabelReferenceMap labelMap)
         {
             m_labelMap = labelMap;
+        }
+
+        public void SetPseudoInstructionReference(Dictionary<UInt32, String> pseudoInstructionMap)
+        {
+            m_pseudoInstructionMap = pseudoInstructionMap;
         }
 
         public void UpdateInfo()
@@ -182,7 +189,7 @@ namespace Emu5
                 UInt32 l_address = l_normalizedPC + (UInt32)(i_index << 2);
                 byte?[] l_rawData = m_emulator.GetMemoryMapReference().Read(l_address, 4);
                 
-                l_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_address), l_address, l_rawData, m_labelMap);
+                l_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_address), l_address, l_rawData, m_labelMap, m_pseudoInstructionMap);
 
                 l_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
 
@@ -255,7 +262,7 @@ namespace Emu5
                 foreach (InstructionViewEntry i_viewEntry in m_instructionEntries)
                 {
                     UInt32 l_address = i_viewEntry.GetAddress();
-                    i_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_address), l_address, m_emulator.GetMemoryMapReference().Read(l_address, 4), m_labelMap);
+                    i_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_address), l_address, m_emulator.GetMemoryMapReference().Read(l_address, 4), m_labelMap, m_pseudoInstructionMap);
                     i_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
                 }
             }
@@ -289,7 +296,7 @@ namespace Emu5
                         {
                             byte?[] l_rawData = m_emulator.GetMemoryMapReference().Read(l_address, 4);
 
-                            i_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_address), l_address, l_rawData, m_labelMap);
+                            i_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_address), l_address, l_rawData, m_labelMap, m_pseudoInstructionMap);
                             i_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
 
                             l_address += 4;
@@ -406,7 +413,7 @@ namespace Emu5
             }
 
             InstructionViewEntry l_viewEntry = new InstructionViewEntry(ConfigureBreakpoint);
-            l_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_nextAddress), l_nextAddress, m_emulator.GetMemoryMapReference().Read(l_nextAddress, 4), m_labelMap);
+            l_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_nextAddress), l_nextAddress, m_emulator.GetMemoryMapReference().Read(l_nextAddress, 4), m_labelMap, m_pseudoInstructionMap);
             l_viewEntry.Highlighted = m_highlightingEnabled && (l_nextAddress == m_currentPC);
 
             m_instructionEntries.Insert(l_addIndex, l_viewEntry);
