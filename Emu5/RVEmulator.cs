@@ -874,8 +874,8 @@ namespace Emu5
 
                     byte l_destinationRegister = (byte)((instruction >> 7) & 0x1F);
                     byte l_sourceRegister1 = (byte)((instruction >> 15) & 0x1F);
-                    UInt16 l_offset = (UInt16)(instruction >> 20);
-                    l_offset = (UInt16)(((Int16)l_offset << (31 - 11)) >> (31 - 11)); // sign extend
+                    UInt32 l_offset = (UInt32)(instruction >> 20);
+                    l_offset = (UInt32)(((Int32)l_offset << (31 - 11)) >> (31 - 11)); // sign extend
 
                     UInt32 l_base = ReadRegister(l_sourceRegister1);
 
