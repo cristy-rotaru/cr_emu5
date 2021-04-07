@@ -189,7 +189,7 @@ namespace Emu5
 
                 if (l_validInstructionData)
                 {
-                    Tuple<String, String> l_decodedInstruction = DecodeIntruction(l_instructionData);
+                    Tuple<String, String> l_decodedInstruction = DecodeIntruction(l_instructionData, labelMap);
 
                     textBlockInstruction.Text = l_decodedInstruction.Item1;
                     textBlockRawValue.Text = l_decodedInstruction.Item2;
@@ -205,7 +205,7 @@ namespace Emu5
             buttonToggleBreakpoint.Content = m_breakpoint ? new Ellipse { Height = 11, Width = 11, Fill = Brushes.Red, Stroke = Brushes.Red } : null;
         }
 
-        private Tuple<String, String> DecodeIntruction(UInt32 encodedInstruction)
+        private Tuple<String, String> DecodeIntruction(UInt32 encodedInstruction, RVLabelReferenceMap labelMap)
         {// returns a pair of strings (1st is the decoded instruction) (2nd is the split instruction bits)
             Tuple<String, String> l_notAnInstruction = new Tuple<String, String>("", String.Format("0x{0,8:X8}", encodedInstruction));
 
@@ -246,6 +246,18 @@ namespace Emu5
 
                     String l_assembly = String.Format("jal x{0}, {1}", l_destinationRegister, l_offset);
                     String l_splitBits = Convert.ToString(l_immediate, 2).PadLeft(20, '0') + '_' + Convert.ToString(l_destinationRegister, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_opcode, 2).PadLeft(7, '0');
+
+                    String[] l_labels = labelMap.FindByAddress((UInt32)m_address + (UInt32)l_offset);
+                    for (int i_labelIndex = 0; i_labelIndex < l_labels.Length; ++i_labelIndex)
+                    {
+                        l_assembly += i_labelIndex == 0 ? " [" : ", ";
+                        l_assembly += l_labels[i_labelIndex];
+
+                        if (i_labelIndex == l_labels.Length - 1)
+                        {
+                            l_assembly += "]";
+                        }
+                    }
 
                     return new Tuple<String, String>(l_assembly, l_splitBits);
                 }
@@ -290,6 +302,18 @@ namespace Emu5
 
                     String l_assembly = String.Format("{0} x{1}, x{2}, {3}", l_mnemonic, l_sourceRegister1, l_sourceRegister2, l_offset);
                     String l_splitBits = Convert.ToString(l_immHigh, 2).PadLeft(7, '0') + '_' + Convert.ToString(l_sourceRegister2, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_sourceRegister1, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_func3, 2).PadLeft(3, '0') + '_' + Convert.ToString(l_immLow, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_opcode, 2).PadLeft(7, '0');
+
+                    String[] l_labels = labelMap.FindByAddress((UInt32)m_address + (UInt32)l_offset);
+                    for (int i_labelIndex = 0; i_labelIndex < l_labels.Length; ++i_labelIndex)
+                    {
+                        l_assembly += i_labelIndex == 0 ? " [" : ", ";
+                        l_assembly += l_labels[i_labelIndex];
+
+                        if (i_labelIndex == l_labels.Length - 1)
+                        {
+                            l_assembly += "]";
+                        }
+                    }
 
                     return new Tuple<String, String>(l_assembly, l_splitBits);
                 }
