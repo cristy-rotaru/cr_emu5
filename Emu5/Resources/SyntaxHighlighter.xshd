@@ -107,7 +107,6 @@
             <Word>jr</Word> <Word>JR</Word>
             <Word>ret</Word> <Word>RET</Word>
             <Word>call</Word> <Word>CALL</Word>
-            <Word>tail</Word> <Word>TAIL</Word>
         </Keywords>
 
         <Keywords color="DataType">

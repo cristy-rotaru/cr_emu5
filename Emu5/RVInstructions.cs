@@ -282,9 +282,6 @@ namespace Emu5
             m_instructionDictionary.Add("call", CALL);
             m_instructionDictionary.Add("CALL", CALL);
 
-            m_instructionDictionary.Add("tail", TAIL);
-            m_instructionDictionary.Add("TAIL", TAIL);
-
             m_registerDictionary = new Dictionary<string, RVRegister>();
 
             m_registerDictionary.Add("x0", RVRegister.x0);
@@ -1134,14 +1131,6 @@ namespace Emu5
             get
             {
                 return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 8, mnemonic = "call" };
-            }
-        }
-
-        public static RVInstructionDescription TAIL
-        {
-            get
-            {
-                return new RVInstructionDescription { type = RVInstructionType.Pseudo, size = 8, mnemonic = "tail" };
             }
         }
     }

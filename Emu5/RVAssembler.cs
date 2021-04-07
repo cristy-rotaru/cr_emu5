@@ -1197,6 +1197,7 @@ namespace Emu5
                                         {
                                             throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
                                         }
+                                        l_instructionDescription.type = RVInstructionType.B;
                                         l_instructionDescription.opcode = 0b1100011;
                                         l_instructionDescription.func3 = 0b000;
                                         l_instructionDescription.rs2 = RVRegister.x0;
@@ -1263,6 +1264,7 @@ namespace Emu5
                                         {
                                             throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
                                         }
+                                        l_instructionDescription.type = RVInstructionType.B;
                                         l_instructionDescription.opcode = 0b1100011;
                                         l_instructionDescription.func3 = 0b001;
                                         l_instructionDescription.rs2 = RVRegister.x0;
@@ -1329,6 +1331,7 @@ namespace Emu5
                                         {
                                             throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
                                         }
+                                        l_instructionDescription.type = RVInstructionType.B;
                                         l_instructionDescription.opcode = 0b1100011;
                                         l_instructionDescription.func3 = 0b101;
                                         l_instructionDescription.rs1 = RVRegister.x0;
@@ -1395,6 +1398,7 @@ namespace Emu5
                                         {
                                             throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
                                         }
+                                        l_instructionDescription.type = RVInstructionType.B;
                                         l_instructionDescription.opcode = 0b1100011;
                                         l_instructionDescription.func3 = 0b101;
                                         l_instructionDescription.rs2 = RVRegister.x0;
@@ -1461,6 +1465,7 @@ namespace Emu5
                                         {
                                             throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
                                         }
+                                        l_instructionDescription.type = RVInstructionType.B;
                                         l_instructionDescription.opcode = 0b1100011;
                                         l_instructionDescription.func3 = 0b100;
                                         l_instructionDescription.rs2 = RVRegister.x0;
@@ -1527,6 +1532,7 @@ namespace Emu5
                                         {
                                             throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
                                         }
+                                        l_instructionDescription.type = RVInstructionType.B;
                                         l_instructionDescription.opcode = 0b1100011;
                                         l_instructionDescription.func3 = 0b100;
                                         l_instructionDescription.rs1 = RVRegister.x0;
@@ -1593,6 +1599,7 @@ namespace Emu5
                                         {
                                             throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
                                         }
+                                        l_instructionDescription.type = RVInstructionType.B;
                                         l_instructionDescription.opcode = 0b1100011;
                                         l_instructionDescription.func3 = 0b100;
 
@@ -1668,6 +1675,7 @@ namespace Emu5
                                         {
                                             throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
                                         }
+                                        l_instructionDescription.type = RVInstructionType.B;
                                         l_instructionDescription.opcode = 0b1100011;
                                         l_instructionDescription.func3 = 0b101;
 
@@ -1743,6 +1751,7 @@ namespace Emu5
                                         {
                                             throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
                                         }
+                                        l_instructionDescription.type = RVInstructionType.B;
                                         l_instructionDescription.opcode = 0b1100011;
                                         l_instructionDescription.func3 = 0b110;
 
@@ -1818,6 +1827,7 @@ namespace Emu5
                                         {
                                             throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
                                         }
+                                        l_instructionDescription.type = RVInstructionType.B;
                                         l_instructionDescription.opcode = 0b1100011;
                                         l_instructionDescription.func3 = 0b111;
 
@@ -1888,17 +1898,18 @@ namespace Emu5
                                     break;
 
                                     case "j":
-                                    case "call":
-                                    case "tail":
                                     {
                                         if (l_tokenLine.Length != 2)
                                         {
                                             throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
                                         }
+                                        l_instructionDescription.type = RVInstructionType.J;
+                                        l_instructionDescription.opcode = 0b1101111;
+                                        l_instructionDescription.rd = RVRegister.x0;
 
-                                        if (l_tokenLine[1].type == RVTokenType.Label)
+                                        if (l_tokenLine[1].type != RVTokenType.Label)
                                         {
-                                            throw new RVAssemblyException("Expected label identifier.", l_tokenLine[3].line, l_tokenLine[3].column);
+                                            throw new RVAssemblyException("Expected label identifier.", l_tokenLine[1].line, l_tokenLine[1].column);
                                         }
 
                                         RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[1].value, labelLine = l_tokenLine[1].line, labelColumn = l_tokenLine[1].column };
@@ -1947,6 +1958,23 @@ namespace Emu5
                                             l_instructionBuilder.data[i_byteIndex] = (byte)(l_actualInstruction & 0xFF);
                                             l_actualInstruction >>= 8;
                                         }
+                                        l_instructionList.Add(l_instructionBuilder);
+                                    }
+                                    break;
+
+                                    case "call":
+                                    {
+                                        if (l_tokenLine.Length != 2)
+                                        {
+                                            throw new RVAssemblyException("Incorrect instruction parameters.", l_tokenLine[0].line, l_tokenLine[0].column);
+                                        }
+
+                                        if (l_tokenLine[1].type != RVTokenType.Label)
+                                        {
+                                            throw new RVAssemblyException("Expected label identifier.", l_tokenLine[1].line, l_tokenLine[1].column);
+                                        }
+
+                                        RVInstructionBuilder l_instructionBuilder = new RVInstructionBuilder { startAddress = l_currentAddress, pendingLabel = true, description = l_instructionDescription, label = (String)l_tokenLine[1].value, labelLine = l_tokenLine[1].line, labelColumn = l_tokenLine[1].column };
                                         l_instructionList.Add(l_instructionBuilder);
                                     }
                                     break;
@@ -2006,58 +2034,123 @@ namespace Emu5
                         throw new RVAssemblyException("Undefined label \"" + l_instructionBuilder.label + "\"", l_instructionBuilder.labelLine, l_instructionBuilder.labelColumn);
                     }
 
-                    UInt32 l_offset = l_labelDictionary[l_instructionBuilder.label] - l_instructionBuilder.startAddress;
-                    UInt32 l_mask;
                     RVInstructionDescription l_instructionDescription = l_instructionBuilder.description;
+                    byte[] l_instructionBytes;
 
-                    if (l_instructionDescription.type == RVInstructionType.B)
+                    if (l_instructionDescription.type == RVInstructionType.Pseudo)
                     {
-                        l_mask = 0xFFFFF000;
-                    }
-                    else if (l_instructionDescription.type == RVInstructionType.J)
-                    {
-                        l_mask = 0xFFF00000;
+                        l_instructionBytes = new byte[8];
+
+                        if (l_instructionDescription.mnemonic == "la")
+                        {
+                            UInt32 l_addressToLoad = l_labelDictionary[l_instructionBuilder.label];
+
+                            UInt32 l_actualInstruction1, l_actualInstruction2;
+
+                            l_actualInstruction1 = 0x37; // LUI instruction
+                            l_actualInstruction1 |= (((UInt32)l_instructionDescription.rd) & 0x1F) << 7;
+                            if ((l_addressToLoad & 0x800) == 0) // checking bit 12 of the immediate
+                            {
+                                l_actualInstruction1 |= l_addressToLoad & 0xFFFFF000;
+                                l_actualInstruction2 = 0x6013; // ORI
+                            }
+                            else
+                            {
+                                l_actualInstruction1 |= ~l_addressToLoad & 0xFFFFF000;
+                                l_actualInstruction2 = 0x4013; // XORI
+                            }
+                            l_actualInstruction2 |= (((UInt32)l_instructionDescription.rd) & 0x1F) << 7;
+                            l_actualInstruction2 |= (((UInt32)l_instructionDescription.rd) & 0x1F) << 15;
+                            l_actualInstruction2 |= (l_addressToLoad & 0xFFF) << 20;
+
+                            for (int i_byteIndex = 0; i_byteIndex < 4; ++i_byteIndex)
+                            {
+                                l_instructionBytes[i_byteIndex] = (byte)(l_actualInstruction1 & 0xFF);
+                                l_instructionBytes[i_byteIndex + 4] = (byte)(l_actualInstruction2 & 0xFF);
+                                l_actualInstruction1 >>= 8;
+                                l_actualInstruction2 >>= 8;
+                            }
+                        }
+                        else if (l_instructionDescription.mnemonic == "call")
+                        {
+                            UInt32 l_offset = l_labelDictionary[l_instructionBuilder.label] - l_instructionBuilder.startAddress;
+
+                            UInt32 l_actualInstruction1, l_actualInstruction2;
+
+                            l_actualInstruction1 = 0x97; // AUIPC x1, ..
+                            l_actualInstruction1 |= (l_offset & 0xFFFFF000) + ((l_offset & 0x800) << 1);
+                            l_actualInstruction2 = 0x80E7; // JALR x1, ..(x1)
+                            l_actualInstruction2 |= l_offset << 20;
+
+                            for (int i_byteIndex = 0; i_byteIndex < 4; ++i_byteIndex)
+                            {
+                                l_instructionBytes[i_byteIndex] = (byte)(l_actualInstruction1 & 0xFF);
+                                l_instructionBytes[i_byteIndex + 4] = (byte)(l_actualInstruction2 & 0xFF);
+                                l_actualInstruction1 >>= 8;
+                                l_actualInstruction2 >>= 8;
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception("If you see this, I definetely fucked something up.");
+                        }
                     }
                     else
                     {
-                        throw new Exception("If you see this, I definetely fucked something up.");
-                    }
+                        UInt32 l_offset = l_labelDictionary[l_instructionBuilder.label] - l_instructionBuilder.startAddress;
+                        UInt32 l_mask;
 
-                    if ((l_offset & l_mask) != l_mask && (l_offset & l_mask) != 0)
-                    {
-                        throw new RVAssemblyException("Target is too far.", l_instructionBuilder.labelLine, l_instructionBuilder.labelColumn);
-                    }
-                    l_instructionDescription.imm = l_offset;
+                        if (l_instructionDescription.type == RVInstructionType.B)
+                        {
+                            l_mask = 0xFFFFF000;
+                        }
+                        else if (l_instructionDescription.type == RVInstructionType.J)
+                        {
+                            l_mask = 0xFFF00000;
+                        }
+                        else
+                        {
+                            throw new Exception("If you see this, I definetely fucked something up.");
+                        }
 
-                    UInt32 l_encodedInstruction = 0x0;
-                    if (l_instructionDescription.type == RVInstructionType.B)
-                    {
-                        l_encodedInstruction |= ((UInt32)l_instructionDescription.opcode) & 0x7F;
-                        l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x800) >> (11 - 7);
-                        l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x1E) << (8 - 1);
-                        l_encodedInstruction |= (((UInt32)l_instructionDescription.func3) & 0x7) << 12;
-                        l_encodedInstruction |= (((UInt32)l_instructionDescription.rs1) & 0x1F) << 15;
-                        l_encodedInstruction |= (((UInt32)l_instructionDescription.rs2) & 0x1F) << 20;
-                        l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x7E0) << (25 - 5);
-                        l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x1000) << (31 - 12);
-                    }
-                    else if (l_instructionDescription.type == RVInstructionType.J)
-                    {
-                        l_encodedInstruction |= ((UInt32)l_instructionDescription.opcode) & 0x7F;
-                        l_encodedInstruction |= (((UInt32)l_instructionDescription.rd) & 0x1F) << 7;
-                        l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0xFF000);
-                        l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x800) << (20 - 11);
-                        l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x7FE) << (21 - 1);
-                        l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x100000) << (31 - 20);
+                        if ((l_offset & l_mask) != l_mask && (l_offset & l_mask) != 0)
+                        {
+                            throw new RVAssemblyException("Target is too far.", l_instructionBuilder.labelLine, l_instructionBuilder.labelColumn);
+                        }
+                        l_instructionDescription.imm = l_offset;
+
+                        UInt32 l_encodedInstruction = 0x0;
+                        if (l_instructionDescription.type == RVInstructionType.B)
+                        {
+                            l_encodedInstruction |= ((UInt32)l_instructionDescription.opcode) & 0x7F;
+                            l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x800) >> (11 - 7);
+                            l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x1E) << (8 - 1);
+                            l_encodedInstruction |= (((UInt32)l_instructionDescription.func3) & 0x7) << 12;
+                            l_encodedInstruction |= (((UInt32)l_instructionDescription.rs1) & 0x1F) << 15;
+                            l_encodedInstruction |= (((UInt32)l_instructionDescription.rs2) & 0x1F) << 20;
+                            l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x7E0) << (25 - 5);
+                            l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x1000) << (31 - 12);
+                        }
+                        else if (l_instructionDescription.type == RVInstructionType.J)
+                        {
+                            l_encodedInstruction |= ((UInt32)l_instructionDescription.opcode) & 0x7F;
+                            l_encodedInstruction |= (((UInt32)l_instructionDescription.rd) & 0x1F) << 7;
+                            l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0xFF000);
+                            l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x800) << (20 - 11);
+                            l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x7FE) << (21 - 1);
+                            l_encodedInstruction |= (((UInt32)l_instructionDescription.imm) & 0x100000) << (31 - 20);
+                        }
+
+                        l_instructionBytes = new byte[4];
+                        for (int i_byteIndex = 0; i_byteIndex < 4; ++i_byteIndex)
+                        {
+                            l_instructionBytes[i_byteIndex] = (byte)(l_encodedInstruction & 0xFF);
+                            l_encodedInstruction >>= 8;
+                        }
                     }
 
                     l_instructionBuilder.pendingLabel = false;
-                    l_instructionBuilder.data = new byte[4];
-                    for (int i_byteIndex = 0; i_byteIndex < 4; ++i_byteIndex)
-                    {
-                        l_instructionBuilder.data[i_byteIndex] = (byte)(l_encodedInstruction & 0xFF);
-                        l_encodedInstruction >>= 8;
-                    }
+                    l_instructionBuilder.data = l_instructionBytes;
 
                     l_instructionList[i_index] = l_instructionBuilder;
                 }
