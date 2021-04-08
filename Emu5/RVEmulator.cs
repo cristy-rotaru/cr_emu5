@@ -55,6 +55,7 @@ namespace Emu5
         UInt32 m_programCounter = 0x0;
         bool m_handlingTrap = false;
         bool m_interruptsEnabled = false;
+        bool m_waitForInterrupt = false;
         bool[] m_pendingInterrupts;
 
         List<UInt32> m_breakpoints;
@@ -179,6 +180,36 @@ namespace Emu5
             }
 
             m_ebreakExecuted = false;
+
+            lock (m_pendingInterrupts)
+            {
+                if (m_pendingInterrupts[1])
+                {
+                    m_pendingInterrupts[1] = false;
+                    LoadVector(RVVector.NMI, CreateByteStream(m_programCounter)); // NMI can not be masked
+                    m_waitForInterrupt = false;
+                    return;
+                }
+
+                if (m_interruptsEnabled)
+                {
+                    for (int i_vectorIndex = 8; i_vectorIndex < 32; ++i_vectorIndex)
+                    {
+                        if (m_pendingInterrupts[i_vectorIndex])
+                        {
+                            m_pendingInterrupts[i_vectorIndex] = false;
+                            LoadVector((RVVector)i_vectorIndex, CreateByteStream(m_programCounter));
+                            m_waitForInterrupt = false;
+                            return;
+                        }
+                    }
+                }
+            }
+
+            if (m_waitForInterrupt)
+            {
+                return;
+            }
 
             if ((m_programCounter & 0x3) != 0)
             {
@@ -752,19 +783,35 @@ namespace Emu5
 
                 case 0x107: // ien
                 {
-                    m_interruptsEnabled = true;
+                    lock (m_pendingInterrupts)
+                    {
+                        m_interruptsEnabled = true;
+                        for (int i_interruptIndex = 2; i_interruptIndex < 32; ++i_interruptIndex)
+                        {
+                            m_pendingInterrupts[i_interruptIndex] = false;
+                        }
+                    }
+
                     return true;
                 }
 
                 case 0x106: // idis
                 {
-                    m_interruptsEnabled = false;
+                    lock (m_pendingInterrupts)
+                    {
+                        m_interruptsEnabled = false;
+                        for (int i_interruptIndex = 2; i_interruptIndex < 32; ++i_interruptIndex)
+                        {
+                            m_pendingInterrupts[i_interruptIndex] = false;
+                        }
+                    }
+
                     return true;
                 }
 
                 case 0x105: // wfi
                 {
-                    // TO BE IMPLEMENTED
+                    m_waitForInterrupt = true;
                     return true;
                 }
 
