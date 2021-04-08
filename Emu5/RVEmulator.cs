@@ -181,26 +181,29 @@ namespace Emu5
 
             m_ebreakExecuted = false;
 
-            lock (m_pendingInterrupts)
+            if (m_handlingTrap == false)
             {
-                if (m_pendingInterrupts[1])
+                lock (m_pendingInterrupts)
                 {
-                    m_pendingInterrupts[1] = false;
-                    LoadVector(RVVector.NMI, CreateByteStream(m_programCounter)); // NMI can not be masked
-                    m_waitForInterrupt = false;
-                    return;
-                }
-
-                if (m_interruptsEnabled)
-                {
-                    for (int i_vectorIndex = 8; i_vectorIndex < 32; ++i_vectorIndex)
+                    if (m_pendingInterrupts[1])
                     {
-                        if (m_pendingInterrupts[i_vectorIndex])
+                        m_pendingInterrupts[1] = false;
+                        LoadVector(RVVector.NMI, CreateByteStream(m_programCounter)); // NMI can not be masked
+                        m_waitForInterrupt = false;
+                        return;
+                    }
+
+                    if (m_interruptsEnabled)
+                    {
+                        for (int i_vectorIndex = 8; i_vectorIndex < 32; ++i_vectorIndex)
                         {
-                            m_pendingInterrupts[i_vectorIndex] = false;
-                            LoadVector((RVVector)i_vectorIndex, CreateByteStream(m_programCounter));
-                            m_waitForInterrupt = false;
-                            return;
+                            if (m_pendingInterrupts[i_vectorIndex])
+                            {
+                                m_pendingInterrupts[i_vectorIndex] = false;
+                                LoadVector((RVVector)i_vectorIndex, CreateByteStream(m_programCounter));
+                                m_waitForInterrupt = false;
+                                return;
+                            }
                         }
                     }
                 }
@@ -811,7 +814,11 @@ namespace Emu5
 
                 case 0x105: // wfi
                 {
-                    m_waitForInterrupt = true;
+                    if (m_handlingTrap == false) // no effect if already in interrupt handler
+                    {
+                        m_waitForInterrupt = true;
+                    }
+
                     return true;
                 }
 
