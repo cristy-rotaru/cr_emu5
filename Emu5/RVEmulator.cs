@@ -57,6 +57,7 @@ namespace Emu5
         bool m_interruptsEnabled = false;
         bool m_waitForInterrupt = false;
         bool[] m_pendingInterrupts;
+        List<Tuple<RVVector, ushort>> m_queuedInterrupts;
 
         List<UInt32> m_breakpoints;
         bool m_ebreakExecuted;
@@ -91,6 +92,7 @@ namespace Emu5
             m_memoryMap = new RVMemoryMap();
             m_registerFile = new UInt32[32];
             m_pendingInterrupts = new bool[32];
+            m_queuedInterrupts = new List<Tuple<RVVector, ushort>>();
 
             m_breakpoints = new List<UInt32>();
             m_ebreakExecuted = false;
@@ -150,15 +152,40 @@ namespace Emu5
             return l_result;
         }
 
+        public void QueueExternalInterrupt(RVVector vector, ushort deliveryTimeout)
+        {
+            if (vector == RVVector.Reset || (vector > RVVector.NMI && vector < RVVector.External8))
+            {
+                throw new Exception("Invalid external interrupt");
+            }
+
+            if (deliveryTimeout == 0)
+            {
+                lock (m_pendingInterrupts)
+                {
+                    m_pendingInterrupts[(int)vector] = true;
+                }
+            }
+            else
+            {
+                lock (m_queuedInterrupts)
+                {
+                    m_queuedInterrupts.Add(new Tuple<RVVector, ushort>(vector, deliveryTimeout));
+                }
+            }
+        }
+
         public void ResetProcessor()
         {
-            for (int i_register = 0; i_register < 32; ++i_register)
+            for (int i_index = 0; i_index < 32; ++i_index)
             {
-                m_registerFile[i_register] = 0x0;
+                m_registerFile[i_index] = 0x0;
+                m_pendingInterrupts[i_index] = false;
             }
 
             m_handlingTrap = false;
             m_interruptsEnabled = false;
+            m_waitForInterrupt = false;
             m_programCounter = 0x0;
             byte?[] l_initialProgramCounter = m_memoryMap.Read(0x0, 4);
             for (int i_byteIndex = 3; i_byteIndex >= 0; --i_byteIndex)
@@ -180,6 +207,28 @@ namespace Emu5
             }
 
             m_ebreakExecuted = false;
+
+            lock (m_queuedInterrupts)
+            {
+                for (int i_interruptIndex = m_queuedInterrupts.Count - 1; i_interruptIndex >= 0; --i_interruptIndex)
+                {
+                    Tuple<RVVector, ushort> l_interrupt = m_queuedInterrupts[i_interruptIndex];
+                    ushort l_newTimeout = (ushort)(l_interrupt.Item2 - 1);
+                    
+                    if (l_newTimeout == 0)
+                    {
+                        m_queuedInterrupts.RemoveAt(i_interruptIndex);
+                        lock (m_pendingInterrupts)
+                        {
+                            m_pendingInterrupts[(int)l_interrupt.Item1] = true;
+                        }
+                    }
+                    else
+                    {
+                        m_queuedInterrupts[i_interruptIndex] = new Tuple<RVVector, ushort>(l_interrupt.Item1, l_newTimeout);
+                    }
+                }
+            }
 
             if (m_handlingTrap == false)
             {
