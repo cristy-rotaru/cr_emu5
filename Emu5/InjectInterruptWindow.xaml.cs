@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Emu5
 {
@@ -15,6 +10,8 @@ namespace Emu5
     /// </summary>
     public partial class InjectInterruptWindow : Window
     {
+        bool m_fullyLoaded = false;
+
         RVEmulator m_emulator;
 
         public InjectInterruptWindow(String simulationName, RVEmulator emulatorInstance)
@@ -41,6 +38,8 @@ namespace Emu5
                 }
             }
             this.Title = "Inject interrupt to " + l_nameWithoutExtension;
+
+            m_fullyLoaded = true;
         }
 
         private void buttonCancel_Click(object sender, RoutedEventArgs e)
@@ -55,32 +54,74 @@ namespace Emu5
 
         private void radioButtonInterruptTypeReset_Checked(object sender, RoutedEventArgs e)
         {
-
+            if (m_fullyLoaded)
+            {
+                textBoxVectorNumber.IsEnabled = false;
+                textBlockInterruptName.Visibility = Visibility.Hidden;
+            }
         }
 
         private void radioButtonInterruptTypeVector_Checked(object sender, RoutedEventArgs e)
         {
-
+            if (m_fullyLoaded)
+            {
+                textBoxVectorNumber.IsEnabled = true;
+                textBlockInterruptName.Visibility = Visibility.Visible;
+            }
         }
 
         private void radioButtonDeliveryImmediate_Checked(object sender, RoutedEventArgs e)
         {
-
+            if (m_fullyLoaded)
+            {
+                textBoxDelayCount.IsEnabled = false;
+            }
         }
 
         private void radioButtonDeliveryDelayed_Checked(object sender, RoutedEventArgs e)
         {
-
+            if (m_fullyLoaded)
+            {
+                textBoxDelayCount.IsEnabled = true;
+            }
         }
 
         private void textBoxVectorNumber_TextChanged(object sender, TextChangedEventArgs e)
         {
+            if (m_fullyLoaded == false)
+            {
+                return;
+            }
 
-        }
-
-        private void textBoxDelayCount_TextChanged(object sender, TextChangedEventArgs e)
-        {
-
+            int l_vectorNumber;
+            if (int.TryParse(textBoxVectorNumber.Text, out l_vectorNumber))
+            {
+                if (l_vectorNumber <= 0 || l_vectorNumber > 31)
+                {
+                    textBlockInterruptName.Text = "Invalid interrupt vector";
+                    textBlockInterruptName.Foreground = Brushes.Red;
+                }
+                else if (l_vectorNumber == 1)
+                {
+                    textBlockInterruptName.Text = "NMI";
+                    textBlockInterruptName.Foreground = Brushes.Black;
+                }
+                else if (l_vectorNumber >= 2 && l_vectorNumber <= 7)
+                {
+                    textBlockInterruptName.Text = "Illegal interrupt vector";
+                    textBlockInterruptName.Foreground = Brushes.Red;
+                }
+                else
+                {
+                    textBlockInterruptName.Text = "External" + l_vectorNumber; // will modify later
+                    textBlockInterruptName.Foreground = Brushes.Black;
+                }
+            }
+            else
+            {
+                textBlockInterruptName.Text = "Invalid number";
+                textBlockInterruptName.Foreground = Brushes.Red;
+            }
         }
     }
 }

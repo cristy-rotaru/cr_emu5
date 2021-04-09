@@ -525,12 +525,13 @@ namespace Emu5
 
         void commandInjectInterrupt_Executed(object target, ExecutedRoutedEventArgs e)
         {
-
+            InjectInterruptWindow l_window = new InjectInterruptWindow("test.asm", null);
+            l_window.ShowDialog();
         }
 
         void commandInjectInterrupt_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = false;
+            e.CanExecute = true;
         }
 
         void commandStop_Executed(object target, ExecutedRoutedEventArgs e)

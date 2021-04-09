@@ -50,7 +50,7 @@
                 <RadioButton Name="radioButtonDeliveryImmediate" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="3, 0, 0, 0" VerticalAlignment="Center" Content="Immediate" IsChecked="True" Checked="radioButtonDeliveryImmediate_Checked" />
                 
                 <RadioButton Name="radioButtonDeliveryDelayed" Grid.Row="1" Grid.Column="0" Margin="3, 0, 0, 0" VerticalAlignment="Center" Content="After" Checked="radioButtonDeliveryDelayed_Checked" />
-                <TextBox Name="textBoxDelayCount" Grid.Row="1" Grid.Column="1" Width="50" Height="21" Margin="3, 0, 0, 0" HorizontalContentAlignment="Right" Text="1" IsEnabled="False" TextChanged="textBoxDelayCount_TextChanged" />
+                <TextBox Name="textBoxDelayCount" Grid.Row="1" Grid.Column="1" Width="82" Height="21" Margin="3, 0, 0, 0" HorizontalContentAlignment="Right" Text="1" IsEnabled="False" />
                 <TextBlock Grid.Row="1" Grid.Column="2" Margin="3, 0, 0, 0" VerticalAlignment="Center" Text="simulation steps" />
             </Grid>
         </GroupBox>
