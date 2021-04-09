@@ -49,7 +49,65 @@ namespace Emu5
 
         private void buttonInject_Click(object sender, RoutedEventArgs e)
         {
+            if (m_emulator.Halted)
+            {
+                this.Close();
+                return;
+            }
 
+            RVVector l_vector;
+            if (radioButtonInterruptTypeReset.IsChecked == true)
+            {
+                l_vector = RVVector.Reset;
+            }
+            else
+            {
+                int l_vectorNumber;
+                if (int.TryParse(textBoxVectorNumber.Text, out l_vectorNumber))
+                {
+                    if (l_vectorNumber == 1 || (l_vectorNumber >= 8 && l_vectorNumber <= 31))
+                    {
+                        l_vector = (RVVector)l_vectorNumber;
+                    }
+                    else
+                    {
+                        String l_message;
+                        if (l_vectorNumber < 1 || l_vectorNumber > 31)
+                        {
+                            l_message = "Invalid vector number.";
+                        }
+                        else
+                        {
+                            l_message = "Illegal vector number.";
+                        }
+
+                        MessageBox.Show(l_message + "\nValid vector numbers are 1 and 8..31", "Invalid vector", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Could not parse vector number!", "Invalid number", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+            }
+
+            ushort l_delay;
+            if (radioButtonDeliveryImmediate.IsChecked == true)
+            {
+                l_delay = 0;
+            }
+            else
+            {
+                if ((ushort.TryParse(textBoxDelayCount.Text, out l_delay) == false) || l_delay == 0 || l_delay > 1000)
+                {
+                    MessageBox.Show("Invalid delay count.\nValid range is 1..1000", "", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+            }
+
+            m_emulator.QueueExternalInterrupt(l_vector, l_delay);
+            this.Close();
         }
 
         private void radioButtonInterruptTypeReset_Checked(object sender, RoutedEventArgs e)

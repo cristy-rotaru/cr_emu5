@@ -141,6 +141,11 @@ namespace Emu5
             return m_simulationRunning && !m_compiling;
         }
 
+        public bool CanInjectInterrupt()
+        {
+            return m_simulationRunning && !m_compiling;
+        }
+
         public void Undo()
         {
             if (m_currentPerspective == Perspective.Editor)
@@ -417,6 +422,12 @@ namespace Emu5
             m_simulationRunning = false;
 
             m_rvEmulator.Halted = true;
+        }
+
+        public void OpenInjectInterruptUI()
+        {
+            InjectInterruptWindow l_injectInterruptUI = new InjectInterruptWindow(GetFileName(), m_rvEmulator);
+            l_injectInterruptUI.ShowDialog();
         }
 
         private void ClockTick(object sender, System.Timers.ElapsedEventArgs e)

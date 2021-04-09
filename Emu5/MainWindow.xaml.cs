@@ -525,13 +525,31 @@ namespace Emu5
 
         void commandInjectInterrupt_Executed(object target, ExecutedRoutedEventArgs e)
         {
-            InjectInterruptWindow l_window = new InjectInterruptWindow("test.asm", null);
-            l_window.ShowDialog();
+            TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+            PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+            l_page.OpenInjectInterruptUI();
         }
 
         void commandInjectInterrupt_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = true;
+            bool l_canExecute = false;
+
+            if (tabControlMain != null)
+            {
+                if (tabControlMain.SelectedIndex >= 0)
+                {
+                    TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+
+                    if (l_tab.Content.GetType() == typeof(PerspectivePage))
+                    {
+                        PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+
+                        l_canExecute = l_page.CanInjectInterrupt();
+                    }
+                }
+            }
+
+            e.CanExecute = l_canExecute;
         }
 
         void commandStop_Executed(object target, ExecutedRoutedEventArgs e)

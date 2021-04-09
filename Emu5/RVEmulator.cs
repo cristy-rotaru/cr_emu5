@@ -154,23 +154,33 @@ namespace Emu5
 
         public void QueueExternalInterrupt(RVVector vector, ushort deliveryTimeout)
         {
-            if (vector == RVVector.Reset || (vector > RVVector.NMI && vector < RVVector.External8))
+            if (vector > RVVector.NMI && vector < RVVector.External8)
             {
                 throw new Exception("Invalid external interrupt");
             }
 
             if (deliveryTimeout == 0)
             {
-                lock (m_pendingInterrupts)
+                if (vector == RVVector.Reset)
                 {
-                    m_pendingInterrupts[(int)vector] = true;
+                    lock (m_queuedInterrupts)
+                    {
+                        m_queuedInterrupts.Add(new Tuple<RVVector, ushort>(vector, 1));
+                    }
+                }
+                else
+                {
+                    lock (m_pendingInterrupts)
+                    {
+                        m_pendingInterrupts[(int)vector] = true;
+                    }
                 }
             }
             else
             {
                 lock (m_queuedInterrupts)
                 {
-                    m_queuedInterrupts.Add(new Tuple<RVVector, ushort>(vector, deliveryTimeout));
+                    m_queuedInterrupts.Add(new Tuple<RVVector, ushort>(vector, (ushort)(deliveryTimeout + 1)));
                 }
             }
         }
@@ -218,9 +228,19 @@ namespace Emu5
                     if (l_newTimeout == 0)
                     {
                         m_queuedInterrupts.RemoveAt(i_interruptIndex);
-                        lock (m_pendingInterrupts)
+
+                        if (l_interrupt.Item1 == RVVector.Reset)
                         {
-                            m_pendingInterrupts[(int)l_interrupt.Item1] = true;
+                            ResetProcessor();
+                            continue;
+                        }
+
+                        if (m_interruptsEnabled || l_interrupt.Item1 == RVVector.NMI)
+                        {
+                            lock (m_pendingInterrupts)
+                            {
+                                m_pendingInterrupts[(int)l_interrupt.Item1] = true;
+                            }
                         }
                     }
                     else
