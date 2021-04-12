@@ -588,7 +588,8 @@ namespace Emu5
 
         void commandOpenIOPanel_Executed(object target, ExecutedRoutedEventArgs e)
         {
-            MessageBox.Show("Open I/O Panel");
+            //MessageBox.Show("Open I/O Panel");
+            (new IOPanelWindow(null)).Show();
         }
         #endregion
         #endregion
