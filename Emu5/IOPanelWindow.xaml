@@ -32,56 +32,56 @@
         </Grid.RowDefinitions>
 
         <Canvas Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="16" Margin="10">
-            <Rectangle Name="rectangle1A" Canvas.Top="10" Canvas.Left="220" Height="4" Width="41" Fill="Black" />
-            <Rectangle Name="rectangle1B" Canvas.Top="14" Canvas.Left="262" Height="41" Width="4" Fill="Black" />
-            <Rectangle Name="rectangle1C" Canvas.Top="59" Canvas.Left="262" Height="41" Width="4" Fill="Black" />
-            <Rectangle Name="rectangle1D" Canvas.Top="100" Canvas.Left="220" Height="4" Width="41" Fill="Black" />
-            <Rectangle Name="rectangle1E" Canvas.Top="59" Canvas.Left="214" Height="41" Width="4" Fill="Black" />
-            <Rectangle Name="rectangle1F" Canvas.Top="14" Canvas.Left="214" Height="41" Width="4" Fill="Black" />
-            <Rectangle Name="rectangle1G" Canvas.Top="55" Canvas.Left="220" Height="4" Width="41" Fill="Black" />
+            <Rectangle Name="rectangle1A" Canvas.Top="10" Canvas.Left="220" Height="4" Width="41" Fill="#40FF0000" />
+            <Rectangle Name="rectangle1B" Canvas.Top="14" Canvas.Left="262" Height="41" Width="4" Fill="#40FF0000" />
+            <Rectangle Name="rectangle1C" Canvas.Top="59" Canvas.Left="262" Height="41" Width="4" Fill="#40FF0000" />
+            <Rectangle Name="rectangle1D" Canvas.Top="100" Canvas.Left="220" Height="4" Width="41" Fill="#40FF0000" />
+            <Rectangle Name="rectangle1E" Canvas.Top="59" Canvas.Left="214" Height="41" Width="4" Fill="#40FF0000" />
+            <Rectangle Name="rectangle1F" Canvas.Top="14" Canvas.Left="214" Height="41" Width="4" Fill="#40FF0000" />
+            <Rectangle Name="rectangle1G" Canvas.Top="55" Canvas.Left="220" Height="4" Width="41" Fill="#40FF0000" />
 
-            <Rectangle Name="rectangle0A" Canvas.Top="10" Canvas.Left="334" Height="4" Width="41" Fill="Black" />
-            <Rectangle Name="rectangle0B" Canvas.Top="14" Canvas.Left="376" Height="41" Width="4" Fill="Black" />
-            <Rectangle Name="rectangle0C" Canvas.Top="59" Canvas.Left="376" Height="41" Width="4" Fill="Black" />
-            <Rectangle Name="rectangle0D" Canvas.Top="100" Canvas.Left="334" Height="4" Width="41" Fill="Black" />
-            <Rectangle Name="rectangle0E" Canvas.Top="59" Canvas.Left="328" Height="41" Width="4" Fill="Black" />
-            <Rectangle Name="rectangle0F" Canvas.Top="14" Canvas.Left="328" Height="41" Width="4" Fill="Black" />
-            <Rectangle Name="rectangle0G" Canvas.Top="55" Canvas.Left="334" Height="4" Width="41" Fill="Black" />
+            <Rectangle Name="rectangle0A" Canvas.Top="10" Canvas.Left="334" Height="4" Width="41" Fill="#40FF0000" />
+            <Rectangle Name="rectangle0B" Canvas.Top="14" Canvas.Left="376" Height="41" Width="4" Fill="#40FF0000" />
+            <Rectangle Name="rectangle0C" Canvas.Top="59" Canvas.Left="376" Height="41" Width="4" Fill="#40FF0000" />
+            <Rectangle Name="rectangle0D" Canvas.Top="100" Canvas.Left="334" Height="4" Width="41" Fill="#40FF0000" />
+            <Rectangle Name="rectangle0E" Canvas.Top="59" Canvas.Left="328" Height="41" Width="4" Fill="#40FF0000" />
+            <Rectangle Name="rectangle0F" Canvas.Top="14" Canvas.Left="328" Height="41" Width="4" Fill="#40FF0000" />
+            <Rectangle Name="rectangle0G" Canvas.Top="55" Canvas.Left="334" Height="4" Width="41" Fill="#40FF0000" />
         </Canvas>
 
-        <Button Name="buttonB15" Grid.Row="1" Grid.Column="0" ToolTip="B15" Height="26" Width="26" />
-        <Button Name="buttonB14" Grid.Row="1" Grid.Column="1" ToolTip="B14" Height="26" Width="26" />
-        <Button Name="buttonB13" Grid.Row="1" Grid.Column="2" ToolTip="B13" Height="26" Width="26" />
-        <Button Name="buttonB12" Grid.Row="1" Grid.Column="3" ToolTip="B12" Height="26" Width="26" />
-        <Button Name="buttonB11" Grid.Row="1" Grid.Column="4" ToolTip="B11" Height="26" Width="26" />
-        <Button Name="buttonB10" Grid.Row="1" Grid.Column="5" ToolTip="B10" Height="26" Width="26" />
-        <Button Name="buttonB9" Grid.Row="1" Grid.Column="6" ToolTip="B9" Height="26" Width="26" />
-        <Button Name="buttonB8" Grid.Row="1" Grid.Column="7" ToolTip="B8" Height="26" Width="26" />
-        <Button Name="buttonB7" Grid.Row="1" Grid.Column="8" ToolTip="B7" Height="26" Width="26" />
-        <Button Name="buttonB6" Grid.Row="1" Grid.Column="9" ToolTip="B6" Height="26" Width="26" />
-        <Button Name="buttonB5" Grid.Row="1" Grid.Column="10" ToolTip="B5" Height="26" Width="26" />
-        <Button Name="buttonB4" Grid.Row="1" Grid.Column="11" ToolTip="B4" Height="26" Width="26" />
-        <Button Name="buttonB3" Grid.Row="1" Grid.Column="12" ToolTip="B3" Height="26" Width="26" />
-        <Button Name="buttonB2" Grid.Row="1" Grid.Column="13" ToolTip="B2" Height="26" Width="26" />
-        <Button Name="buttonB1" Grid.Row="1" Grid.Column="14" ToolTip="B1" Height="26" Width="26" />
-        <Button Name="buttonB0" Grid.Row="1" Grid.Column="15" ToolTip="B0" Height="26" Width="26" />
+        <Button Name="buttonB15" Grid.Row="1" Grid.Column="0" ToolTip="B15" Height="26" Width="26" Click="buttonB_Click" />
+        <Button Name="buttonB14" Grid.Row="1" Grid.Column="1" ToolTip="B14" Height="26" Width="26" Click="buttonB_Click" />
+        <Button Name="buttonB13" Grid.Row="1" Grid.Column="2" ToolTip="B13" Height="26" Width="26" Click="buttonB_Click" />
+        <Button Name="buttonB12" Grid.Row="1" Grid.Column="3" ToolTip="B12" Height="26" Width="26" Click="buttonB_Click" />
+        <Button Name="buttonB11" Grid.Row="1" Grid.Column="4" ToolTip="B11" Height="26" Width="26" Click="buttonB_Click" />
+        <Button Name="buttonB10" Grid.Row="1" Grid.Column="5" ToolTip="B10" Height="26" Width="26" Click="buttonB_Click" />
+        <Button Name="buttonB9" Grid.Row="1" Grid.Column="6" ToolTip="B9" Height="26" Width="26" Click="buttonB_Click" />
+        <Button Name="buttonB8" Grid.Row="1" Grid.Column="7" ToolTip="B8" Height="26" Width="26" Click="buttonB_Click" />
+        <Button Name="buttonB7" Grid.Row="1" Grid.Column="8" ToolTip="B7" Height="26" Width="26" Click="buttonB_Click" />
+        <Button Name="buttonB6" Grid.Row="1" Grid.Column="9" ToolTip="B6" Height="26" Width="26" Click="buttonB_Click" />
+        <Button Name="buttonB5" Grid.Row="1" Grid.Column="10" ToolTip="B5" Height="26" Width="26" Click="buttonB_Click" />
+        <Button Name="buttonB4" Grid.Row="1" Grid.Column="11" ToolTip="B4" Height="26" Width="26" Click="buttonB_Click" />
+        <Button Name="buttonB3" Grid.Row="1" Grid.Column="12" ToolTip="B3" Height="26" Width="26" Click="buttonB_Click" />
+        <Button Name="buttonB2" Grid.Row="1" Grid.Column="13" ToolTip="B2" Height="26" Width="26" Click="buttonB_Click" />
+        <Button Name="buttonB1" Grid.Row="1" Grid.Column="14" ToolTip="B1" Height="26" Width="26" Click="buttonB_Click" />
+        <Button Name="buttonB0" Grid.Row="1" Grid.Column="15" ToolTip="B0" Height="26" Width="26" Click="buttonB_Click" />
 
-        <Ellipse Name="ellipseLED15" Grid.Row="2" Grid.Column="0" ToolTip="LED15" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="Black" />
-        <Ellipse Name="ellipseLED14" Grid.Row="2" Grid.Column="1" ToolTip="LED14" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="Black" />
-        <Ellipse Name="ellipseLED13" Grid.Row="2" Grid.Column="2" ToolTip="LED13" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="Black" />
-        <Ellipse Name="ellipseLED12" Grid.Row="2" Grid.Column="3" ToolTip="LED12" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="Black" />
-        <Ellipse Name="ellipseLED11" Grid.Row="2" Grid.Column="4" ToolTip="LED11" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="Black" />
-        <Ellipse Name="ellipseLED10" Grid.Row="2" Grid.Column="5" ToolTip="LED10" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="Black" />
-        <Ellipse Name="ellipseLED9" Grid.Row="2" Grid.Column="6" ToolTip="LED9" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="Black" />
-        <Ellipse Name="ellipseLED8" Grid.Row="2" Grid.Column="7" ToolTip="LED8" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="Black" />
-        <Ellipse Name="ellipseLED7" Grid.Row="2" Grid.Column="8" ToolTip="LED7" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="Black" />
-        <Ellipse Name="ellipseLED6" Grid.Row="2" Grid.Column="9" ToolTip="LED6" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="Black" />
-        <Ellipse Name="ellipseLED5" Grid.Row="2" Grid.Column="10" ToolTip="LED5" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="Black" />
-        <Ellipse Name="ellipseLED4" Grid.Row="2" Grid.Column="11" ToolTip="LED4" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="Black" />
-        <Ellipse Name="ellipseLED3" Grid.Row="2" Grid.Column="12" ToolTip="LED3" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="Black" />
-        <Ellipse Name="ellipseLED2" Grid.Row="2" Grid.Column="13" ToolTip="LED2" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="Black" />
-        <Ellipse Name="ellipseLED1" Grid.Row="2" Grid.Column="14" ToolTip="LED1" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="Black" />
-        <Ellipse Name="ellipseLED0" Grid.Row="2" Grid.Column="15" ToolTip="LED0" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="Black" />
+        <Ellipse Name="ellipseLED15" Grid.Row="2" Grid.Column="0" ToolTip="LED15" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
+        <Ellipse Name="ellipseLED14" Grid.Row="2" Grid.Column="1" ToolTip="LED14" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
+        <Ellipse Name="ellipseLED13" Grid.Row="2" Grid.Column="2" ToolTip="LED13" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
+        <Ellipse Name="ellipseLED12" Grid.Row="2" Grid.Column="3" ToolTip="LED12" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
+        <Ellipse Name="ellipseLED11" Grid.Row="2" Grid.Column="4" ToolTip="LED11" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
+        <Ellipse Name="ellipseLED10" Grid.Row="2" Grid.Column="5" ToolTip="LED10" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
+        <Ellipse Name="ellipseLED9" Grid.Row="2" Grid.Column="6" ToolTip="LED9" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
+        <Ellipse Name="ellipseLED8" Grid.Row="2" Grid.Column="7" ToolTip="LED8" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
+        <Ellipse Name="ellipseLED7" Grid.Row="2" Grid.Column="8" ToolTip="LED7" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
+        <Ellipse Name="ellipseLED6" Grid.Row="2" Grid.Column="9" ToolTip="LED6" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
+        <Ellipse Name="ellipseLED5" Grid.Row="2" Grid.Column="10" ToolTip="LED5" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
+        <Ellipse Name="ellipseLED4" Grid.Row="2" Grid.Column="11" ToolTip="LED4" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
+        <Ellipse Name="ellipseLED3" Grid.Row="2" Grid.Column="12" ToolTip="LED3" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
+        <Ellipse Name="ellipseLED2" Grid.Row="2" Grid.Column="13" ToolTip="LED2" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
+        <Ellipse Name="ellipseLED1" Grid.Row="2" Grid.Column="14" ToolTip="LED1" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
+        <Ellipse Name="ellipseLED0" Grid.Row="2" Grid.Column="15" ToolTip="LED0" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
 
         <Slider Name="sliderSW15" Grid.Row="3" Grid.Column="0" ToolTip="SW15" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
         <Slider Name="sliderSW14" Grid.Row="3" Grid.Column="1" ToolTip="SW14" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
