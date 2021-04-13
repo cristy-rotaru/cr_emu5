@@ -28,8 +28,8 @@
         <CommandBinding Command="local:EmulatorCommands.Pause" Executed="commandPause_Executed" CanExecute="commandPause_CanExecute" />
         <CommandBinding Command="local:EmulatorCommands.InjectInterrupt" Executed="commandInjectInterrupt_Executed" CanExecute="commandInjectInterrupt_CanExecute" />
         <CommandBinding Command="local:EmulatorCommands.Stop" Executed="commandStop_Executed" CanExecute="commandStop_CanExecute" />
-        <CommandBinding Command="local:EmulatorCommands.OpenTerminal" Executed="commandOpenTerminal_Executed" />
-        <CommandBinding Command="local:EmulatorCommands.OpenIOPanel" Executed="commandOpenIOPanel_Executed" />
+        <CommandBinding Command="local:EmulatorCommands.OpenTerminal" Executed="commandOpenTerminal_Executed" CanExecute="commandOpenPeripheralUI_CanExecute" />
+        <CommandBinding Command="local:EmulatorCommands.OpenIOPanel" Executed="commandOpenIOPanel_Executed" CanExecute="commandOpenPeripheralUI_CanExecute" />
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Key="N" Modifiers="Ctrl" Command="ApplicationCommands.New" />

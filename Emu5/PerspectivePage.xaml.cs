@@ -31,6 +31,8 @@ namespace Emu5
 
         RVEmulator m_rvEmulator = new RVEmulator();
 
+        IOPanelWindow m_IOPeripheral;
+
         System.Timers.Timer m_clockTimer;
         Thread m_simulationThread;
         object m_threadSync;
@@ -61,6 +63,9 @@ namespace Emu5
             m_compiling = false;
             m_runningClocked = false;
             m_runningFast = false;
+
+            m_IOPeripheral = new IOPanelWindow(m_rvEmulator);
+            m_rvEmulator.GetMemoryMapReference().RegisterIOPanelPeripheral(m_IOPeripheral);
         }
 
         public PerspectivePage(TabHeader tabHeader) : this()
@@ -144,6 +149,11 @@ namespace Emu5
         public bool CanInjectInterrupt()
         {
             return m_simulationRunning && !m_compiling;
+        }
+
+        public bool CanOpenPeripheralUI()
+        {
+            return m_simulationRunning;
         }
 
         public void Undo()
@@ -428,6 +438,12 @@ namespace Emu5
         {
             InjectInterruptWindow l_injectInterruptUI = new InjectInterruptWindow(GetFileName(), m_rvEmulator);
             l_injectInterruptUI.ShowDialog();
+        }
+
+        public void OpenIOPanelPeripheralUI()
+        {
+            m_IOPeripheral.Title = "I/O panel for " + GetFileName();
+            m_IOPeripheral.Show();
         }
 
         private void ClockTick(object sender, System.Timers.ElapsedEventArgs e)

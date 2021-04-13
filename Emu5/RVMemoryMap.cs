@@ -28,6 +28,8 @@ namespace Emu5
 
         UInt64 m_uninitializedValue;
 
+        IOPanelWindow m_IOPanelPeripheral;
+
         public RVMemoryMap()
         {
             m_memoryDictionary = new Dictionary<UInt32, UInt64>();
@@ -54,6 +56,11 @@ namespace Emu5
                 m_uninitializedValue |= l_val << 48;
                 m_uninitializedValue |= l_val << 56;
             }
+        }
+
+        public void RegisterIOPanelPeripheral(IOPanelWindow ioPanel)
+        {
+            m_IOPanelPeripheral = ioPanel;
         }
 
         public byte?[] Read(UInt32 startAddress, int count)
