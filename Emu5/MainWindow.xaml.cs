@@ -102,6 +102,11 @@ namespace Emu5
                     }
                 }
             }
+
+            if (e.Cancel == false)
+            {
+                Application.Current.Shutdown();
+            }
         }
         #endregion
 
