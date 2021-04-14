@@ -116,69 +116,93 @@ namespace Emu5
                 {
                     case 0: // segments LO
                     {
-                        l_result[i_byteIndex] = (byte)m_segmentValues;
+                        lock (m_segments)
+                        {
+                            l_result[i_byteIndex] = (byte)m_segmentValues;
+                        }
                     }
                     break;
 
                     case 1: // segments HI
                     {
-                        l_result[i_byteIndex] = (byte)(m_segmentValues >> 8);
+                        lock (m_segments)
+                        {
+                            l_result[i_byteIndex] = (byte)(m_segmentValues >> 8);
+                        }
                     }
                     break;
 
                     case 2: // buttons LO
                     {
-                        l_result[i_byteIndex] = (byte)m_buttonEvents;
-                        l_buttonEventsRead = true;
+                        lock (m_buttons)
+                        {
+                            l_result[i_byteIndex] = (byte)m_buttonEvents;
+                            l_buttonEventsRead = true;
+                        }
                     }
                     break;
 
                     case 3: // buttons HI
                     {
-                        l_result[i_byteIndex] = (byte)(m_buttonEvents >> 8);
-                        l_buttonEventsRead = true;
+                        lock (m_buttons)
+                        {
+                            l_result[i_byteIndex] = (byte)(m_buttonEvents >> 8);
+                            l_buttonEventsRead = true;
+                        }
                     }
                     break;
 
                     case 4: // LEDS LO
                     {
-                        l_result[i_byteIndex] = (byte)m_ledValues;
+                        lock (m_leds)
+                        {
+                            l_result[i_byteIndex] = (byte)m_ledValues;
+                        }
                     }
                     break;
 
                     case 5: // LEDS HI
                     {
-                        l_result[i_byteIndex] = (byte)(m_ledValues >> 8);
+                        lock (m_leds)
+                        {
+                            l_result[i_byteIndex] = (byte)(m_ledValues >> 8);
+                        }
                     }
                     break;
 
                     case 6: // switches LO
                     {
-                        byte l_value = 0;
-                        for (int i_switchIndex = 0; i_switchIndex < 8; ++i_switchIndex)
+                        lock (m_switches)
                         {
-                            if (m_switches[i_switchIndex].Value > .5)
+                            byte l_value = 0;
+                            for (int i_switchIndex = 0; i_switchIndex < 8; ++i_switchIndex)
                             {
-                                l_value |= (byte)(1 << i_switchIndex);
+                                if (m_switches[i_switchIndex].Value > .5)
+                                {
+                                    l_value |= (byte)(1 << i_switchIndex);
+                                }
                             }
-                        }
 
-                        l_result[i_byteIndex] = l_value;
+                            l_result[i_byteIndex] = l_value;
+                        }
                     }
                     break;
 
                     case 7: // switches HI
                     {
-                        byte l_value = 0;
-                        for (int i_switchIndex = 0; i_switchIndex < 8; ++i_switchIndex)
+                        lock (m_switches)
                         {
-                            if (m_switches[i_switchIndex + 8].Value > .5)
+                            byte l_value = 0;
+                            for (int i_switchIndex = 0; i_switchIndex < 8; ++i_switchIndex)
                             {
-                                l_value |= (byte)(1 << i_switchIndex);
+                                if (m_switches[i_switchIndex + 8].Value > .5)
+                                {
+                                    l_value |= (byte)(1 << i_switchIndex);
+                                }
                             }
-                        }
 
-                        l_result[i_byteIndex] = l_value;
+                            l_result[i_byteIndex] = l_value;
+                        }
                     }
                     break;
 
@@ -210,47 +234,65 @@ namespace Emu5
                 {
                     case 0: // segments LO
                     {
-                        m_segmentValues &= 0xFF00;
-                        m_segmentValues |= (UInt16)(data[i_byteIndex] & 0x7F);
-                        l_segmentsWritten = true;
+                        lock (m_segments)
+                        {
+                            m_segmentValues &= 0xFF00;
+                            m_segmentValues |= (UInt16)(data[i_byteIndex] & 0x7F);
+                            l_segmentsWritten = true;
+                        }
                     }
                     break;
 
                     case 1: // segments HI
                     {
-                        m_segmentValues &= 0x00FF;
-                        m_segmentValues |= (UInt16)(((UInt16)(data[i_byteIndex] & 0x7F)) << 8);
-                        l_segmentsWritten = true;
+                        lock (m_segments)
+                        {
+                            m_segmentValues &= 0x00FF;
+                            m_segmentValues |= (UInt16)(((UInt16)(data[i_byteIndex] & 0x7F)) << 8);
+                            l_segmentsWritten = true;
+                        }
                     }
                     break;
 
                     case 2: // buttons LO
                     {
-                        m_buttonInterruptMask &= 0xFF00;
-                        m_buttonInterruptMask |= (UInt16)(data[i_byteIndex] & 0x7F);
+                        lock (m_buttons)
+                        {
+                            m_buttonInterruptMask &= 0xFF00;
+                            m_buttonInterruptMask |= (UInt16)(data[i_byteIndex] & 0x7F);
+                        }
                     }
                     break;
 
                     case 3: // buttons HI
                     {
-                        m_buttonInterruptMask &= 0x00FF;
-                        m_buttonInterruptMask |= (UInt16)(((UInt16)(data[i_byteIndex] & 0x7F)) << 8);
+                        lock (m_buttons)
+                        {
+                            m_buttonInterruptMask &= 0x00FF;
+                            m_buttonInterruptMask |= (UInt16)(((UInt16)(data[i_byteIndex] & 0x7F)) << 8);
+                        }
                     }
                     break;
 
                     case 4: // LEDS LO
                     {
-                        m_ledValues &= 0xFF00;
-                        m_ledValues |= (UInt16)(data[i_byteIndex] & 0x7F);
-                        l_ledsWritten = true;
+                        lock (m_leds)
+                        {
+                            m_ledValues &= 0xFF00;
+                            m_ledValues |= (UInt16)(data[i_byteIndex] & 0x7F);
+                            l_ledsWritten = true;
+                        }
                     }
                     break;
 
                     case 5: // LEDS HI
                     {
-                        m_ledValues &= 0x00FF;
-                        m_ledValues |= (UInt16)(((UInt16)(data[i_byteIndex] & 0x7F)) << 8);
-                        l_ledsWritten = true;
+                        lock (m_leds)
+                        {
+                            m_ledValues &= 0x00FF;
+                            m_ledValues |= (UInt16)(((UInt16)(data[i_byteIndex] & 0x7F)) << 8);
+                            l_ledsWritten = true;
+                        }
                     }
                     break;
 
@@ -267,30 +309,35 @@ namespace Emu5
 
             if (l_segmentsWritten)
             {
+                //Dispatcher.BeginInvoke(new Action(UpdateSegmentDisplay));
                 UpdateSegmentDisplay();
             }
 
             if (l_ledsWritten)
             {
+                //Dispatcher.BeginInvoke(new Action(UpdateLEDStatus));
                 UpdateLEDStatus();
             }
         }
 
         private void buttonB_Click(object sender, RoutedEventArgs e)
         {
-            for (int i_buttonIndex = 0; i_buttonIndex < 16; ++i_buttonIndex)
+            lock (m_buttons)
             {
-                if (m_buttons[i_buttonIndex] == sender)
+                for (int i_buttonIndex = 0; i_buttonIndex < 16; ++i_buttonIndex)
                 {
-                    UInt16 l_bit = (UInt16)(1 << i_buttonIndex);
-                    m_buttonEvents |= l_bit;
-
-                    if ((m_buttonInterruptMask & l_bit) != 0)
+                    if (m_buttons[i_buttonIndex] == sender)
                     {
-                        m_emulator.QueueExternalInterrupt(RVVector.External9, 0);
-                    }
+                        UInt16 l_bit = (UInt16)(1 << i_buttonIndex);
+                        m_buttonEvents |= l_bit;
 
-                    break;
+                        if ((m_buttonInterruptMask & l_bit) != 0)
+                        {
+                            m_emulator.QueueExternalInterrupt(RVVector.External9, 0);
+                        }
+
+                        break;
+                    }
                 }
             }
         }
@@ -299,9 +346,13 @@ namespace Emu5
         {
             for (int i_segmentIndex = 0; i_segmentIndex < 16; ++i_segmentIndex)
             {
-                if (m_segments[i_segmentIndex] != null)
+                lock (m_segments)
                 {
-                    m_segments[i_segmentIndex].Fill = (m_segmentValues & (1 << i_segmentIndex)) != 0 ? Brushes.Red : new SolidColorBrush(Color.FromArgb(0x40, 0xFF, 0x00, 0x00));
+                    if (m_segments[i_segmentIndex] != null)
+                    {
+                        m_segments[i_segmentIndex].Fill = (m_segmentValues & (1 << i_segmentIndex)) != 0 ? Brushes.Red : new SolidColorBrush(Color.FromArgb(0x40, 0xFF, 0x00, 0x00));
+                        m_segments[i_segmentIndex].UpdateLayout();
+                    }
                 }
             }
         }
@@ -310,7 +361,11 @@ namespace Emu5
         {
             for (int i_ledIndex = 0; i_ledIndex < 16; ++i_ledIndex)
             {
-                m_leds[i_ledIndex].Fill = (m_ledValues & (1 << i_ledIndex)) != 0 ? Brushes.Red : new SolidColorBrush(Color.FromArgb(0x40, 0xFF, 0x00, 0x00));
+                lock (m_leds)
+                {
+                    m_leds[i_ledIndex].Fill = (m_ledValues & (1 << i_ledIndex)) != 0 ? Brushes.Red : new SolidColorBrush(Color.FromArgb(0x40, 0xFF, 0x00, 0x00));
+                    m_leds[i_ledIndex].UpdateLayout();
+                }
             }
         }
     }
