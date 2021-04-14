@@ -187,7 +187,7 @@ namespace Emu5
                 InstructionViewEntry l_viewEntry = new InstructionViewEntry(ConfigureBreakpoint);
 
                 UInt32 l_address = l_normalizedPC + (UInt32)(i_index << 2);
-                byte?[] l_rawData = m_emulator.GetMemoryMapReference().ReadIgnoreIO(l_address, 4);
+                byte?[] l_rawData = m_emulator.GetMemoryMapReference().ReadIgnorePeripherals(l_address, 4);
                 
                 l_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_address), l_address, l_rawData, m_labelMap, m_pseudoInstructionMap);
 
@@ -217,7 +217,7 @@ namespace Emu5
                 DataViewEntry l_viewEntry = new DataViewEntry();
 
                 UInt32 l_baseAddress = (UInt32)(l_startAddress + i_index << 3);
-                byte?[] l_rawData = m_emulator.GetMemoryMapReference().ReadIgnoreIO(l_baseAddress, 8);
+                byte?[] l_rawData = m_emulator.GetMemoryMapReference().ReadIgnorePeripherals(l_baseAddress, 8);
                 
                 l_viewEntry.DisplayData(l_baseAddress, l_rawData);
 
@@ -262,7 +262,7 @@ namespace Emu5
                 foreach (InstructionViewEntry i_viewEntry in m_instructionEntries)
                 {
                     UInt32 l_address = i_viewEntry.GetAddress();
-                    i_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_address), l_address, m_emulator.GetMemoryMapReference().ReadIgnoreIO(l_address, 4), m_labelMap, m_pseudoInstructionMap);
+                    i_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_address), l_address, m_emulator.GetMemoryMapReference().ReadIgnorePeripherals(l_address, 4), m_labelMap, m_pseudoInstructionMap);
                     i_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
                 }
             }
@@ -273,7 +273,7 @@ namespace Emu5
             foreach (DataViewEntry i_viewEntry in m_dataEntries)
             {
                 UInt32 l_baseAddress = i_viewEntry.GetBaseAddress();
-                i_viewEntry.DisplayData(l_baseAddress, m_emulator.GetMemoryMapReference().ReadIgnoreIO(l_baseAddress, 8));
+                i_viewEntry.DisplayData(l_baseAddress, m_emulator.GetMemoryMapReference().ReadIgnorePeripherals(l_baseAddress, 8));
             }
         }
 
@@ -294,7 +294,7 @@ namespace Emu5
 
                         foreach (InstructionViewEntry i_viewEntry in m_instructionEntries)
                         {
-                            byte?[] l_rawData = m_emulator.GetMemoryMapReference().ReadIgnoreIO(l_address, 4);
+                            byte?[] l_rawData = m_emulator.GetMemoryMapReference().ReadIgnorePeripherals(l_address, 4);
 
                             i_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_address), l_address, l_rawData, m_labelMap, m_pseudoInstructionMap);
                             i_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
@@ -329,7 +329,7 @@ namespace Emu5
 
                         foreach (DataViewEntry i_viewEntry in m_dataEntries)
                         {
-                            byte?[] l_rawData = m_emulator.GetMemoryMapReference().ReadIgnoreIO(l_address, 8);
+                            byte?[] l_rawData = m_emulator.GetMemoryMapReference().ReadIgnorePeripherals(l_address, 8);
 
                             i_viewEntry.DisplayData(l_address, l_rawData);
 
@@ -413,7 +413,7 @@ namespace Emu5
             }
 
             InstructionViewEntry l_viewEntry = new InstructionViewEntry(ConfigureBreakpoint);
-            l_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_nextAddress), l_nextAddress, m_emulator.GetMemoryMapReference().ReadIgnoreIO(l_nextAddress, 4), m_labelMap, m_pseudoInstructionMap);
+            l_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_nextAddress), l_nextAddress, m_emulator.GetMemoryMapReference().ReadIgnorePeripherals(l_nextAddress, 4), m_labelMap, m_pseudoInstructionMap);
             l_viewEntry.Highlighted = m_highlightingEnabled && (l_nextAddress == m_currentPC);
 
             m_instructionEntries.Insert(l_addIndex, l_viewEntry);
@@ -463,7 +463,7 @@ namespace Emu5
             }
 
             DataViewEntry l_viewEntry = new DataViewEntry();
-            l_viewEntry.DisplayData(l_nextAddress, m_emulator.GetMemoryMapReference().ReadIgnoreIO(l_nextAddress, 8));
+            l_viewEntry.DisplayData(l_nextAddress, m_emulator.GetMemoryMapReference().ReadIgnorePeripherals(l_nextAddress, 8));
 
             m_dataEntries.Insert(l_addIndex, l_viewEntry);
             stackPanelMemoryView.Children.Clear();

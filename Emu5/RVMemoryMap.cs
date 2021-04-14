@@ -23,15 +23,19 @@ namespace Emu5
 
     public class RVMemoryMap
     {
+        private struct PeripheralInfo
+        {
+            public I_RVPeripheral peripheral;
+            public UInt32 baseAddress;
+            public int spaceSize;
+        }
+
         Dictionary<UInt32, UInt64> m_memoryDictionary; // mapped to 8 bytes to reduce memory consumption
         List<Interval> m_memoryRanges;
 
         UInt64 m_uninitializedValue;
 
-        IOPanelWindow m_IOPanelPeripheral;
-
-        const UInt32 c_IOPanelBaseAddress = 0x00000110;
-        const int c_IOPanelSpaceSize = 8;
+        List<PeripheralInfo> m_peripherals;
 
         public RVMemoryMap()
         {
@@ -42,6 +46,8 @@ namespace Emu5
             m_memoryRanges.Add(new Interval { start = 0xC0000000, end = 0xFFFFFFFF }); // will be replaced in the future
 
             m_uninitializedValue = 0xFFFFFFFFFFFFFFFF;
+
+            m_peripherals = new List<PeripheralInfo>();
         }
 
         public byte UninitializedMemoryValue
@@ -61,9 +67,15 @@ namespace Emu5
             }
         }
 
-        public void RegisterIOPanelPeripheral(IOPanelWindow ioPanel)
+        public void RegisterPeripheral(I_RVPeripheral peripheral, UInt32 baseAddress, int addressSpaceSize)
         {
-            m_IOPanelPeripheral = ioPanel;
+            PeripheralInfo l_peripheralDescription = new PeripheralInfo();
+
+            l_peripheralDescription.peripheral = peripheral;
+            l_peripheralDescription.baseAddress = baseAddress;
+            l_peripheralDescription.spaceSize = addressSpaceSize;
+
+            m_peripherals.Add(l_peripheralDescription);
         }
 
         public byte?[] Read(UInt32 startAddress, int count)
@@ -79,20 +91,30 @@ namespace Emu5
 
                 if (IsInRange(l_byteAddress))
                 {
-                    if (l_byteAddress >= c_IOPanelBaseAddress && l_byteAddress < (UInt32)(c_IOPanelBaseAddress + c_IOPanelSpaceSize))
+                    bool l_isPeripheral = false;
+
+                    foreach (PeripheralInfo i_peripheralDescription in m_peripherals)
                     {
-                        int l_bytesLeftToRead = count - i_index;
-                        int l_bytesFromIO = l_bytesLeftToRead > c_IOPanelSpaceSize ? c_IOPanelSpaceSize : l_bytesLeftToRead;
-
-                        byte[] l_ioData = m_IOPanelPeripheral.ReadRegisters(l_byteAddress - c_IOPanelBaseAddress, l_bytesFromIO);
-                        for (int i_ioByteIndex = 0; i_ioByteIndex < l_bytesFromIO; ++i_ioByteIndex)
+                        if (l_byteAddress >= i_peripheralDescription.baseAddress && l_byteAddress < (UInt32)(i_peripheralDescription.baseAddress + i_peripheralDescription.spaceSize))
                         {
-                            l_toReturn[i_index + i_ioByteIndex] = l_ioData[i_ioByteIndex];
-                        }
+                            l_isPeripheral = true;
 
-                        i_index += l_bytesFromIO - 1;
+                            int l_bytesLeftToRead = count - i_index;
+                            int l_bytesFromIO = l_bytesLeftToRead > i_peripheralDescription.spaceSize ? i_peripheralDescription.spaceSize : l_bytesLeftToRead;
+
+                            byte[] l_ioData = i_peripheralDescription.peripheral.ReadRegisters(l_byteAddress - i_peripheralDescription.baseAddress, l_bytesFromIO);
+                            for (int i_ioByteIndex = 0; i_ioByteIndex < l_bytesFromIO; ++i_ioByteIndex)
+                            {
+                                l_toReturn[i_index + i_ioByteIndex] = l_ioData[i_ioByteIndex];
+                            }
+
+                            i_index += l_bytesFromIO - 1;
+
+                            break;
+                        }
                     }
-                    else
+
+                    if (l_isPeripheral == false)
                     {
                         UInt32 l_dwordAddress = l_byteAddress & ~(UInt32)0x7;
                         int l_byteIndex = (int)l_byteAddress & 0x7;
@@ -123,7 +145,7 @@ namespace Emu5
             return l_toReturn;
         }
 
-        public byte?[] ReadIgnoreIO(UInt32 startAddress, int count)
+        public byte?[] ReadIgnorePeripherals(UInt32 startAddress, int count)
         {
             byte?[] l_toReturn = new byte?[count];
 
@@ -136,11 +158,18 @@ namespace Emu5
 
                 if (IsInRange(l_byteAddress))
                 {
-                    if (l_byteAddress >= c_IOPanelBaseAddress && l_byteAddress < (UInt32)(c_IOPanelBaseAddress + c_IOPanelSpaceSize))
+                    bool l_isPeripheral = false;
+
+                    foreach (PeripheralInfo i_peripheralDescription in m_peripherals)
                     {
-                        l_toReturn[i_index] = null; // reads performed with this function should not trigger peripherals
+                        if (l_byteAddress >= i_peripheralDescription.baseAddress && l_byteAddress < (UInt32)(i_peripheralDescription.baseAddress + i_peripheralDescription.spaceSize))
+                        {
+                            l_isPeripheral = true;
+                            l_toReturn[i_index] = null; // reads performed with this function should not trigger peripherals
+                        }
                     }
-                    else
+
+                    if (l_isPeripheral == false)
                     {
                         UInt32 l_dwordAddress = l_byteAddress & ~(UInt32)0x7;
                         int l_byteIndex = (int)l_byteAddress & 0x7;
@@ -185,21 +214,27 @@ namespace Emu5
                     throw new RVMemoryException("Attempting to write reserved memory address.", l_byteAddress);
                 }
 
-                if (l_byteAddress >= c_IOPanelBaseAddress && l_byteAddress < (UInt32)(c_IOPanelBaseAddress + c_IOPanelSpaceSize))
+                bool l_isPeripheral = false;
+
+                foreach (PeripheralInfo i_peripheralDescription in m_peripherals)
                 {
-                    int l_bytesLeftToWrite = data.Length - i_index;
-                    int l_bytesToIO = l_bytesLeftToWrite > c_IOPanelSpaceSize ? c_IOPanelSpaceSize : l_bytesLeftToWrite;
-
-                    byte[] l_ioData = new byte[l_bytesToIO];
-                    for (int i_ioByteIndex = 0; i_ioByteIndex < l_bytesToIO; ++i_ioByteIndex)
+                    if (l_byteAddress >= i_peripheralDescription.baseAddress && l_byteAddress < (UInt32)(i_peripheralDescription.baseAddress + i_peripheralDescription.spaceSize))
                     {
-                        l_ioData[i_ioByteIndex] = data[i_index + i_ioByteIndex];
-                    }
-                    m_IOPanelPeripheral.WriteRegisters(l_byteAddress - c_IOPanelBaseAddress, l_ioData);
+                        int l_bytesLeftToWrite = data.Length - i_index;
+                        int l_bytesToIO = l_bytesLeftToWrite > i_peripheralDescription.spaceSize ? i_peripheralDescription.spaceSize : l_bytesLeftToWrite;
 
-                    i_index += l_bytesToIO - 1;
+                        byte[] l_ioData = new byte[l_bytesToIO];
+                        for (int i_ioByteIndex = 0; i_ioByteIndex < l_bytesToIO; ++i_ioByteIndex)
+                        {
+                            l_ioData[i_ioByteIndex] = data[i_index + i_ioByteIndex];
+                        }
+                        i_peripheralDescription.peripheral.WriteRegisters(l_byteAddress - i_peripheralDescription.baseAddress, l_ioData);
+
+                        i_index += l_bytesToIO - 1;
+                    }
                 }
-                else
+
+                if (l_isPeripheral == false)
                 {
                     UInt32 l_dwordAddress = l_byteAddress & ~(UInt32)0x7;
                     int l_byteIndex = (int)l_byteAddress & 0x7;

@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="I/O panel" Height="355" Width="625" ResizeMode="CanMinimize" Background="#FFF0F0F0">
+        Title="I/O panel" Height="355" Width="625" ResizeMode="CanMinimize" Background="#FFF0F0F0" Closing="IOPanelWindow_Closing">
     <Grid Margin="4">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -83,21 +83,21 @@
         <Ellipse Name="ellipseLED1" Grid.Row="2" Grid.Column="14" ToolTip="LED1" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
         <Ellipse Name="ellipseLED0" Grid.Row="2" Grid.Column="15" ToolTip="LED0" Height="22" Width="22" StrokeThickness="2" Stroke="Red" Fill="#40FF0000" />
 
-        <Slider Name="sliderSW15" Grid.Row="3" Grid.Column="0" ToolTip="SW15" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
-        <Slider Name="sliderSW14" Grid.Row="3" Grid.Column="1" ToolTip="SW14" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
-        <Slider Name="sliderSW13" Grid.Row="3" Grid.Column="2" ToolTip="SW13" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
-        <Slider Name="sliderSW12" Grid.Row="3" Grid.Column="3" ToolTip="SW12" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
-        <Slider Name="sliderSW11" Grid.Row="3" Grid.Column="4" ToolTip="SW11" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
-        <Slider Name="sliderSW10" Grid.Row="3" Grid.Column="5" ToolTip="SW10" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
-        <Slider Name="sliderSW9" Grid.Row="3" Grid.Column="6" ToolTip="SW9" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
-        <Slider Name="sliderSW8" Grid.Row="3" Grid.Column="7" ToolTip="SW8" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
-        <Slider Name="sliderSW7" Grid.Row="3" Grid.Column="8" ToolTip="SW7" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
-        <Slider Name="sliderSW6" Grid.Row="3" Grid.Column="9" ToolTip="SW6" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
-        <Slider Name="sliderSW5" Grid.Row="3" Grid.Column="10" ToolTip="SW5" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
-        <Slider Name="sliderSW4" Grid.Row="3" Grid.Column="11" ToolTip="SW4" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
-        <Slider Name="sliderSW3" Grid.Row="3" Grid.Column="12" ToolTip="SW3" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
-        <Slider Name="sliderSW2" Grid.Row="3" Grid.Column="13" ToolTip="SW2" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
-        <Slider Name="sliderSW1" Grid.Row="3" Grid.Column="14" ToolTip="SW1" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
-        <Slider Name="sliderSW0" Grid.Row="3" Grid.Column="15" ToolTip="SW0" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" />
+        <Slider Name="sliderSW15" Grid.Row="3" Grid.Column="0" ToolTip="SW15" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" ValueChanged="sliderSW_ValueChanged" />
+        <Slider Name="sliderSW14" Grid.Row="3" Grid.Column="1" ToolTip="SW14" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" ValueChanged="sliderSW_ValueChanged" />
+        <Slider Name="sliderSW13" Grid.Row="3" Grid.Column="2" ToolTip="SW13" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" ValueChanged="sliderSW_ValueChanged" />
+        <Slider Name="sliderSW12" Grid.Row="3" Grid.Column="3" ToolTip="SW12" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" ValueChanged="sliderSW_ValueChanged" />
+        <Slider Name="sliderSW11" Grid.Row="3" Grid.Column="4" ToolTip="SW11" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" ValueChanged="sliderSW_ValueChanged" />
+        <Slider Name="sliderSW10" Grid.Row="3" Grid.Column="5" ToolTip="SW10" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" ValueChanged="sliderSW_ValueChanged" />
+        <Slider Name="sliderSW9" Grid.Row="3" Grid.Column="6" ToolTip="SW9" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" ValueChanged="sliderSW_ValueChanged" />
+        <Slider Name="sliderSW8" Grid.Row="3" Grid.Column="7" ToolTip="SW8" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" ValueChanged="sliderSW_ValueChanged" />
+        <Slider Name="sliderSW7" Grid.Row="3" Grid.Column="8" ToolTip="SW7" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" ValueChanged="sliderSW_ValueChanged" />
+        <Slider Name="sliderSW6" Grid.Row="3" Grid.Column="9" ToolTip="SW6" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" ValueChanged="sliderSW_ValueChanged" />
+        <Slider Name="sliderSW5" Grid.Row="3" Grid.Column="10" ToolTip="SW5" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" ValueChanged="sliderSW_ValueChanged" />
+        <Slider Name="sliderSW4" Grid.Row="3" Grid.Column="11" ToolTip="SW4" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" ValueChanged="sliderSW_ValueChanged" />
+        <Slider Name="sliderSW3" Grid.Row="3" Grid.Column="12" ToolTip="SW3" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" ValueChanged="sliderSW_ValueChanged" />
+        <Slider Name="sliderSW2" Grid.Row="3" Grid.Column="13" ToolTip="SW2" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" ValueChanged="sliderSW_ValueChanged" />
+        <Slider Name="sliderSW1" Grid.Row="3" Grid.Column="14" ToolTip="SW1" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" ValueChanged="sliderSW_ValueChanged" />
+        <Slider Name="sliderSW0" Grid.Row="3" Grid.Column="15" ToolTip="SW0" Orientation="Vertical" Margin="0, 14, 0, 14" Minimum="0" Maximum="1" SmallChange="1" IsSnapToTickEnabled="True" HorizontalAlignment="Center" ValueChanged="sliderSW_ValueChanged" />
     </Grid>
 </Window>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -11,23 +12,22 @@ namespace Emu5
     /// </summary>
     public partial class IOPanelWindow : Window
     {
-        RVEmulator m_emulator;
+        IOPanel m_ioPanel;
 
         Rectangle[] m_segments = new Rectangle[16];
         Button[] m_buttons = new Button[16];
         Ellipse[] m_leds = new Ellipse[16];
         Slider[] m_switches = new Slider[16];
 
-        UInt16 m_segmentValues;
-        UInt16 m_buttonEvents;
-        UInt16 m_buttonInterruptMask;
-        UInt16 m_ledValues;
+        bool m_threadShutdown;
 
-        public IOPanelWindow(RVEmulator emulator)
+        public IOPanelWindow(IOPanel peripheral)
         {
             InitializeComponent();
 
-            m_emulator = emulator;
+            m_ioPanel = peripheral;
+
+            m_threadShutdown = false;
 
             m_segments[0] = rectangle0A;
             m_segments[1] = rectangle0B;
@@ -97,275 +97,85 @@ namespace Emu5
             m_switches[14] = sliderSW14;
             m_switches[15] = sliderSW15;
 
-            m_segmentValues = 0x0000;
-            m_buttonEvents = 0x0000;
-            m_buttonInterruptMask = 0x0000;
-            m_ledValues = 0x0000;
-        }
+            ThreadStart l_threadFunction = new ThreadStart(
+            () => {
+                UInt16 l_oldSegments = m_ioPanel.GetSegmentValues();
+                Dispatcher.BeginInvoke(new Action(() => UpdateSegmentDisplay(l_oldSegments)));
 
-        public byte[] ReadRegisters(UInt32 offset, int count)
-        {
-            byte[] l_result = new byte[count];
-            bool l_buttonEventsRead = false;
+                UInt16 l_oldLeds = m_ioPanel.GetLEDValues();
+                Dispatcher.BeginInvoke(new Action(() => UpdateLEDStatus(l_oldLeds)));
 
-            for (int i_byteIndex = 0; i_byteIndex < count; ++i_byteIndex)
-            {
-                int l_registerOffset = (int)offset + i_byteIndex;
-
-                switch (l_registerOffset)
+                while (m_threadShutdown == false)
                 {
-                    case 0: // segments LO
+                    UInt16 l_segments = m_ioPanel.GetSegmentValues();
+                    if (l_segments != l_oldSegments)
                     {
-                        lock (m_segments)
-                        {
-                            l_result[i_byteIndex] = (byte)m_segmentValues;
-                        }
+                        l_oldSegments = l_segments;
+                        Dispatcher.Invoke(new Action(() => UpdateSegmentDisplay(l_segments)));
                     }
-                    break;
 
-                    case 1: // segments HI
+                    UInt16 l_leds = m_ioPanel.GetLEDValues();
+                    if (l_leds != l_oldLeds)
                     {
-                        lock (m_segments)
-                        {
-                            l_result[i_byteIndex] = (byte)(m_segmentValues >> 8);
-                        }
-                    }
-                    break;
-
-                    case 2: // buttons LO
-                    {
-                        lock (m_buttons)
-                        {
-                            l_result[i_byteIndex] = (byte)m_buttonEvents;
-                            l_buttonEventsRead = true;
-                        }
-                    }
-                    break;
-
-                    case 3: // buttons HI
-                    {
-                        lock (m_buttons)
-                        {
-                            l_result[i_byteIndex] = (byte)(m_buttonEvents >> 8);
-                            l_buttonEventsRead = true;
-                        }
-                    }
-                    break;
-
-                    case 4: // LEDS LO
-                    {
-                        lock (m_leds)
-                        {
-                            l_result[i_byteIndex] = (byte)m_ledValues;
-                        }
-                    }
-                    break;
-
-                    case 5: // LEDS HI
-                    {
-                        lock (m_leds)
-                        {
-                            l_result[i_byteIndex] = (byte)(m_ledValues >> 8);
-                        }
-                    }
-                    break;
-
-                    case 6: // switches LO
-                    {
-                        lock (m_switches)
-                        {
-                            byte l_value = 0;
-                            for (int i_switchIndex = 0; i_switchIndex < 8; ++i_switchIndex)
-                            {
-                                if (m_switches[i_switchIndex].Value > .5)
-                                {
-                                    l_value |= (byte)(1 << i_switchIndex);
-                                }
-                            }
-
-                            l_result[i_byteIndex] = l_value;
-                        }
-                    }
-                    break;
-
-                    case 7: // switches HI
-                    {
-                        lock (m_switches)
-                        {
-                            byte l_value = 0;
-                            for (int i_switchIndex = 0; i_switchIndex < 8; ++i_switchIndex)
-                            {
-                                if (m_switches[i_switchIndex + 8].Value > .5)
-                                {
-                                    l_value |= (byte)(1 << i_switchIndex);
-                                }
-                            }
-
-                            l_result[i_byteIndex] = l_value;
-                        }
-                    }
-                    break;
-
-                    default:
-                    {
-                        throw new Exception("Invalid register offset");
+                        l_oldLeds = l_leds;
+                        Dispatcher.Invoke(new Action(() => UpdateLEDStatus(l_leds)));
                     }
                 }
-            }
+            });
 
-            if (l_buttonEventsRead)
-            {
-                m_buttonEvents = 0x0000;
-            }
-
-            return l_result;
+            Thread l_monitorThread = new Thread(l_threadFunction);
+            l_monitorThread.Start();
         }
 
-        public void WriteRegisters(UInt32 offset, byte[] data)
+        private void IOPanelWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            bool l_segmentsWritten = false;
-            bool l_ledsWritten = false;
-
-            for (int i_byteIndex = 0; i_byteIndex < data.Length; ++i_byteIndex)
-            {
-                int l_registerOffset = (int)offset + i_byteIndex;
-
-                switch (l_registerOffset)
-                {
-                    case 0: // segments LO
-                    {
-                        lock (m_segments)
-                        {
-                            m_segmentValues &= 0xFF00;
-                            m_segmentValues |= (UInt16)(data[i_byteIndex] & 0x7F);
-                            l_segmentsWritten = true;
-                        }
-                    }
-                    break;
-
-                    case 1: // segments HI
-                    {
-                        lock (m_segments)
-                        {
-                            m_segmentValues &= 0x00FF;
-                            m_segmentValues |= (UInt16)(((UInt16)(data[i_byteIndex] & 0x7F)) << 8);
-                            l_segmentsWritten = true;
-                        }
-                    }
-                    break;
-
-                    case 2: // buttons LO
-                    {
-                        lock (m_buttons)
-                        {
-                            m_buttonInterruptMask &= 0xFF00;
-                            m_buttonInterruptMask |= (UInt16)(data[i_byteIndex] & 0x7F);
-                        }
-                    }
-                    break;
-
-                    case 3: // buttons HI
-                    {
-                        lock (m_buttons)
-                        {
-                            m_buttonInterruptMask &= 0x00FF;
-                            m_buttonInterruptMask |= (UInt16)(((UInt16)(data[i_byteIndex] & 0x7F)) << 8);
-                        }
-                    }
-                    break;
-
-                    case 4: // LEDS LO
-                    {
-                        lock (m_leds)
-                        {
-                            m_ledValues &= 0xFF00;
-                            m_ledValues |= (UInt16)(data[i_byteIndex] & 0x7F);
-                            l_ledsWritten = true;
-                        }
-                    }
-                    break;
-
-                    case 5: // LEDS HI
-                    {
-                        lock (m_leds)
-                        {
-                            m_ledValues &= 0x00FF;
-                            m_ledValues |= (UInt16)(((UInt16)(data[i_byteIndex] & 0x7F)) << 8);
-                            l_ledsWritten = true;
-                        }
-                    }
-                    break;
-
-                    case 6: // switches LO
-                    case 7: // switches HI
-                        break; // ignore writes to theese registers
-
-                    default:
-                    {
-                        throw new Exception("Invalid register offset");
-                    }
-                }
-            }
-
-            if (l_segmentsWritten)
-            {
-                //Dispatcher.BeginInvoke(new Action(UpdateSegmentDisplay));
-                UpdateSegmentDisplay();
-            }
-
-            if (l_ledsWritten)
-            {
-                //Dispatcher.BeginInvoke(new Action(UpdateLEDStatus));
-                UpdateLEDStatus();
-            }
+            m_threadShutdown = true;
         }
 
         private void buttonB_Click(object sender, RoutedEventArgs e)
         {
-            lock (m_buttons)
+            for (int i_buttonIndex = 0; i_buttonIndex < 16; ++i_buttonIndex)
             {
-                for (int i_buttonIndex = 0; i_buttonIndex < 16; ++i_buttonIndex)
+                if (m_buttons[i_buttonIndex] == sender)
                 {
-                    if (m_buttons[i_buttonIndex] == sender)
-                    {
-                        UInt16 l_bit = (UInt16)(1 << i_buttonIndex);
-                        m_buttonEvents |= l_bit;
+                    m_ioPanel.RegisterButtonPressed(i_buttonIndex);
 
-                        if ((m_buttonInterruptMask & l_bit) != 0)
-                        {
-                            m_emulator.QueueExternalInterrupt(RVVector.External9, 0);
-                        }
-
-                        break;
-                    }
+                    break;
                 }
             }
         }
 
-        private void UpdateSegmentDisplay()
+        private void sliderSW_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            for (int i_switchIndex = 0; i_switchIndex < 16; ++i_switchIndex)
+            {
+                if (m_switches[i_switchIndex] == sender)
+                {
+                    m_ioPanel.SwitchStateChanged(i_switchIndex, m_switches[i_switchIndex].Value > .5);
+
+                    break;
+                }
+            }
+        }
+
+        private void UpdateSegmentDisplay(UInt16 segments)
         {
             for (int i_segmentIndex = 0; i_segmentIndex < 16; ++i_segmentIndex)
             {
-                lock (m_segments)
+                if (m_segments[i_segmentIndex] != null)
                 {
-                    if (m_segments[i_segmentIndex] != null)
-                    {
-                        m_segments[i_segmentIndex].Fill = (m_segmentValues & (1 << i_segmentIndex)) != 0 ? Brushes.Red : new SolidColorBrush(Color.FromArgb(0x40, 0xFF, 0x00, 0x00));
-                        m_segments[i_segmentIndex].UpdateLayout();
-                    }
+                    m_segments[i_segmentIndex].Fill = (segments & (1 << i_segmentIndex)) != 0 ? Brushes.Red : new SolidColorBrush(Color.FromArgb(0x40, 0xFF, 0x00, 0x00));
+                    m_segments[i_segmentIndex].UpdateLayout();
                 }
             }
         }
 
-        private void UpdateLEDStatus()
+        private void UpdateLEDStatus(UInt16 leds)
         {
             for (int i_ledIndex = 0; i_ledIndex < 16; ++i_ledIndex)
             {
-                lock (m_leds)
-                {
-                    m_leds[i_ledIndex].Fill = (m_ledValues & (1 << i_ledIndex)) != 0 ? Brushes.Red : new SolidColorBrush(Color.FromArgb(0x40, 0xFF, 0x00, 0x00));
-                    m_leds[i_ledIndex].UpdateLayout();
-                }
+                m_leds[i_ledIndex].Fill = (leds & (1 << i_ledIndex)) != 0 ? Brushes.Red : new SolidColorBrush(Color.FromArgb(0x40, 0xFF, 0x00, 0x00));
+                m_leds[i_ledIndex].UpdateLayout();
             }
         }
     }

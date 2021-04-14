@@ -31,7 +31,7 @@ namespace Emu5
 
         RVEmulator m_rvEmulator = new RVEmulator();
 
-        IOPanelWindow m_IOPeripheral;
+        IOPanel m_IOPeripheral;
 
         System.Timers.Timer m_clockTimer;
         Thread m_simulationThread;
@@ -64,8 +64,8 @@ namespace Emu5
             m_runningClocked = false;
             m_runningFast = false;
 
-            m_IOPeripheral = new IOPanelWindow(m_rvEmulator);
-            m_rvEmulator.GetMemoryMapReference().RegisterIOPanelPeripheral(m_IOPeripheral);
+            m_IOPeripheral = new IOPanel(m_rvEmulator);
+            m_rvEmulator.GetMemoryMapReference().RegisterPeripheral(m_IOPeripheral, 0x0110, 8);
         }
 
         public PerspectivePage(TabHeader tabHeader) : this()
@@ -442,8 +442,9 @@ namespace Emu5
 
         public void OpenIOPanelPeripheralUI()
         {
-            m_IOPeripheral.Title = "I/O panel for " + GetFileName();
-            m_IOPeripheral.Show();
+            IOPanelWindow l_windowHandle = new IOPanelWindow(m_IOPeripheral);
+            l_windowHandle.Title = "I/O panel for " + GetFileName();
+            l_windowHandle.Show();
         }
 
         private void ClockTick(object sender, System.Timers.ElapsedEventArgs e)
