@@ -37,7 +37,26 @@ namespace Emu5
             m_ledValues = 0x0000;
         }
 
-        public byte[] ReadRegisters(uint offset, int count)
+        void I_RVPeripheral.Reset()
+        {
+            lock (m_segmentSync)
+            {
+                m_segmentValues = 0;
+            }
+
+            lock (m_buttonSync)
+            {
+                m_buttonInterruptMask = 0;
+                m_buttonEvents = 0;
+            }
+
+            lock (m_ledSync)
+            {
+                m_ledValues = 0;
+            }
+        }
+
+        byte[] I_RVPeripheral.ReadRegisters(uint offset, int count)
         {
             byte[] l_result = new byte[count];
             bool l_buttonEventsRead = false;
@@ -140,7 +159,7 @@ namespace Emu5
             return l_result;
         }
 
-        public void WriteRegisters(uint offset, byte[] data)
+        void I_RVPeripheral.WriteRegisters(uint offset, byte[] data)
         {
             for (int i_byteIndex = 0; i_byteIndex < data.Length; ++i_byteIndex)
             {

@@ -207,6 +207,8 @@ namespace Emu5
                 m_programCounter <<= 8;
                 m_programCounter |= (UInt32)l_initialProgramCounter[i_byteIndex];
             }
+
+            m_memoryMap.ResetAllPeripherals();
         }
 
         public void SingleStep()

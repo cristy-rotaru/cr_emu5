@@ -15,6 +15,11 @@ namespace Emu5
             m_emulator = emulator;
         }
 
+        void I_RVPeripheral.Reset()
+        {
+            m_invalidProgrammingDetected = false;
+        }
+
         byte[] I_RVPeripheral.ReadRegisters(UInt32 offset, int count)
         {
             if (offset + count > 4)

@@ -271,6 +271,14 @@ namespace Emu5
             }
         }
 
+        public void ResetAllPeripherals()
+        {
+            foreach (PeripheralInfo i_peripheralDescription in m_peripherals)
+            {
+                i_peripheralDescription.peripheral.Reset();
+            }
+        }
+
         private bool IsInRange(UInt32 address)
         {
             foreach (Interval i_interval in m_memoryRanges)
