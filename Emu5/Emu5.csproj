@@ -74,6 +74,7 @@
     <Compile Include="InstructionViewEntry.xaml.cs">
       <DependentUpon>InstructionViewEntry.xaml</DependentUpon>
     </Compile>
+    <Compile Include="InterruptInjector.cs" />
     <Compile Include="IOPanel.cs" />
     <Compile Include="IOPanelWindow.xaml.cs">
       <DependentUpon>IOPanelWindow.xaml</DependentUpon>

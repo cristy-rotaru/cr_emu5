@@ -32,6 +32,7 @@ namespace Emu5
         RVEmulator m_rvEmulator = new RVEmulator();
 
         IOPanel m_IOPeripheral;
+        InterruptInjector m_interruptInjectorPeripheral;
 
         System.Timers.Timer m_clockTimer;
         Thread m_simulationThread;
@@ -65,7 +66,9 @@ namespace Emu5
             m_runningFast = false;
 
             m_IOPeripheral = new IOPanel(m_rvEmulator);
+            m_interruptInjectorPeripheral = new InterruptInjector(m_rvEmulator);
             m_rvEmulator.GetMemoryMapReference().RegisterPeripheral(m_IOPeripheral, 0x0110, 8);
+            m_rvEmulator.GetMemoryMapReference().RegisterPeripheral(m_interruptInjectorPeripheral, 0x0118, 4);
         }
 
         public PerspectivePage(TabHeader tabHeader) : this()
