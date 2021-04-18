@@ -588,7 +588,7 @@ namespace Emu5
 
         void commandOpenTerminal_Executed(object target, ExecutedRoutedEventArgs e)
         {
-            MessageBox.Show("Open Terminal");
+            (new TerminalWindow()).Show();
         }
 
         void commandOpenIOPanel_Executed(object target, ExecutedRoutedEventArgs e)
