@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         Title="Terminal" Height="718" Width="1080" Background="#FFF0F0F0">
     <DockPanel>
-        <TextBox Name="textBoxTerminal" DockPanel.Dock="Top" Margin="1" Background="Black" Foreground="Lime" FontFamily="Consolas" FontSize="15" Height="566" CaretBrush="Lime" IsReadOnlyCaretVisible="True" IsReadOnly="true" TextWrapping="NoWrap" HorizontalScrollBarVisibility="Disabled" PreviewMouseWheel="textBoxTerminal_PreviewMouseWheel" />
+        <TextBox Name="textBoxTerminal" DockPanel.Dock="Top" Margin="1" Background="Black" Foreground="Lime" FontFamily="Consolas" FontSize="15" Height="566" CaretBrush="Lime" IsReadOnlyCaretVisible="True" IsReadOnly="true" TextWrapping="NoWrap" HorizontalScrollBarVisibility="Disabled" PreviewMouseWheel="textBoxTerminal_PreviewMouseWheel" PreviewMouseDown="textBoxTerminal_PreviewMouseDown" PreviewMouseUp="textBoxTerminal_MouseUp" MouseUp="textBoxTerminal_MouseUp" PreviewKeyDown="textBoxTerminal_PreviewKeyDown" />
 
         <Grid />
     </DockPanel>
