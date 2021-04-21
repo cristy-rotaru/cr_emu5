@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Terminal" Height="746" Width="1080" Background="#FFF0F0F0" FontSize="13">
+        Title="Terminal" Height="746" Width="1080" Background="#FFF0F0F0" FontSize="13" ResizeMode="NoResize">
     <DockPanel>
         <TextBox Name="textBoxTerminal" DockPanel.Dock="Top" Margin="1" Background="Black" Foreground="Lime" FontFamily="Consolas" FontSize="15" Height="566" CaretBrush="Lime" IsReadOnlyCaretVisible="True" IsReadOnly="true" TextWrapping="NoWrap" HorizontalScrollBarVisibility="Disabled" PreviewMouseWheel="textBoxTerminal_PreviewMouseWheel" PreviewMouseDown="textBoxTerminal_PreviewMouseDown" PreviewMouseUp="textBoxTerminal_MouseUp" MouseUp="textBoxTerminal_MouseUp" PreviewKeyDown="textBoxTerminal_PreviewKeyDown" />
 
