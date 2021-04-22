@@ -104,57 +104,7 @@ namespace Emu5
 
                     foreach (char i_character in l_clipboardText)
                     {
-                        if (i_character <= (char)255)
-                        { // ascii extended
-                            if (i_character == (char)10) // line feed
-                            {
-                                if (m_caretLine < 31)
-                                {
-                                    ++m_caretLine;
-                                }
-                                else
-                                {
-                                    ScrollUpAndAddNewLine();
-                                }
-                            }
-                            else if (i_character == (char)13) // carriage return
-                            {
-                                m_caretColumn = 0;
-                            }
-                            else if (i_character == (char)9) // tab
-                            {
-                                m_caretColumn += 8;
-                                if (m_caretColumn > 127)
-                                {
-                                    m_caretColumn = 0;
-
-                                    if (m_caretLine < 31)
-                                    {
-                                        ++m_caretLine;
-                                    }
-                                    else
-                                    {
-                                        ScrollUpAndAddNewLine();
-                                    }
-                                }
-                                else
-                                {
-                                    m_caretColumn = 8 * (m_caretColumn / 8);
-                                }
-                            }
-                            else if ((i_character >= (char)32 && i_character <= (char)126) || (i_character == (char)128) || (i_character >= (char)130 && i_character <= (char)140) || (i_character == (char)142) || (i_character >= (char)145 && i_character <= (char)156) || (i_character == (char)158) || (i_character == (char)159) || (i_character >= (char)161 && i_character <= (char)255))
-                            {
-                                PutChar(i_character);
-                            }
-                            else
-                            {
-                                PutChar(c_unprintableCharacter);
-                            }
-                        }
-                        else
-                        {
-                            PutChar(c_unprintableCharacter);
-                        }
+                        TryPrint(i_character);
                     }
 
                     UpdateTextView();
@@ -572,6 +522,61 @@ namespace Emu5
             }
         }
 
+        private void TryPrint(char character)
+        {
+            if (character <= (char)255)
+            { // ascii extended
+                if (character == (char)10) // line feed
+                {
+                    if (m_caretLine < 31)
+                    {
+                        ++m_caretLine;
+                    }
+                    else
+                    {
+                        ScrollUpAndAddNewLine();
+                    }
+                }
+                else if (character == (char)13) // carriage return
+                {
+                    m_caretColumn = 0;
+                }
+                else if (character == (char)9) // tab
+                {
+                    m_caretColumn += 8;
+                    if (m_caretColumn > 127)
+                    {
+                        m_caretColumn = 0;
+
+                        if (m_caretLine < 31)
+                        {
+                            ++m_caretLine;
+                        }
+                        else
+                        {
+                            ScrollUpAndAddNewLine();
+                        }
+                    }
+                    else
+                    {
+                        m_caretColumn = 8 * (m_caretColumn / 8);
+                    }
+                }
+                else if ((character >= (char)32 && character <= (char)126) || (character >= (char)161 && character <= (char)172) || (character >= (char)174 && character <= (char)255))
+                {
+                    PutChar(character);
+                }
+                else
+                {
+                    PutChar(c_unprintableCharacter);
+                }
+            }
+            else
+            {
+                PutChar(c_unprintableCharacter);
+            }
+        }
+
         private void PutChar(char character)
         {
             StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
@@ -602,50 +607,7 @@ namespace Emu5
 
             foreach (char i_character in l_characters)
             {
-                if (i_character == (char)10) // line feed
-                {
-                    if (m_caretLine < 31)
-                    {
-                        ++m_caretLine;
-                    }
-                    else
-                    {
-                        ScrollUpAndAddNewLine();
-                    }
-                }
-                else if (i_character == (char)13) // carriage return
-                {
-                    m_caretColumn = 0;
-                }
-                else if (i_character == (char)9) // tab
-                {
-                    m_caretColumn += 8;
-                    if (m_caretColumn > 127)
-                    {
-                        m_caretColumn = 0;
-
-                        if (m_caretLine < 31)
-                        {
-                            ++m_caretLine;
-                        }
-                        else
-                        {
-                            ScrollUpAndAddNewLine();
-                        }
-                    }
-                    else
-                    {
-                        m_caretColumn = 8 * (m_caretColumn / 8);
-                    }
-                }
-                else if ((i_character >= (char)32 && i_character <= (char)126) || (i_character == (char)128) || (i_character >= (char)130 && i_character <= (char)140) || (i_character == (char)142) || (i_character >= (char)145 && i_character <= (char)156) || (i_character == (char)158) || (i_character == (char)159) || (i_character >= (char)161 && i_character <= (char)255))
-                {
-                    PutChar(i_character);
-                }
-                else
-                {
-                    PutChar(c_unprintableCharacter);
-                }
+                TryPrint(i_character);
             }
 
             UpdateTextView();
