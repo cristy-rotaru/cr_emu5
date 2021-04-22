@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Terminal" Height="746" Width="1080" Background="#FFF0F0F0" FontSize="13" ResizeMode="NoResize">
+        Title="Terminal" Height="746" Width="1080" Background="#FFF0F0F0" FontSize="13" ResizeMode="CanMinimize">
     <DockPanel>
         <TextBox Name="textBoxTerminal" DockPanel.Dock="Top" Margin="1" Background="Black" Foreground="Lime" FontFamily="Consolas" FontSize="15" Height="566" CaretBrush="Lime" IsReadOnlyCaretVisible="True" IsReadOnly="true" TextWrapping="NoWrap" HorizontalScrollBarVisibility="Disabled" PreviewMouseWheel="textBoxTerminal_PreviewMouseWheel" PreviewMouseDown="textBoxTerminal_PreviewMouseDown" PreviewMouseUp="textBoxTerminal_MouseUp" MouseUp="textBoxTerminal_MouseUp" PreviewKeyDown="textBoxTerminal_PreviewKeyDown" />
 
@@ -28,9 +28,9 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <CheckBox Name="checkBoxEchoSentCharacters" Grid.Row="0" Grid.Column="0" IsChecked="True" Content="Echo sent characters" VerticalAlignment="Top" />
-                <CheckBox Name="checkBoxBackspaceDeletesCharacters" Grid.Row="1" Grid.Column="0" IsChecked="True" Content="Backspace deletes characters" VerticalAlignment="Center" />
-                <CheckBox Name="checkBoxNewLineSetsCaretTo0" Grid.Row="2" Grid.Column="0" IsChecked="True" Content="\n puts the caret to the beginning of the line" VerticalAlignment="Bottom" />
+                <CheckBox Name="checkBoxEchoSentCharacters" Grid.Row="0" Grid.Column="0" IsChecked="True" Content="Echo sent characters" VerticalAlignment="Top" Checked="checkBox_Toggled" Unchecked="checkBox_Toggled" />
+                <CheckBox Name="checkBoxBackspaceDeletesCharacters" Grid.Row="1" Grid.Column="0" IsChecked="True" Content="Backspace deletes characters" VerticalAlignment="Center" Checked="checkBox_Toggled" Unchecked="checkBox_Toggled" />
+                <CheckBox Name="checkBoxNewLineSetsCaretTo0" Grid.Row="2" Grid.Column="0" IsChecked="True" Content="\n puts the caret to the beginning of the line" VerticalAlignment="Bottom" Checked="checkBox_Toggled" Unchecked="checkBox_Toggled" />
             </Grid>
 
             <Grid Grid.Row="0" Grid.Column="1" Margin="6, 6, 6, 0">
@@ -45,16 +45,16 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <RadioButton Name="radioButtonKeyboard" Grid.Row="0" Grid.Column="0" IsChecked="True" Content="Keyboard" VerticalAlignment="Center" />
-                        <RadioButton Name="radioButtonHex" Grid.Row="1" Grid.Column="0" IsChecked="False" Content="Hex" VerticalAlignment="Center" />
-                        <RadioButton Name="radioButtonString" Grid.Row="2" Grid.Column="0" IsChecked="False" Content="String" VerticalAlignment="Center" />
+                        <RadioButton Name="radioButtonKeyboard" Grid.Row="0" Grid.Column="0" IsChecked="True" Content="Keyboard" VerticalAlignment="Center" Checked="radioButtonKeyboard_Checked" />
+                        <RadioButton Name="radioButtonHex" Grid.Row="1" Grid.Column="0" IsChecked="False" Content="Hex" VerticalAlignment="Center" Checked="radioButtonHexString_Checked" />
+                        <RadioButton Name="radioButtonString" Grid.Row="2" Grid.Column="0" IsChecked="False" Content="String" VerticalAlignment="Center" Checked="radioButtonHexString_Checked" />
                     </Grid>
                 </GroupBox>
             </Grid>
 
             <DockPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="6">
-                <Button Name="buttonSent" DockPanel.Dock="Right" Content="Send" Width="50" IsEnabled="False" />
-                <TextBox Name="textBoxInput" Margin="0, 0, 4, 0" IsEnabled="False" />
+                <Button Name="buttonSend" DockPanel.Dock="Right" Content="Send" Width="50" IsEnabled="False" Click="buttonSend_Click" />
+                <TextBox Name="textBoxInput" Margin="0, 0, 4, 0" IsEnabled="False" KeyDown="textBoxInput_KeyDown" />
             </DockPanel>
         </Grid>
     </DockPanel>

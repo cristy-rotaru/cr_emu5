@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Emu5
@@ -15,6 +15,8 @@ namespace Emu5
 
         String[] m_lines;
         int m_caretLine, m_caretColumn;
+
+        bool m_initialized = false;
 
         public TerminalWindow()
         {
@@ -35,6 +37,8 @@ namespace Emu5
 
             UpdateTextView();
             UpdateCaretPosition();
+
+            m_initialized = true;
         }
 
         private void UpdateCaretPosition()
@@ -140,20 +144,16 @@ namespace Emu5
                             }
                             else if ((i_character >= (char)32 && i_character <= (char)126) || (i_character == (char)128) || (i_character >= (char)130 && i_character <= (char)140) || (i_character == (char)142) || (i_character >= (char)145 && i_character <= (char)156) || (i_character == (char)158) || (i_character == (char)159) || (i_character >= (char)161 && i_character <= (char)255))
                             {
-                                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                                l_stringEditor[m_caretColumn] = i_character;
-                                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                                AdvanceCaret();
+                                PutChar(i_character);
                             }
                             else
                             {
-                                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                                l_stringEditor[m_caretColumn] = c_unprintableCharacter;
-                                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                                AdvanceCaret();
+                                PutChar(c_unprintableCharacter);
                             }
+                        }
+                        else
+                        {
+                            PutChar(c_unprintableCharacter);
                         }
                     }
 
@@ -177,8 +177,41 @@ namespace Emu5
             UpdateCaretPosition(); // make sure the caret doesn't change position
         }
 
+        private void textBoxInput_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                if (radioButtonHex.IsChecked == true)
+                {
+                    ParseAndSendHex();
+                }
+                else if (radioButtonString.IsChecked == true)
+                {
+                    SendString();
+                }
+            }
+        }
+
+        private void buttonSend_Click(object sender, RoutedEventArgs e)
+        {
+            if (radioButtonHex.IsChecked == true)
+            {
+                ParseAndSendHex();
+            }
+            else if (radioButtonString.IsChecked == true)
+            {
+                SendString();
+            }
+        }
+
         private void textBoxTerminal_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            if (radioButtonKeyboard.IsChecked != true)
+            {
+                e.Handled = true;
+                return;
+            }
+
             bool l_textUpdateRequired = false;
 
             if (e.Key == Key.Return)
@@ -193,7 +226,7 @@ namespace Emu5
                     l_textUpdateRequired = true;
                 }
 
-                if (Keyboard.IsKeyDown(Key.LeftShift) == false && Keyboard.IsKeyDown(Key.RightShift) == false)
+                if ((Keyboard.IsKeyDown(Key.LeftShift) == false && Keyboard.IsKeyDown(Key.RightShift) == false) ^ checkBoxNewLineSetsCaretTo0.IsChecked == false)
                 { // if the user holds shift the caret will keep it's column
                     m_caretColumn = 0;
                 }
@@ -222,11 +255,7 @@ namespace Emu5
             }
             else if (e.Key == Key.Space)
             {
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = ' ';
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(' ');
 
                 l_textUpdateRequired = true;
             }
@@ -236,20 +265,19 @@ namespace Emu5
                 {
                     --m_caretColumn;
 
-                    StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                    l_stringEditor[m_caretColumn] = ' ';
-                    m_lines[m_caretLine] = l_stringEditor.ToString();
+                    if (checkBoxBackspaceDeletesCharacters.IsChecked == true)
+                    {
+                        StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
+                        l_stringEditor[m_caretColumn] = ' ';
+                        m_lines[m_caretLine] = l_stringEditor.ToString();
 
-                    l_textUpdateRequired = true;
+                        l_textUpdateRequired = true;
+                    }
                 }
             }
             else if (e.Key == Key.Escape)
             {
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = c_unprintableCharacter;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(c_unprintableCharacter);
 
                 l_textUpdateRequired = true;
             }
@@ -284,231 +312,147 @@ namespace Emu5
             else if (e.Key == Key.Oem1) // the ; and : button
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? ':' : ';';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.Oem2) // the / and ? button
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '?' : '/';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.Oem3) // the ` and ~ button
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '~' : '`';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.Oem4) // the [ and { button
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '{' : '[';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.Oem5 || e.Key == Key.Oem102) // the \ and | button
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '|' : '\\';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.Oem6) // the ] and } button
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '}' : ']';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.Oem7) // the ' and " button
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '"' : '\'';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.OemComma) // the , and < button
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '<' : ',';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.OemPeriod) // the . and > button
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '>' : '.';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.OemMinus) // the - and _ button
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '_' : '-';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.OemPlus) // the = and + button
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '+' : '=';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.D1)
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '!' : '1';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.D2)
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '@' : '2';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.D3)
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '#' : '3';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.D4)
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '$' : '4';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.D5)
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '%' : '5';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.D6)
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '^' : '6';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.D7)
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '&' : '7';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.D8)
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '*' : '8';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.D9)
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? '(' : '9';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
             else if (e.Key == Key.D0)
             {
                 Char l_character = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? ')' : '0';
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
@@ -516,11 +460,7 @@ namespace Emu5
             {
                 if (Keyboard.IsKeyToggled(Key.NumLock))
                 {
-                    StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                    l_stringEditor[m_caretColumn] = '.';
-                    m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                    AdvanceCaret();
+                    PutChar('.');
 
                     l_textUpdateRequired = true;
                 }
@@ -529,11 +469,7 @@ namespace Emu5
             {
                 if (Keyboard.IsKeyToggled(Key.NumLock))
                 {
-                    StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                    l_stringEditor[m_caretColumn] = '+';
-                    m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                    AdvanceCaret();
+                    PutChar('+');
 
                     l_textUpdateRequired = true;
                 }
@@ -542,11 +478,7 @@ namespace Emu5
             {
                 if (Keyboard.IsKeyToggled(Key.NumLock))
                 {
-                    StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                    l_stringEditor[m_caretColumn] = '-';
-                    m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                    AdvanceCaret();
+                    PutChar('-');
 
                     l_textUpdateRequired = true;
                 }
@@ -555,11 +487,7 @@ namespace Emu5
             {
                 if (Keyboard.IsKeyToggled(Key.NumLock))
                 {
-                    StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                    l_stringEditor[m_caretColumn] = '*';
-                    m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                    AdvanceCaret();
+                    PutChar('*');
 
                     l_textUpdateRequired = true;
                 }
@@ -568,11 +496,7 @@ namespace Emu5
             {
                 if (Keyboard.IsKeyToggled(Key.NumLock))
                 {
-                    StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                    l_stringEditor[m_caretColumn] = '/';
-                    m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                    AdvanceCaret();
+                    PutChar('/');
 
                     l_textUpdateRequired = true;
                 }
@@ -582,12 +506,7 @@ namespace Emu5
                 if (Keyboard.IsKeyToggled(Key.NumLock))
                 {
                     Char l_character = (char)(e.Key - Key.NumPad0 + '0');
-
-                    StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                    l_stringEditor[m_caretColumn] = l_character;
-                    m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                    AdvanceCaret();
+                    PutChar(l_character);
 
                     l_textUpdateRequired = true;
                 }
@@ -598,12 +517,7 @@ namespace Emu5
                 l_capitalize ^= Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
 
                 Char l_character = (char)(e.Key - Key.A + (l_capitalize ? 'A' : 'a'));
-
-                StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
-                l_stringEditor[m_caretColumn] = l_character;
-                m_lines[m_caretLine] = l_stringEditor.ToString();
-
-                AdvanceCaret();
+                PutChar(l_character);
 
                 l_textUpdateRequired = true;
             }
@@ -617,6 +531,147 @@ namespace Emu5
             textBoxTerminal.Focus();
 
             e.Handled = true;
+        }
+
+        private void radioButtonKeyboard_Checked(object sender, RoutedEventArgs e)
+        {
+            if (m_initialized)
+            {
+                textBoxInput.Clear();
+
+                textBoxInput.IsEnabled = false;
+                buttonSend.IsEnabled = false;
+
+                textBoxTerminal.Focus();
+            }
+        }
+
+        private void radioButtonHexString_Checked(object sender, RoutedEventArgs e)
+        {
+            if (m_initialized)
+            {
+                textBoxInput.IsEnabled = true;
+                buttonSend.IsEnabled = true;
+
+                textBoxInput.Focus();
+            }
+        }
+
+        private void checkBox_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (m_initialized)
+            {
+                if (radioButtonKeyboard.IsChecked == true)
+                {
+                    textBoxTerminal.Focus();
+                }
+                else
+                {
+                    textBoxInput.Focus();
+                }
+            }
+        }
+
+        private void PutChar(char character)
+        {
+            StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
+            l_stringEditor[m_caretColumn] = character;
+            m_lines[m_caretLine] = l_stringEditor.ToString();
+
+            AdvanceCaret();
+        }
+
+        private void ParseAndSendHex()
+        {
+            String[] l_tokens = textBoxInput.Text.Split(' ');
+            char[] l_characters = new char[l_tokens.Length];
+
+            for (int i_token = 0; i_token < l_tokens.Length; ++i_token)
+            {
+                try
+                {
+                    byte l_characterCode = byte.Parse(l_tokens[i_token], NumberStyles.HexNumber);
+                    l_characters[i_token] = (char)l_characterCode;
+                }
+                catch
+                {
+                    MessageBox.Show(l_tokens[i_token] + " is not a valid ascii extended character hex code.", "Invalid character code", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+            }
+
+            foreach (char i_character in l_characters)
+            {
+                if (i_character == (char)10) // line feed
+                {
+                    if (m_caretLine < 31)
+                    {
+                        ++m_caretLine;
+                    }
+                    else
+                    {
+                        ScrollUpAndAddNewLine();
+                    }
+                }
+                else if (i_character == (char)13) // carriage return
+                {
+                    m_caretColumn = 0;
+                }
+                else if (i_character == (char)9) // tab
+                {
+                    m_caretColumn += 8;
+                    if (m_caretColumn > 127)
+                    {
+                        m_caretColumn = 0;
+
+                        if (m_caretLine < 31)
+                        {
+                            ++m_caretLine;
+                        }
+                        else
+                        {
+                            ScrollUpAndAddNewLine();
+                        }
+                    }
+                    else
+                    {
+                        m_caretColumn = 8 * (m_caretColumn / 8);
+                    }
+                }
+                else if ((i_character >= (char)32 && i_character <= (char)126) || (i_character == (char)128) || (i_character >= (char)130 && i_character <= (char)140) || (i_character == (char)142) || (i_character >= (char)145 && i_character <= (char)156) || (i_character == (char)158) || (i_character == (char)159) || (i_character >= (char)161 && i_character <= (char)255))
+                {
+                    PutChar(i_character);
+                }
+                else
+                {
+                    PutChar(c_unprintableCharacter);
+                }
+            }
+
+            UpdateTextView();
+            UpdateCaretPosition();
+
+            textBoxInput.Clear();
+        }
+
+        private void SendString()
+        {
+            foreach (char i_character in textBoxInput.Text)
+            {
+                if (i_character <= (char)255)
+                {
+                    PutChar(i_character);
+                }
+                else
+                {
+                    PutChar(c_unprintableCharacter);
+                }
+            }
+
+            UpdateTextView();
+            UpdateCaretPosition();
+
+            textBoxInput.Clear();
         }
     }
 }
