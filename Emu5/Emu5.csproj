@@ -93,6 +93,7 @@
     <Compile Include="TabHeader.xaml.cs">
       <DependentUpon>TabHeader.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Terminal.cs" />
     <Compile Include="TerminalWindow.xaml.cs">
       <DependentUpon>TerminalWindow.xaml</DependentUpon>
     </Compile>
