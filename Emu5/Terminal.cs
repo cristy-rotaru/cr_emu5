@@ -72,6 +72,8 @@ namespace Emu5
                     m_lines[i_line] += '\n';
                 }
             }
+
+            NotifyTextChanged();
         }
 
         byte[] I_RVPeripheral.ReadRegisters(uint offset, int count)

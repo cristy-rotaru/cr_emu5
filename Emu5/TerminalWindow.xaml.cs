@@ -326,10 +326,13 @@ namespace Emu5
 
         private void UpdateTextAndCaret(String text, int caretPosition)
         {
-            textBoxTerminal.Text = text;
-            textBoxTerminal.CaretIndex = caretPosition;
+            Dispatcher.BeginInvoke(new Action(
+            () => {
+                textBoxTerminal.Text = text;
+                textBoxTerminal.CaretIndex = caretPosition;
 
-            m_caretPosition = caretPosition;
+                m_caretPosition = caretPosition;
+            }));
         }
 
         private void ParseAndSendHex()
