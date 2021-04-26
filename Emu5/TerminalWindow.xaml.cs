@@ -319,6 +319,8 @@ namespace Emu5
                 {
                     textBoxInput.Focus();
                 }
+
+                m_terminal.BackspaceDeletesCharacter = checkBoxBackspaceDeletesCharacters.IsChecked == true;
             }
         }
 

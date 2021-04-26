@@ -20,7 +20,16 @@ namespace Emu5
         Queue<char> m_characterBuffer;
         char m_lastCharacterRead;
 
+        bool m_backspaceDeletesCharacter;
         bool m_triggerInterruptOnSend;
+
+        public bool BackspaceDeletesCharacter
+        {
+            set
+            {
+                m_backspaceDeletesCharacter = value;
+            }
+        }
 
         public Terminal(RVEmulator emulator)
         {
@@ -29,6 +38,7 @@ namespace Emu5
             m_characterBuffer = new Queue<char>();
             m_lastCharacterRead = '\0';
             m_triggerInterruptOnSend = false;
+            m_backspaceDeletesCharacter = true;
 
             m_caretLine = 0;
             m_caretColumn = 0;
@@ -283,6 +293,20 @@ namespace Emu5
                     else
                     {
                         m_caretColumn = 8 * (m_caretColumn / 8);
+                    }
+                }
+                else if (character == (char)8) // backspace
+                {
+                    if (m_caretColumn > 0)
+                    {
+                        --m_caretColumn;
+
+                        if (m_backspaceDeletesCharacter)
+                        {
+                            StringBuilder l_stringEditor = new StringBuilder(m_lines[m_caretLine]);
+                            l_stringEditor[m_caretColumn] = ' ';
+                            m_lines[m_caretLine] = l_stringEditor.ToString();
+                        }
                     }
                 }
                 else if ((character >= (char)32 && character <= (char)126) || (character >= (char)161 && character <= (char)172) || (character >= (char)174 && character <= (char)255))
