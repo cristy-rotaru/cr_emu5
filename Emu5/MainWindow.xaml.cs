@@ -588,7 +588,9 @@ namespace Emu5
 
         void commandOpenTerminal_Executed(object target, ExecutedRoutedEventArgs e)
         {
-            (new TerminalWindow()).Show();
+            TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+            PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+            l_page.OpenTerminalPeripheralUI();
         }
 
         void commandOpenIOPanel_Executed(object target, ExecutedRoutedEventArgs e)

@@ -33,6 +33,7 @@ namespace Emu5
 
         IOPanel m_IOPeripheral;
         InterruptInjector m_interruptInjectorPeripheral;
+        Terminal m_terminalPeripheral;
 
         System.Timers.Timer m_clockTimer;
         Thread m_simulationThread;
@@ -67,8 +68,10 @@ namespace Emu5
 
             m_IOPeripheral = new IOPanel(m_rvEmulator);
             m_interruptInjectorPeripheral = new InterruptInjector(m_rvEmulator);
+            m_terminalPeripheral = new Terminal(m_rvEmulator);
             m_rvEmulator.GetMemoryMapReference().RegisterPeripheral(m_IOPeripheral, 0x0110, 8);
             m_rvEmulator.GetMemoryMapReference().RegisterPeripheral(m_interruptInjectorPeripheral, 0x0118, 4);
+            m_rvEmulator.GetMemoryMapReference().RegisterPeripheral(m_terminalPeripheral, 0x011C, 4);
         }
 
         public PerspectivePage(TabHeader tabHeader) : this()
@@ -441,6 +444,13 @@ namespace Emu5
         {
             InjectInterruptWindow l_injectInterruptUI = new InjectInterruptWindow(GetFileName(), m_rvEmulator);
             l_injectInterruptUI.ShowDialog();
+        }
+
+        public void OpenTerminalPeripheralUI()
+        {
+            TerminalWindow l_windowHandle = new TerminalWindow(m_terminalPeripheral);
+            l_windowHandle.Title = "Terminal for " + GetFileName();
+            l_windowHandle.Show();
         }
 
         public void OpenIOPanelPeripheralUI()

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Emu5
 {
-    class Terminal : I_RVPeripheral
+    public class Terminal : I_RVPeripheral
     {
         public delegate void UpdateTextDelgate(String text, int caretPosition);
 
@@ -17,8 +17,8 @@ namespace Emu5
         String[] m_lines;
         int m_caretLine, m_caretColumn;
 
-        Queue<byte> m_characterBuffer;
-        byte m_lastCharacterRead;
+        Queue<char> m_characterBuffer;
+        char m_lastCharacterRead;
 
         bool m_triggerInterruptOnSend;
 
@@ -26,8 +26,8 @@ namespace Emu5
         {
             m_emulator = emulator;
 
-            m_characterBuffer = new Queue<byte>();
-            m_lastCharacterRead = 0x00;
+            m_characterBuffer = new Queue<char>();
+            m_lastCharacterRead = '\0';
             m_triggerInterruptOnSend = false;
 
             m_caretLine = 0;
@@ -49,7 +49,7 @@ namespace Emu5
         void I_RVPeripheral.Reset()
         {
             m_characterBuffer.Clear();
-            m_lastCharacterRead = 0x00;
+            m_lastCharacterRead = '\0';
 
             m_caretLine = 0;
             m_caretColumn = 0;
@@ -85,12 +85,15 @@ namespace Emu5
 
                     case 1: // data register
                     {
-                        if (m_characterBuffer.Count > 0)
+                        lock (m_characterBuffer)
                         {
-                            m_lastCharacterRead = m_characterBuffer.Dequeue();
+                            if (m_characterBuffer.Count > 0)
+                            {
+                                m_lastCharacterRead = m_characterBuffer.Dequeue();
+                            }
                         }
 
-                        l_result[i_byteIndex] = m_lastCharacterRead;
+                        l_result[i_byteIndex] = (byte)m_lastCharacterRead;
                     }
                     break;
 
@@ -182,19 +185,23 @@ namespace Emu5
             NotifyTextChanged();
         }
 
-        public void SendCharacter(bool putOnScreen, params byte[] characterCodes)
+        public void SendCharacters(bool putOnScreen, params char[] characterCodes)
         {
-            foreach (byte i_characterCode in characterCodes)
+            foreach (char i_characterCode in characterCodes)
             {
-                if (m_characterBuffer.Count == 127) // buffer limit | will be configurable
+                lock (m_characterBuffer)
                 {
-                    m_characterBuffer.Dequeue(); // remove oldest character | buffer full policy will also be configurable
-                }
+                    if (m_characterBuffer.Count == 127) // buffer limit | will be configurable
+                    {
+                        m_characterBuffer.Dequeue(); // remove oldest character | buffer full policy will also be configurable
+                    }
 
-                m_characterBuffer.Enqueue(i_characterCode);
+                    m_characterBuffer.Enqueue(i_characterCode);
+                }
+                
                 if (putOnScreen)
                 {
-                    TryPrint((char)i_characterCode);
+                    TryPrint(i_characterCode);
                 }
 
                 if (m_triggerInterruptOnSend)
