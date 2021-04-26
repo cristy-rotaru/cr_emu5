@@ -35,6 +35,9 @@ namespace Emu5
         InterruptInjector m_interruptInjectorPeripheral;
         Terminal m_terminalPeripheral;
 
+        IOPanelWindow m_IOPanelWindowHandle;
+        TerminalWindow m_terminalWindowHandle;
+
         System.Timers.Timer m_clockTimer;
         Thread m_simulationThread;
         object m_threadSync;
@@ -72,6 +75,9 @@ namespace Emu5
             m_rvEmulator.GetMemoryMapReference().RegisterPeripheral(m_IOPeripheral, 0x0110, 8);
             m_rvEmulator.GetMemoryMapReference().RegisterPeripheral(m_interruptInjectorPeripheral, 0x0118, 4);
             m_rvEmulator.GetMemoryMapReference().RegisterPeripheral(m_terminalPeripheral, 0x011C, 4);
+
+            m_IOPanelWindowHandle = null;
+            m_terminalWindowHandle = null;
         }
 
         public PerspectivePage(TabHeader tabHeader) : this()
@@ -448,16 +454,32 @@ namespace Emu5
 
         public void OpenTerminalPeripheralUI()
         {
-            TerminalWindow l_windowHandle = new TerminalWindow(m_terminalPeripheral);
-            l_windowHandle.Title = "Terminal for " + GetFileName();
-            l_windowHandle.Show();
+            if (m_terminalWindowHandle == null)
+            {
+                m_terminalWindowHandle = new TerminalWindow(m_terminalPeripheral);
+                m_terminalWindowHandle.Title = "Terminal for " + GetFileName();
+            }
+
+            m_terminalWindowHandle.Show();
+            m_terminalWindowHandle.Focus();
         }
 
         public void OpenIOPanelPeripheralUI()
         {
-            IOPanelWindow l_windowHandle = new IOPanelWindow(m_IOPeripheral);
-            l_windowHandle.Title = "I/O panel for " + GetFileName();
-            l_windowHandle.Show();
+            if (m_IOPanelWindowHandle == null)
+            {
+                m_IOPanelWindowHandle = new IOPanelWindow(m_IOPeripheral);
+                m_IOPanelWindowHandle.Title = "I/O panel for " + GetFileName();
+            }
+
+            m_IOPanelWindowHandle.Show();
+            m_IOPanelWindowHandle.Focus();
+        }
+
+        public void CloseAllPeripheralWindows()
+        {
+            m_terminalWindowHandle?.Close();
+            m_IOPanelWindowHandle?.Close();
         }
 
         private void ClockTick(object sender, System.Timers.ElapsedEventArgs e)

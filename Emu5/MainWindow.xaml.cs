@@ -651,14 +651,17 @@ namespace Emu5
             else if (tab.Content.GetType() == typeof(PerspectivePage))
             {
                 TabHeader l_header = (TabHeader)tab.Header;
+                PerspectivePage l_page = (PerspectivePage)tab.Content;
 
                 if (l_header.IsUnsaved() == false)
                 {
                     tabControlMain.Items.Remove(tab);
+                    l_page.CloseAllPeripheralWindows();
                 }
                 else if (MessageBox.Show("The file is not saved.\nAll progress will be lost.\nAre you sure you want to close this tab?", "File not saved", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     tabControlMain.Items.Remove(tab);
+                    l_page.CloseAllPeripheralWindows();
                 }
             }
 
