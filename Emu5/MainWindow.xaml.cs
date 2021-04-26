@@ -678,11 +678,8 @@ namespace Emu5
 
         private void tabControlMain_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            int l_selectedIntex = tabControlMain.SelectedIndex;
-            if (l_selectedIntex >= 0)
+            if (tabControlMain.SelectedIndex >= 0)
             {
-                TabItem l_tab = (TabItem)tabControlMain.Items[l_selectedIntex];
-
                 UpdatePerspectiveState();
             }
         }
