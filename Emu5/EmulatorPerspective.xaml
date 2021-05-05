@@ -17,6 +17,9 @@
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Row="0" Grid.Column="0" Background="White">
+            <Border Name="borderSimulationStatusBackground" DockPanel.Dock="Bottom" BorderThickness="2.5" BorderBrush="Black" Background="White" Height="48">
+                <TextBlock Name="textBlockSimulationStatus" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Simulation stopped" TextWrapping="Wrap" TextAlignment="Center" FontSize="14" />
+            </Border>
             <Border DockPanel.Dock="Bottom" BorderThickness="1" BorderBrush="Black">
                 <Grid>
                     <Grid.ColumnDefinitions>

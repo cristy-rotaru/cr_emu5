@@ -26,10 +26,10 @@ namespace Emu5
 
         TabHeader m_tabHeader = null;
 
-        EditorPerspective m_editor = new EditorPerspective();
-        EmulatorPerspective m_processor = new EmulatorPerspective();
+        EditorPerspective m_editor = null;
+        EmulatorPerspective m_processor = null;
 
-        RVEmulator m_rvEmulator = new RVEmulator();
+        RVEmulator m_rvEmulator = null;
 
         IOPanel m_IOPeripheral;
         InterruptInjector m_interruptInjectorPeripheral;
@@ -44,6 +44,7 @@ namespace Emu5
 
         bool m_simulationRunning, m_compiling;
         bool m_runningClocked, m_runningFast;
+        bool m_simulationJustStarted, m_simulationJustPaused;
 
         public bool IsRunning
         {
@@ -53,9 +54,40 @@ namespace Emu5
             }
         }
 
+        public bool JustStarted
+        {
+            get
+            {
+                return m_simulationJustStarted;
+            }
+        }
+
+        public bool JustPaused
+        {
+            get
+            {
+                bool l_toReturn = m_simulationJustPaused;
+                m_simulationJustPaused = false;
+                return l_toReturn;
+            }
+        }
+
+        public bool RunningFastSimulation
+        {
+            get
+            {
+                return m_runningFast;
+            }
+        }
+
         public PerspectivePage()
         {
             InitializeComponent();
+
+            m_editor = new EditorPerspective();
+            m_processor = new EmulatorPerspective(this);
+
+            m_rvEmulator = new RVEmulator();
 
             dockPanelMain.Children.Add(m_editor);
 
@@ -68,6 +100,8 @@ namespace Emu5
             m_compiling = false;
             m_runningClocked = false;
             m_runningFast = false;
+            m_simulationJustStarted = false;
+            m_simulationJustPaused = false;
 
             m_IOPeripheral = new IOPanel(m_rvEmulator);
             m_interruptInjectorPeripheral = new InterruptInjector(m_rvEmulator);
@@ -334,6 +368,8 @@ namespace Emu5
 
                     Delegate l_compilationFinishedDelegate = new Action(
                     () => {
+                        m_simulationJustStarted = true;
+
                         m_editor.SetEditable(true);
                         m_processor.SetLabelReferences(l_labelMap);
                         m_processor.SetPseudoInstructionReference(l_pseudoInstructionMap);
@@ -372,6 +408,8 @@ namespace Emu5
         {
             m_rvEmulator.SingleStep();
 
+            m_simulationJustStarted = false;
+            m_simulationJustPaused = false;
             m_processor.UpdateInfo();
 
             if (m_rvEmulator.Halted)
@@ -386,12 +424,19 @@ namespace Emu5
         {
             m_runningClocked = true;
             m_clockTimer.Start();
+
+            m_simulationJustStarted = false;
+            m_simulationJustPaused = false;
         }
 
         public void Run()
         {
             m_runningFast = true;
 
+            m_simulationJustStarted = false;
+            m_simulationJustPaused = false;
+
+            m_processor.UpdateInfo();
             m_processor.HighlightingEnabled = false;
 
             ThreadStart l_runThreadFunction = new ThreadStart(RunFastSimulation);
@@ -402,10 +447,14 @@ namespace Emu5
 
         public void Pause()
         {
+            m_simulationJustPaused = true;
+
             if (m_runningClocked)
             {
                 m_clockTimer.Stop();
                 m_runningClocked = false;
+
+                m_processor.UpdateInfo();
             }
             else if (m_runningFast)
             {
@@ -443,7 +492,12 @@ namespace Emu5
             
             m_simulationRunning = false;
 
+            m_simulationJustStarted = false;
+            m_simulationJustPaused = false;
+
             m_rvEmulator.Halted = true;
+
+            m_processor.UpdateInfo();
         }
 
         public void OpenInjectInterruptUI()

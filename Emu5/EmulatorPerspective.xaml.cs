@@ -15,6 +15,7 @@ namespace Emu5
     public partial class EmulatorPerspective : UserControl
     {
         RVEmulator m_emulator = null;
+        PerspectivePage m_parentPage = null;
 
         List<InstructionViewEntry> m_instructionEntries;
         List<DataViewEntry> m_dataEntries;
@@ -45,9 +46,11 @@ namespace Emu5
             }
         }
 
-        public EmulatorPerspective()
+        public EmulatorPerspective(PerspectivePage parent)
         {
             InitializeComponent();
+
+            m_parentPage = parent;
 
             m_instructionEntries = new List<InstructionViewEntry>();
             m_dataEntries = new List<DataViewEntry>();
@@ -138,6 +141,9 @@ namespace Emu5
 
                 stackPanelInstructionView.Children.Clear();
                 stackPanelMemoryView.Children.Clear();
+
+                borderSimulationStatusBackground.Background = Brushes.White;
+                textBlockSimulationStatus.Text = "";
             }
             else
             {
@@ -170,6 +176,37 @@ namespace Emu5
                 {
                     UpdateDataView();
                 }
+
+                UpdateSimulationStatus();
+            }
+        }
+
+        private void UpdateSimulationStatus()
+        {
+            if (m_parentPage.IsRunning == false)
+            {
+                borderSimulationStatusBackground.Background = Brushes.White;
+                textBlockSimulationStatus.Text = "Simulation stopped";
+            }
+            else if (m_parentPage.JustStarted)
+            {
+                borderSimulationStatusBackground.Background = Brushes.White;
+                textBlockSimulationStatus.Text = "Simulation started";
+            }
+            else if (m_parentPage.JustPaused)
+            {
+                borderSimulationStatusBackground.Background = Brushes.White;
+                textBlockSimulationStatus.Text = "Simulation paused";
+            }
+            else if (m_parentPage.RunningFastSimulation)
+            {
+                borderSimulationStatusBackground.Background = Brushes.LightGreen;
+                textBlockSimulationStatus.Text = "Running";
+            }
+            else
+            {
+                borderSimulationStatusBackground.Background = Brushes.White;
+                textBlockSimulationStatus.Text = "";
             }
         }
 
