@@ -53,7 +53,7 @@ namespace Emu5
         UInt32[] m_registerFile;
 
         UInt32 m_programCounter = 0x0;
-        bool m_handlingTrap = false;
+        RVVector? m_trapHandled = null;
         bool m_interruptsEnabled = false;
         bool m_waitForInterrupt = false;
         bool[] m_pendingInterrupts;
@@ -152,6 +152,48 @@ namespace Emu5
             return l_result;
         }
 
+        public RVVector? AboutToTakeInterrupt()
+        {
+            if (m_trapHandled != null)
+            {
+                return null;
+            }
+
+            bool[] l_nextInterruptVector = new bool[32];
+            m_pendingInterrupts.CopyTo(l_nextInterruptVector, 0);
+
+            foreach (Tuple<RVVector, ushort> i_pendingInterrupt in m_queuedInterrupts)
+            {
+                if (i_pendingInterrupt.Item2 == 1)
+                {
+                    l_nextInterruptVector[(int)i_pendingInterrupt.Item1] = true;
+                }
+            }
+
+            for (int i_vectorIndex = 0; i_vectorIndex < 32; ++i_vectorIndex)
+            {
+                if (l_nextInterruptVector[i_vectorIndex])
+                {
+                    if (i_vectorIndex <= 1 || m_interruptsEnabled) // return only if interrupt can actually be taken by the core in it's current state
+                    {
+                        return (RVVector)i_vectorIndex;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public RVVector? HandlingTrap()
+        {
+            return m_trapHandled;
+        }
+
+        public bool WaitingForInterrupt()
+        {
+            return m_waitForInterrupt;
+        }
+
         public void QueueExternalInterrupt(RVVector vector, ushort deliveryTimeout)
         {
             if (vector > RVVector.NMI && vector < RVVector.External8)
@@ -193,7 +235,7 @@ namespace Emu5
                 m_pendingInterrupts[i_index] = false;
             }
 
-            m_handlingTrap = false;
+            m_trapHandled = null;
             m_interruptsEnabled = false;
             m_waitForInterrupt = false;
             m_programCounter = 0x0;
@@ -252,7 +294,7 @@ namespace Emu5
                 }
             }
 
-            if (m_handlingTrap == false)
+            if (m_trapHandled == null)
             {
                 lock (m_pendingInterrupts)
                 {
@@ -340,7 +382,7 @@ namespace Emu5
 
         private void LoadVector(RVVector vectorIndex, byte[] contextInfo)
         {
-            if (m_handlingTrap)
+            if (m_trapHandled != null)
             {
                 m_halted = true;
                 m_haltReason = "Fault during exception/interrupt handling";
@@ -377,7 +419,7 @@ namespace Emu5
              * 0x20-0x7C - programmable and external interrupts | saves PC
             */
 
-            m_handlingTrap = true;
+            m_trapHandled = vectorIndex;
         }
 
         private void WriteRegister(byte index, UInt32 data)
@@ -885,7 +927,7 @@ namespace Emu5
 
                 case 0x105: // wfi
                 {
-                    if (m_handlingTrap == false) // no effect if already in interrupt handler
+                    if (m_trapHandled == null) // no effect if already in interrupt handler
                     {
                         m_waitForInterrupt = true;
                     }
@@ -895,7 +937,7 @@ namespace Emu5
 
                 case 0x102: // iret
                 {
-                    if (m_handlingTrap)
+                    if (m_trapHandled != null)
                     {
                         // restore registers
                         byte?[] l_registerBackup = m_memoryMap.Read(0x80, 128);
@@ -927,7 +969,7 @@ namespace Emu5
                             m_programCounter |= (UInt32)l_returnPC[i_byteIndex];
                         }
 
-                        m_handlingTrap = false;
+                        m_trapHandled = null;
                     }
                     else
                     {

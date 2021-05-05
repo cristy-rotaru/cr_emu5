@@ -114,9 +114,9 @@ namespace Emu5
             m_simulationJustPaused = false;
             m_breakpointHit = false;
 
-            m_IOPeripheral = new IOPanel(m_rvEmulator);
+            m_IOPeripheral = new IOPanel(m_rvEmulator, this);
             m_interruptInjectorPeripheral = new InterruptInjector(m_rvEmulator);
-            m_terminalPeripheral = new Terminal(m_rvEmulator);
+            m_terminalPeripheral = new Terminal(m_rvEmulator, this);
             m_rvEmulator.GetMemoryMapReference().RegisterPeripheral(m_IOPeripheral, 0x0110, 8);
             m_rvEmulator.GetMemoryMapReference().RegisterPeripheral(m_interruptInjectorPeripheral, 0x0118, 4);
             m_rvEmulator.GetMemoryMapReference().RegisterPeripheral(m_terminalPeripheral, 0x011C, 4);
@@ -307,6 +307,17 @@ namespace Emu5
             }
 
             return l_result;
+        }
+
+        public void NotifyUpdateRequired()
+        {
+            Dispatcher.BeginInvoke(new Action(
+            () => {
+                if (m_simulationRunning && !m_runningFast)
+                {
+                    m_processor.UpdateInfo();
+                }
+            }));
         }
 
         public String GetFileName()
@@ -525,6 +536,11 @@ namespace Emu5
         {
             InjectInterruptWindow l_injectInterruptUI = new InjectInterruptWindow(GetFileName(), m_rvEmulator);
             l_injectInterruptUI.ShowDialog();
+
+            if (m_runningFast == false)
+            {
+                m_processor.UpdateInfo();
+            }
         }
 
         public void OpenTerminalPeripheralUI()

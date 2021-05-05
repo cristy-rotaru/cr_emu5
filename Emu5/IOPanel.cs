@@ -6,6 +6,8 @@ namespace Emu5
     {
         RVEmulator m_emulator;
 
+        PerspectivePage m_parentPage;
+
         UInt16 m_segmentValues;
         UInt16 m_buttonEvents;
         UInt16 m_buttonInterruptMask;
@@ -18,9 +20,10 @@ namespace Emu5
         object m_ledSync;
         object m_switchSync;
 
-        public IOPanel(RVEmulator emulator)
+        public IOPanel(RVEmulator emulator, PerspectivePage parent)
         {
             m_emulator = emulator;
+            m_parentPage = parent;
 
             m_segmentSync = new object();
             m_buttonSync = new object();
@@ -279,6 +282,7 @@ namespace Emu5
             if (l_triggerInterrupt)
             {
                 m_emulator.QueueExternalInterrupt(RVVector.External8, 0);
+                m_parentPage.NotifyUpdateRequired();
             }
         }
 

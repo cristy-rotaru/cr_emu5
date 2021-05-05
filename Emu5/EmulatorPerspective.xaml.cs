@@ -210,8 +210,95 @@ namespace Emu5
             }
             else
             {
-                borderSimulationStatusBackground.Background = Brushes.White;
-                textBlockSimulationStatus.Text = "";
+                RVVector? l_aboutToTake, l_handling;
+
+                if ((l_aboutToTake = m_emulator.AboutToTakeInterrupt()) != null)
+                {
+                    String l_status = "About to ";
+                    if (l_aboutToTake == RVVector.Reset)
+                    {
+                        l_status += "be reset";
+                    }
+                    else if (l_aboutToTake == RVVector.NMI)
+                    {
+                        l_status += "take NMI";
+                    }
+                    else
+                    {
+                        l_status += "take external int " + (int)l_aboutToTake;
+                    }
+
+                    borderSimulationStatusBackground.Background = Brushes.LightBlue;
+                    textBlockSimulationStatus.Text = l_status;
+                }
+                else if (m_emulator.WaitingForInterrupt())
+                {
+                    borderSimulationStatusBackground.Background = Brushes.LightBlue;
+                    textBlockSimulationStatus.Text = "Waiting for interrupt";
+                }
+                else if ((l_handling = m_emulator.HandlingTrap()) != null)
+                {
+                    String l_status = "Handling ";
+
+                    switch (l_handling)
+                    {
+                        case RVVector.NMI:
+                        {
+                            l_status += "NMI";
+                        }
+                        break;
+
+                        case RVVector.ECALL:
+                        {
+                            l_status += "ECALL";
+                        }
+                        break;
+
+                        case RVVector.MisalignedPC:
+                        {
+                            l_status += "misaligned PC fault";
+                        }
+                        break;
+
+                        case RVVector.MisalignedMemory:
+                        {
+                            l_status += "misaligned memory access fault";
+                        }
+                        break;
+
+                        case RVVector.UndefinedMemory:
+                        {
+                            l_status += "undefined memory space fault";
+                        }
+                        break;
+
+                        case RVVector.InvalidInstruction:
+                        {
+                            l_status += "invalid instruction fault";
+                        }
+                        break;
+
+                        case RVVector.DivisionBy0:
+                        {
+                            l_status += "division by 0 fault";
+                        }
+                        break;
+
+                        default:
+                        {
+                            l_status += "external int " + (int)l_handling;
+                        }
+                        break;
+                    }
+
+                    borderSimulationStatusBackground.Background = Brushes.LightBlue;
+                    textBlockSimulationStatus.Text = l_status;
+                }
+                else
+                {
+                    borderSimulationStatusBackground.Background = Brushes.LightGreen;
+                    textBlockSimulationStatus.Text = "Normal operation";
+                }
             }
         }
 

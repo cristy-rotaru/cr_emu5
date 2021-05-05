@@ -10,6 +10,8 @@ namespace Emu5
 
         RVEmulator m_emulator;
 
+        PerspectivePage m_parentPage;
+
         UpdateTextDelgate m_textChangedHandler;
 
         const Char c_unprintableCharacter = '◌';
@@ -31,9 +33,10 @@ namespace Emu5
             }
         }
 
-        public Terminal(RVEmulator emulator)
+        public Terminal(RVEmulator emulator, PerspectivePage parent)
         {
             m_emulator = emulator;
+            m_parentPage = parent;
 
             m_characterBuffer = new Queue<char>();
             m_lastCharacterRead = '\0';
@@ -219,6 +222,7 @@ namespace Emu5
                 if (m_triggerInterruptOnSend)
                 {
                     m_emulator.QueueExternalInterrupt(RVVector.External9, 0);
+                    m_parentPage.NotifyUpdateRequired();
                 }
             }
 
