@@ -203,6 +203,11 @@ namespace Emu5
                 borderSimulationStatusBackground.Background = Brushes.LightGreen;
                 textBlockSimulationStatus.Text = "Running";
             }
+            else if (m_parentPage.BreakpointHit)
+            {
+                borderSimulationStatusBackground.Background = Brushes.Yellow;
+                textBlockSimulationStatus.Text = "Breakpoint hit";
+            }
             else
             {
                 borderSimulationStatusBackground.Background = Brushes.White;

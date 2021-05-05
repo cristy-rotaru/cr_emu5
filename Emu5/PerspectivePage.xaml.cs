@@ -44,7 +44,7 @@ namespace Emu5
 
         bool m_simulationRunning, m_compiling;
         bool m_runningClocked, m_runningFast;
-        bool m_simulationJustStarted, m_simulationJustPaused;
+        bool m_simulationJustStarted, m_simulationJustPaused, m_breakpointHit;
 
         public bool IsRunning
         {
@@ -80,6 +80,16 @@ namespace Emu5
             }
         }
 
+        public bool BreakpointHit
+        {
+            get
+            {
+                bool l_toReturn = m_breakpointHit;
+                m_breakpointHit = false;
+                return l_toReturn;
+            }
+        }
+
         public PerspectivePage()
         {
             InitializeComponent();
@@ -102,6 +112,7 @@ namespace Emu5
             m_runningFast = false;
             m_simulationJustStarted = false;
             m_simulationJustPaused = false;
+            m_breakpointHit = false;
 
             m_IOPeripheral = new IOPanel(m_rvEmulator);
             m_interruptInjectorPeripheral = new InterruptInjector(m_rvEmulator);
@@ -369,6 +380,8 @@ namespace Emu5
                     Delegate l_compilationFinishedDelegate = new Action(
                     () => {
                         m_simulationJustStarted = true;
+                        m_simulationJustPaused = false;
+                        m_breakpointHit = false;
 
                         m_editor.SetEditable(true);
                         m_processor.SetLabelReferences(l_labelMap);
@@ -410,13 +423,18 @@ namespace Emu5
 
             m_simulationJustStarted = false;
             m_simulationJustPaused = false;
-            m_processor.UpdateInfo();
+            m_breakpointHit = false;
 
             if (m_rvEmulator.Halted)
             {
                 m_simulationRunning = false;
+                m_processor.UpdateInfo();
 
                 MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                m_processor.UpdateInfo();
             }
         }
 
@@ -427,6 +445,7 @@ namespace Emu5
 
             m_simulationJustStarted = false;
             m_simulationJustPaused = false;
+            m_breakpointHit = false;
         }
 
         public void Run()
@@ -435,6 +454,7 @@ namespace Emu5
 
             m_simulationJustStarted = false;
             m_simulationJustPaused = false;
+            m_breakpointHit = false;
 
             m_processor.UpdateInfo();
             m_processor.HighlightingEnabled = false;
@@ -494,6 +514,7 @@ namespace Emu5
 
             m_simulationJustStarted = false;
             m_simulationJustPaused = false;
+            m_breakpointHit = false;
 
             m_rvEmulator.Halted = true;
 
@@ -542,26 +563,32 @@ namespace Emu5
             () => {
                 m_rvEmulator.SingleStep();
 
-                m_processor.UpdateInfo();
-
                 if (m_rvEmulator.Halted)
                 {
                     m_clockTimer.Stop();
 
                     m_simulationRunning = false;
                     m_runningClocked = false;
+                    m_processor.UpdateInfo();
 
                     MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
 
                     CommandManager.InvalidateRequerySuggested();
                 }
-
-                if (m_rvEmulator.BreakpointHit())
+                else if (m_rvEmulator.BreakpointHit())
                 {
                     m_clockTimer.Stop();
                     m_runningClocked = false;
 
+                    m_breakpointHit = true;
+
+                    m_processor.UpdateInfo();
+
                     CommandManager.InvalidateRequerySuggested();
+                }
+                else
+                {
+                    m_processor.UpdateInfo();
                 }
             }));
         }
@@ -609,6 +636,8 @@ namespace Emu5
                     Delegate l_breakpointHitDelegate = new Action(
                     () => {
                         m_runningFast = false;
+
+                        m_breakpointHit = true;
 
                         m_processor.UpdateInfo();
                         m_processor.HighlightingEnabled = true;
