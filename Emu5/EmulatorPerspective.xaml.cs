@@ -17,32 +17,18 @@ namespace Emu5
         RVEmulator m_emulator = null;
         PerspectivePage m_parentPage = null;
 
-        List<InstructionViewEntry> m_instructionEntries;
-        List<DataViewEntry> m_dataEntries;
-
-        RVLabelReferenceMap m_labelMap;
-        Dictionary<UInt32, String> m_pseudoInstructionMap;
-
         UInt32 m_currentPC;
         UInt32[] m_previousRegisterValues;
         TextBlock[] m_registerTextBoxes;
 
-        Timer m_resizeTimer;
-
-        bool m_highlightingEnabled = true;
+        InstructionView m_instructionView;
+        DataView m_memoryView;
 
         public bool HighlightingEnabled
         {
             set
             {
-                m_highlightingEnabled = value;
-
-                foreach (InstructionViewEntry i_viewEntry in m_instructionEntries)
-                {
-                    UInt32 l_address = i_viewEntry.GetAddress();
-
-                    i_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
-                }
+                m_instructionView.HighlightingEnabled = value;
             }
         }
 
@@ -52,11 +38,11 @@ namespace Emu5
 
             m_parentPage = parent;
 
-            m_instructionEntries = new List<InstructionViewEntry>();
-            m_dataEntries = new List<DataViewEntry>();
+            m_instructionView = new InstructionView();
+            m_memoryView = new DataView();
 
-            m_labelMap = new RVLabelReferenceMap();
-            m_pseudoInstructionMap = new Dictionary<UInt32, String>();
+            contentControlLeftPanel.Content = m_instructionView;
+            contentControlRightPanel.Content = m_memoryView;
 
             m_currentPC = 0x0;
             m_previousRegisterValues = new UInt32[32];
@@ -100,26 +86,25 @@ namespace Emu5
             m_registerTextBoxes[30] = textBlockRegisterX30;
             m_registerTextBoxes[31] = textBlockRegisterX31;
 
-            m_resizeTimer = new Timer(65);
-            m_resizeTimer.Elapsed += new ElapsedEventHandler(ResizeComplete);
-            m_resizeTimer.AutoReset = false;
-
             UpdateInfo();
         }
 
         public void BindEmulator(RVEmulator emulator)
         {
             m_emulator = emulator;
+
+            m_instructionView.BindEmulator(m_emulator);
+            m_memoryView.BindEmulator(m_emulator);
         }
 
         public void SetLabelReferences(RVLabelReferenceMap labelMap)
         {
-            m_labelMap = labelMap;
+            m_instructionView.SetLabelReferences(labelMap);
         }
 
         public void SetPseudoInstructionReference(Dictionary<UInt32, String> pseudoInstructionMap)
         {
-            m_pseudoInstructionMap = pseudoInstructionMap;
+            m_instructionView.SetPseudoInstructionReference(pseudoInstructionMap);
         }
 
         public void UpdateInfo()
@@ -135,12 +120,6 @@ namespace Emu5
                 }
 
                 textBlockRegisterPC.Text = "";
-
-                m_instructionEntries.Clear();
-                m_dataEntries.Clear();
-
-                stackPanelInstructionView.Children.Clear();
-                stackPanelMemoryView.Children.Clear();
 
                 borderSimulationStatusBackground.Background = Brushes.White;
                 textBlockSimulationStatus.Text = "";
@@ -159,26 +138,11 @@ namespace Emu5
                 m_currentPC = m_emulator.GetProgramCounter();
                 textBlockRegisterPC.Text = String.Format("0x{0,8:X8}", m_currentPC);
 
-                if (m_instructionEntries.Count == 0)
-                {
-                    RefreshInstructionView();
-                }
-                else
-                {
-                    UpdateInstructionView();
-                }
-
-                if (m_dataEntries.Count == 0)
-                {
-                    RefreshDataView();
-                }
-                else
-                {
-                    UpdateDataView();
-                }
-
                 UpdateSimulationStatus();
             }
+
+            m_instructionView.UpdateInfo();
+            m_memoryView.UpdateInfo();
         }
 
         private void UpdateSimulationStatus()
@@ -298,322 +262,6 @@ namespace Emu5
                 {
                     borderSimulationStatusBackground.Background = Brushes.LightGreen;
                     textBlockSimulationStatus.Text = "Normal operation";
-                }
-            }
-        }
-
-        private void RefreshInstructionView()
-        {
-            stackPanelInstructionView.Children.Clear();
-            m_instructionEntries.Clear();
-
-            stackPanelInstructionView.UpdateLayout();
-
-            UInt32 l_normalizedPC = m_currentPC & ~(UInt32)0x3;
-            int l_entryCount = (int)(stackPanelInstructionView.ActualHeight / 24);
-            for (int i_index = 0; i_index < l_entryCount; ++i_index)
-            {
-                InstructionViewEntry l_viewEntry = new InstructionViewEntry(ConfigureBreakpoint);
-
-                UInt32 l_address = l_normalizedPC + (UInt32)(i_index << 2);
-                byte?[] l_rawData = m_emulator.GetMemoryMapReference().ReadIgnorePeripherals(l_address, 4);
-                
-                l_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_address), l_address, l_rawData, m_labelMap, m_pseudoInstructionMap);
-
-                l_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
-
-                stackPanelInstructionView.Children.Add(l_viewEntry);
-                m_instructionEntries.Add(l_viewEntry);
-            }
-        }
-
-        private void RefreshDataView()
-        {
-            UInt32 l_startAddress = 0x0;
-            if (m_dataEntries.Count > 0)
-            {
-                l_startAddress = m_dataEntries[0].GetBaseAddress();
-            }
-
-            stackPanelMemoryView.Children.Clear();
-            m_dataEntries.Clear();
-
-            stackPanelMemoryView.UpdateLayout();
-
-            int l_entryCount = (int)(stackPanelMemoryView.ActualHeight / 24);
-            for (int i_index = 0; i_index < l_entryCount; ++i_index)
-            {
-                DataViewEntry l_viewEntry = new DataViewEntry();
-
-                UInt32 l_baseAddress = (UInt32)(l_startAddress + i_index << 3);
-                byte?[] l_rawData = m_emulator.GetMemoryMapReference().ReadIgnorePeripherals(l_baseAddress, 8);
-                
-                l_viewEntry.DisplayData(l_baseAddress, l_rawData);
-
-                stackPanelMemoryView.Children.Add(l_viewEntry);
-                m_dataEntries.Add(l_viewEntry);
-            }
-        }
-
-        private void UpdateInstructionView()
-        {
-            int l_entryCount = m_instructionEntries.Count;
-            if (l_entryCount == 0)
-            {
-                RefreshInstructionView();
-            }
-
-            UInt32 l_firstAddress = m_instructionEntries[0].GetAddress();
-            UInt32 l_lastAddress = m_instructionEntries[l_entryCount - 1].GetAddress();
-
-            bool l_refreshRequired = false;
-            if (l_firstAddress < l_lastAddress)
-            {
-                if (m_currentPC < l_firstAddress || m_currentPC > l_lastAddress)
-                {
-                    l_refreshRequired = true;
-                }
-            }
-            else
-            {
-                if (m_currentPC < l_firstAddress && m_currentPC > l_lastAddress)
-                {
-                    l_refreshRequired = true;
-                }
-            }
-
-            if (l_refreshRequired)
-            {
-                RefreshInstructionView();
-            }
-            else
-            {
-                foreach (InstructionViewEntry i_viewEntry in m_instructionEntries)
-                {
-                    UInt32 l_address = i_viewEntry.GetAddress();
-                    i_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_address), l_address, m_emulator.GetMemoryMapReference().ReadIgnorePeripherals(l_address, 4), m_labelMap, m_pseudoInstructionMap);
-                    i_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
-                }
-            }
-        }
-
-        private void UpdateDataView()
-        {
-            foreach (DataViewEntry i_viewEntry in m_dataEntries)
-            {
-                UInt32 l_baseAddress = i_viewEntry.GetBaseAddress();
-                i_viewEntry.DisplayData(l_baseAddress, m_emulator.GetMemoryMapReference().ReadIgnorePeripherals(l_baseAddress, 8));
-            }
-        }
-
-        private void textBoxTargetInstructionAddress_KeyDown(object sender, KeyEventArgs e)
-        { // go to address
-            if (e.Key == Key.Enter)
-            {
-                if (m_emulator == null)
-                {
-                    MessageBox.Show("You need to start a simulation to see memory contents.", "No simulation running", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                else
-                {
-                    try
-                    {
-                        UInt32 l_address = UInt32.Parse(textBoxTargetInstructionAddress.Text, NumberStyles.HexNumber);
-                        l_address &= ~(UInt32)0x3; // normalize address
-
-                        foreach (InstructionViewEntry i_viewEntry in m_instructionEntries)
-                        {
-                            byte?[] l_rawData = m_emulator.GetMemoryMapReference().ReadIgnorePeripherals(l_address, 4);
-
-                            i_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_address), l_address, l_rawData, m_labelMap, m_pseudoInstructionMap);
-                            i_viewEntry.Highlighted = m_highlightingEnabled && (l_address == m_currentPC);
-
-                            l_address += 4;
-                        }    
-                    }
-                    catch (Exception e_numberConversionError)
-                    {
-                        MessageBox.Show(e_numberConversionError.Message, "Invalid input", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    }
-                }
-
-                textBoxTargetInstructionAddress.Clear();
-            }
-        }
-
-        private void textBoxTargetDataAddress_KeyDown(object sender, KeyEventArgs e)
-        { // go to address
-            if (e.Key == Key.Enter)
-            {
-                if (m_emulator == null)
-                {
-                    MessageBox.Show("You need to start a simulation to see memory contents.", "No simulation running", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                else
-                {
-                    try
-                    {
-                        UInt32 l_address = UInt32.Parse(textBoxTargetDataAddress.Text, NumberStyles.HexNumber);
-                        l_address &= ~(UInt32)0x7; // normalize address
-
-                        foreach (DataViewEntry i_viewEntry in m_dataEntries)
-                        {
-                            byte?[] l_rawData = m_emulator.GetMemoryMapReference().ReadIgnorePeripherals(l_address, 8);
-
-                            i_viewEntry.DisplayData(l_address, l_rawData);
-
-                            l_address += 8;
-                        }
-                    }
-                    catch (Exception e_numberConversionError)
-                    {
-                        MessageBox.Show(e_numberConversionError.Message, "Invalid input", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    }
-                }
-
-                textBoxTargetDataAddress.Clear();
-            }
-        }
-
-        private void EmulatorPerspective_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (e.HeightChanged)
-            {
-                m_resizeTimer.Stop();
-                m_resizeTimer.Start();
-            }
-        }
-
-        private void ResizeComplete(object sender, ElapsedEventArgs e)
-        {
-            Dispatcher.BeginInvoke(new Action(
-            () => {
-                if (m_emulator == null)
-                {
-                    m_instructionEntries.Clear();
-                    stackPanelInstructionView.Children.Clear();
-
-                    m_dataEntries.Clear();
-                    stackPanelMemoryView.Children.Clear();
-                }
-                else
-                {
-                    RefreshInstructionView();
-                    RefreshDataView();
-                }
-            }));
-        }
-
-        private void stackPanelInstructionView_MouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            if (m_instructionEntries.Count == 0)
-            {
-                return;
-            }
-
-            UInt32 l_nextAddress;
-            int l_addIndex;
-
-            if (e.Delta > 0) // scroll up
-            {
-                int l_lastIndex = m_instructionEntries.Count - 1;
-
-                for (int i_index = l_lastIndex; i_index > 0; --i_index)
-                {
-                    m_instructionEntries[i_index] = m_instructionEntries[i_index - 1];
-                }
-
-                l_nextAddress = m_instructionEntries[0].GetAddress() - 4;
-                m_instructionEntries.RemoveAt(0);
-                l_addIndex = 0;
-            }
-            else // scroll down
-            {
-                int l_lastIndex = m_instructionEntries.Count - 1;
-
-                for (int i_index = 0; i_index < l_lastIndex; ++i_index)
-                {
-                    m_instructionEntries[i_index] = m_instructionEntries[i_index + 1];
-                }
-
-                l_nextAddress = m_instructionEntries[l_lastIndex].GetAddress() + 4;
-                m_instructionEntries.RemoveAt(l_lastIndex);
-                l_addIndex = l_lastIndex;
-            }
-
-            InstructionViewEntry l_viewEntry = new InstructionViewEntry(ConfigureBreakpoint);
-            l_viewEntry.DisplayData(m_emulator.HasBreakpoint(l_nextAddress), l_nextAddress, m_emulator.GetMemoryMapReference().ReadIgnorePeripherals(l_nextAddress, 4), m_labelMap, m_pseudoInstructionMap);
-            l_viewEntry.Highlighted = m_highlightingEnabled && (l_nextAddress == m_currentPC);
-
-            m_instructionEntries.Insert(l_addIndex, l_viewEntry);
-            stackPanelInstructionView.Children.Clear();
-
-            foreach (InstructionViewEntry i_entry in m_instructionEntries)
-            {
-                stackPanelInstructionView.Children.Add(i_entry);
-            }
-        }
-
-        private void stackPanelMemoryView_MouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            if (m_dataEntries.Count == 0)
-            {
-                return;
-            }
-
-            UInt32 l_nextAddress;
-            int l_addIndex;
-
-            if (e.Delta > 0) // scroll up
-            {
-                int l_lastIndex = m_dataEntries.Count - 1;
-
-                for (int i_index = l_lastIndex; i_index > 0; --i_index)
-                {
-                    m_dataEntries[i_index] = m_dataEntries[i_index - 1];
-                }
-
-                l_nextAddress = m_dataEntries[0].GetBaseAddress() - 8;
-                m_dataEntries.RemoveAt(0);
-                l_addIndex = 0;
-            }
-            else // scroll down
-            {
-                int l_lastIndex = m_dataEntries.Count - 1;
-
-                for (int i_index = 0; i_index < l_lastIndex; ++i_index)
-                {
-                    m_dataEntries[i_index] = m_dataEntries[i_index + 1];
-                }
-
-                l_nextAddress = m_dataEntries[l_lastIndex].GetBaseAddress() + 8;
-                m_dataEntries.RemoveAt(l_lastIndex);
-                l_addIndex = l_lastIndex;
-            }
-
-            DataViewEntry l_viewEntry = new DataViewEntry();
-            l_viewEntry.DisplayData(l_nextAddress, m_emulator.GetMemoryMapReference().ReadIgnorePeripherals(l_nextAddress, 8));
-
-            m_dataEntries.Insert(l_addIndex, l_viewEntry);
-            stackPanelMemoryView.Children.Clear();
-
-            foreach (DataViewEntry i_entry in m_dataEntries)
-            {
-                stackPanelMemoryView.Children.Add(i_entry);
-            }
-        }
-
-        private void ConfigureBreakpoint(bool active, UInt32 address)
-        {
-            if (m_emulator != null)
-            {
-                if (active)
-                {
-                    m_emulator.AddBreakpoint(address);
-                }
-                else
-                {
-                    m_emulator.RemoveBreakpoint(address);
                 }
             }
         }

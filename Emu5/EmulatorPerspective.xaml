@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Emu5"
              mc:Ignorable="d"
-             FontFamily="Consolas" SizeChanged="EmulatorPerspective_SizeChanged">
+             FontFamily="Consolas">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="270" />
@@ -588,132 +588,10 @@
             </ScrollViewer>
         </DockPanel>
 
-        <DockPanel Grid.Row="0" Grid.Column="1" Margin="3,0,3,0" Background="White">
-            <Border DockPanel.Dock="Bottom" BorderThickness="1" BorderBrush="Black">
-                <Grid Margin="8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Go to address:" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                    <TextBox Name="textBoxTargetInstructionAddress" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" FontSize="16" Height="Auto" Width="250" MaxLines="1" KeyDown="textBoxTargetInstructionAddress_KeyDown" />
-                </Grid>
-            </Border>
-
-            <Grid DockPanel.Dock="Top" Margin="0,0,0,1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="24" />
-                    <ColumnDefinition Width="3*" />
-                    <ColumnDefinition Width="6*" />
-                    <ColumnDefinition Width="7*" />
-                    <ColumnDefinition Width="6*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="25" />
-                </Grid.RowDefinitions>
-
-                <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                    <Ellipse Height="8" Width="8" Margin="2" Stroke="Red" Fill="Red" />
-                </Border>
-
-                <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                    <TextBlock Margin="2" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold" Text="Address" />
-                </Border>
-
-                <Border Grid.Row="0" Grid.Column="2" BorderThickness="1" BorderBrush="#FFACACAC">
-                    <TextBlock Margin="2" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold" Text="Instruction" />
-                </Border>
-
-                <Border Grid.Row="0" Grid.Column="3" BorderThickness="1" BorderBrush="#FFACACAC">
-                    <TextBlock Margin="2" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold" Text="Raw value" />
-                </Border>
-
-                <Border Grid.Row="0" Grid.Column="4" BorderThickness="1" BorderBrush="#FFACACAC">
-                    <TextBlock Margin="2" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold" Text="Annotation" />
-                </Border>
-            </Grid>
-
-            <StackPanel Name="stackPanelInstructionView" Height="Auto" MouseWheel="stackPanelInstructionView_MouseWheel">
-            </StackPanel>
-        </DockPanel>
+        <ContentControl Name="contentControlLeftPanel" Grid.Row="0" Grid.Column="1" Margin="3,0,3,0"/>
 
         <GridSplitter Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" />
 
-        <DockPanel Grid.Row="0" Grid.Column="3" Margin="3,0,0,0" Background="White">
-            <Border DockPanel.Dock="Bottom" BorderThickness="1" BorderBrush="Black">
-                <Grid Margin="8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Go to address:" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                    <TextBox Name="textBoxTargetDataAddress" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" FontSize="16" Height="Auto" Width="250" MaxLines="1" KeyDown="textBoxTargetDataAddress_KeyDown" />
-                </Grid>
-            </Border>
-
-            <Grid DockPanel.Dock="Top" Margin="0,0,0,1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="13*" />
-                    <ColumnDefinition Width="5*" />
-                    <ColumnDefinition Width="5*" />
-                    <ColumnDefinition Width="5*" />
-                    <ColumnDefinition Width="5*" />
-                    <ColumnDefinition Width="5*" />
-                    <ColumnDefinition Width="5*" />
-                    <ColumnDefinition Width="5*" />
-                    <ColumnDefinition Width="5*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="25" />
-                </Grid.RowDefinitions>
-
-                <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" BorderBrush="#FFACACAC">
-                    <TextBlock Margin="2" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold" Text="Base" />
-                </Border>
-
-                <Border Grid.Row="0" Grid.Column="1" BorderThickness="1" BorderBrush="#FFACACAC">
-                    <TextBlock Margin="2" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Text="+0" />
-                </Border>
-
-                <Border Grid.Row="0" Grid.Column="2" BorderThickness="1" BorderBrush="#FFACACAC">
-                    <TextBlock Margin="2" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Text="+1" />
-                </Border>
-
-                <Border Grid.Row="0" Grid.Column="3" BorderThickness="1" BorderBrush="#FFACACAC">
-                    <TextBlock Margin="2" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Text="+2" />
-                </Border>
-
-                <Border Grid.Row="0" Grid.Column="4" BorderThickness="1" BorderBrush="#FFACACAC">
-                    <TextBlock Margin="2" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Text="+3" />
-                </Border>
-
-                <Border Grid.Row="0" Grid.Column="5" BorderThickness="1" BorderBrush="#FFACACAC">
-                    <TextBlock Margin="2" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Text="+4" />
-                </Border>
-
-                <Border Grid.Row="0" Grid.Column="6" BorderThickness="1" BorderBrush="#FFACACAC">
-                    <TextBlock Margin="2" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Text="+5" />
-                </Border>
-
-                <Border Grid.Row="0" Grid.Column="7" BorderThickness="1" BorderBrush="#FFACACAC">
-                    <TextBlock Margin="2" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Text="+6" />
-                </Border>
-
-                <Border Grid.Row="0" Grid.Column="8" BorderThickness="1" BorderBrush="#FFACACAC">
-                    <TextBlock Margin="2" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Text="+7" />
-                </Border>
-            </Grid>
-
-            <StackPanel Name="stackPanelMemoryView" Height="Auto" MouseWheel="stackPanelMemoryView_MouseWheel">
-            </StackPanel>
-        </DockPanel>
+        <ContentControl Name="contentControlRightPanel" Grid.Row="0" Grid.Column="3" Margin="3,0,0,0" />
     </Grid>
 </UserControl>

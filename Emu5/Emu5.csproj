@@ -60,6 +60,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DataView.xaml.cs">
+      <DependentUpon>DataView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DataViewEntry.xaml.cs">
       <DependentUpon>DataViewEntry.xaml</DependentUpon>
     </Compile>
@@ -71,6 +74,9 @@
     </Compile>
     <Compile Include="InjectInterruptWindow.xaml.cs">
       <DependentUpon>InjectInterruptWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="InstructionView.xaml.cs">
+      <DependentUpon>InstructionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="InstructionViewEntry.xaml.cs">
       <DependentUpon>InstructionViewEntry.xaml</DependentUpon>
@@ -100,6 +106,10 @@
     <Compile Include="WelcomePage.xaml.cs">
       <DependentUpon>WelcomePage.xaml</DependentUpon>
     </Compile>
+    <Page Include="DataView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DataViewEntry.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -113,6 +123,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="InjectInterruptWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="InstructionView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
