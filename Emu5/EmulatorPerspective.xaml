@@ -9,8 +9,9 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="270" />
-            <ColumnDefinition Width="9*" />
-            <ColumnDefinition Width="7*" />
+            <ColumnDefinition Width="9*" MinWidth="380" />
+            <ColumnDefinition Width="4" />
+            <ColumnDefinition Width="7*" MinWidth="380" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -587,7 +588,7 @@
             </ScrollViewer>
         </DockPanel>
 
-        <DockPanel Grid.Row="0" Grid.Column="1" Margin="3,0,0,0" Background="White">
+        <DockPanel Grid.Row="0" Grid.Column="1" Margin="3,0,3,0" Background="White">
             <Border DockPanel.Dock="Bottom" BorderThickness="1" BorderBrush="Black">
                 <Grid Margin="8">
                     <Grid.ColumnDefinitions>
@@ -640,7 +641,9 @@
             </StackPanel>
         </DockPanel>
 
-        <DockPanel Grid.Row="0" Grid.Column="2" Margin="3,0,0,0" Background="White">
+        <GridSplitter Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" />
+
+        <DockPanel Grid.Row="0" Grid.Column="3" Margin="3,0,0,0" Background="White">
             <Border DockPanel.Dock="Bottom" BorderThickness="1" BorderBrush="Black">
                 <Grid Margin="8">
                     <Grid.ColumnDefinitions>
