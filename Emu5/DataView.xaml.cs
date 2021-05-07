@@ -15,8 +15,6 @@ namespace Emu5
     {
         RVEmulator m_emulator = null;
 
-        UInt32 m_currentPC;
-
         List<DataViewEntry> m_dataEntries;
 
         Timer m_resizeTimer;
@@ -24,8 +22,6 @@ namespace Emu5
         public DataView()
         {
             InitializeComponent();
-
-            m_currentPC = 0x0;
 
             m_dataEntries = new List<DataViewEntry>();
 
@@ -48,8 +44,6 @@ namespace Emu5
             }
             else
             {
-                m_currentPC = m_emulator.GetProgramCounter();
-
                 if (m_dataEntries.Count == 0)
                 {
                     RefreshView();
