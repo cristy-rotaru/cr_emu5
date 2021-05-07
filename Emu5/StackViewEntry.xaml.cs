@@ -92,7 +92,7 @@ namespace Emu5
 
             for (int i_halfIndex = 0; i_halfIndex < 2; ++i_halfIndex)
             {
-                m_halfTextBlocks[i_halfIndex].Text = (l_halves[i_halfIndex] == null) ? "" : String.Format("0x{0,4:X4}", l_halves[i_halfIndex]);
+                m_halfTextBlocks[i_halfIndex].Text = (l_halves[i_halfIndex] == null || (address & 0x1) != 0) ? "" : String.Format("0x{0,4:X4}", l_halves[i_halfIndex]);
                 m_halfTextBlocks[i_halfIndex].Foreground = (l_highlightChanges && (l_previousHalves[i_halfIndex] != l_halves[i_halfIndex])) ? Brushes.Red : Brushes.Black;
             }
 
@@ -106,7 +106,7 @@ namespace Emu5
                 l_previousWord = null;
             }
 
-            textBlockWord.Text = (l_word == null) ? "" : String.Format("0x{0,8:X8}", l_word);
+            textBlockWord.Text = (l_word == null || (address & 0x3) != 0) ? "" : String.Format("0x{0,8:X8}", l_word);
             textBlockWord.Foreground = (l_highlightChanges && (l_previousWord != l_word)) ? Brushes.Red : Brushes.Black;
 
             m_address = address;
