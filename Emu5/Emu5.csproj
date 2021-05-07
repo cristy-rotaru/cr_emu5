@@ -96,6 +96,12 @@
     <Compile Include="RVLabelReferenceMap.cs" />
     <Compile Include="RVMemoryMap.cs" />
     <Compile Include="RVParser.cs" />
+    <Compile Include="StackView.xaml.cs">
+      <DependentUpon>StackView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="StackViewEntry.xaml.cs">
+      <DependentUpon>StackViewEntry.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TabHeader.xaml.cs">
       <DependentUpon>TabHeader.xaml</DependentUpon>
     </Compile>
@@ -152,6 +158,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="PerspectivePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="StackView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="StackViewEntry.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

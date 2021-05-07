@@ -23,6 +23,7 @@ namespace Emu5
 
         InstructionView m_instructionView;
         DataView m_memoryView;
+        StackView m_stackView;
 
         public bool HighlightingEnabled
         {
@@ -40,9 +41,11 @@ namespace Emu5
 
             m_instructionView = new InstructionView();
             m_memoryView = new DataView();
+            m_stackView = new StackView();
 
             contentControlLeftPanel.Content = m_instructionView;
-            contentControlRightPanel.Content = m_memoryView;
+            //contentControlRightPanel.Content = m_memoryView;
+            contentControlRightPanel.Content = m_stackView;
 
             m_currentPC = 0x0;
             m_previousRegisterValues = new UInt32[32];
@@ -95,6 +98,7 @@ namespace Emu5
 
             m_instructionView.BindEmulator(m_emulator);
             m_memoryView.BindEmulator(m_emulator);
+            m_stackView.BindEmulator(m_emulator);
         }
 
         public void SetLabelReferences(RVLabelReferenceMap labelMap)
@@ -143,6 +147,7 @@ namespace Emu5
 
             m_instructionView.UpdateInfo();
             m_memoryView.UpdateInfo();
+            m_stackView.UpdateInfo();
         }
 
         private void UpdateSimulationStatus()
