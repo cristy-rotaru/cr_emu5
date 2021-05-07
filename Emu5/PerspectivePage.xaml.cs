@@ -548,7 +548,13 @@ namespace Emu5
             if (m_terminalWindowHandle == null)
             {
                 m_terminalWindowHandle = new TerminalWindow(m_terminalPeripheral);
-                m_terminalWindowHandle.Title = "Terminal for " + GetFileName();
+
+                String l_simulationName = GetFileName();
+                if (l_simulationName == null)
+                {
+                    l_simulationName = "*untitled simulation*";
+                }
+                m_terminalWindowHandle.Title = "Terminal for " + l_simulationName;
             }
 
             m_terminalWindowHandle.Show();
@@ -560,7 +566,13 @@ namespace Emu5
             if (m_IOPanelWindowHandle == null)
             {
                 m_IOPanelWindowHandle = new IOPanelWindow(m_IOPeripheral);
-                m_IOPanelWindowHandle.Title = "I/O panel for " + GetFileName();
+
+                String l_simulationName = GetFileName();
+                if (l_simulationName == null)
+                {
+                    l_simulationName = "*untitled simulation*";
+                }
+                m_IOPanelWindowHandle.Title = "I/O panel for " + l_simulationName;
             }
 
             m_IOPanelWindowHandle.Show();

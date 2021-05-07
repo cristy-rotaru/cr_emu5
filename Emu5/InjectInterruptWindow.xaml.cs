@@ -20,24 +20,31 @@ namespace Emu5
 
             m_emulator = emulatorInstance;
 
-            String l_nameWithoutExtension = simulationName;
-            if (l_nameWithoutExtension.Contains("."))
+            if (simulationName == null)
             {
-                int l_lastPointIndex = -1;
-                for (int i_charIndex = l_nameWithoutExtension.Length - 1; i_charIndex >= 0; --i_charIndex)
+                this.Title = "Inject interrupt to *untitled simulation*";
+            }
+            else
+            {
+                String l_nameWithoutExtension = simulationName;
+                if (l_nameWithoutExtension.Contains("."))
                 {
-                    if (l_nameWithoutExtension[i_charIndex] == '.')
+                    int l_lastPointIndex = -1;
+                    for (int i_charIndex = l_nameWithoutExtension.Length - 1; i_charIndex >= 0; --i_charIndex)
                     {
-                        l_lastPointIndex = i_charIndex;
-                        break;
+                        if (l_nameWithoutExtension[i_charIndex] == '.')
+                        {
+                            l_lastPointIndex = i_charIndex;
+                            break;
+                        }
+                    }
+                    if (l_lastPointIndex >= 0)
+                    {
+                        l_nameWithoutExtension = l_nameWithoutExtension.Substring(0, l_lastPointIndex);
                     }
                 }
-                if (l_lastPointIndex >= 0)
-                {
-                    l_nameWithoutExtension = l_nameWithoutExtension.Substring(0, l_lastPointIndex);
-                }
+                this.Title = "Inject interrupt to " + l_nameWithoutExtension;
             }
-            this.Title = "Inject interrupt to " + l_nameWithoutExtension;
 
             m_fullyLoaded = true;
         }
