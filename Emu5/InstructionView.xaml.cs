@@ -97,10 +97,6 @@ namespace Emu5
         private void UpdateView()
         {
             int l_entryCount = m_instructionEntries.Count;
-            if (l_entryCount == 0)
-            {
-                RefreshView();
-            }
 
             UInt32 l_firstAddress = m_instructionEntries[0].GetAddress();
             UInt32 l_lastAddress = m_instructionEntries[l_entryCount - 1].GetAddress();
