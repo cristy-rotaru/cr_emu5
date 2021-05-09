@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -20,10 +18,15 @@ namespace Emu5
         UInt32 m_currentPC;
         UInt32[] m_previousRegisterValues;
         TextBlock[] m_registerTextBoxes;
+        Border[] m_viewOrder;
 
         InstructionView m_instructionView;
         DataView m_memoryView;
         StackView m_stackView;
+
+        bool m_viewSelectionMouseDown, m_viewSelectionMouseMoved;
+        double m_viewSelectionMouseDelta;
+        int m_viewSelectionIndex;
 
         public bool HighlightingEnabled
         {
@@ -44,12 +47,17 @@ namespace Emu5
             m_stackView = new StackView();
 
             contentControlLeftPanel.Content = m_instructionView;
-            //contentControlRightPanel.Content = m_memoryView;
-            contentControlRightPanel.Content = m_stackView;
+            contentControlRightPanel.Content = m_memoryView;
+            //contentControlRightPanel.Content = m_stackView;
 
             m_currentPC = 0x0;
             m_previousRegisterValues = new UInt32[32];
             m_registerTextBoxes = new TextBlock[32];
+
+            m_viewOrder = new Border[3];
+            m_viewOrder[0] = borderInstructionView;
+            m_viewOrder[1] = borderMemoryView;
+            m_viewOrder[2] = borderStackView;
 
             for (int i_index = 0; i_index < 32; ++i_index)
             {
@@ -88,6 +96,11 @@ namespace Emu5
             m_registerTextBoxes[29] = textBlockRegisterX29;
             m_registerTextBoxes[30] = textBlockRegisterX30;
             m_registerTextBoxes[31] = textBlockRegisterX31;
+
+            m_viewSelectionMouseDown = false;
+            m_viewSelectionMouseMoved = false;
+            m_viewSelectionMouseDelta = 0;
+            m_viewSelectionIndex = -1;
 
             UpdateInfo();
         }
@@ -268,6 +281,256 @@ namespace Emu5
                     borderSimulationStatusBackground.Background = Brushes.LightGreen;
                     textBlockSimulationStatus.Text = "Normal operation";
                 }
+            }
+        }
+
+        private void canvasViewSelector_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (m_viewOrder == null)
+            {
+                return;
+            }
+
+            UpdateCanvasLayout();
+        }
+
+        private void borderView_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            m_viewSelectionMouseDown = true;
+            m_viewSelectionMouseMoved = false;
+
+            m_viewSelectionMouseDelta = Mouse.GetPosition(canvasViewSelector).X - Canvas.GetLeft((UIElement)sender);
+
+            for (int i_viewSelectorIndex = 0; i_viewSelectorIndex < 3; ++i_viewSelectorIndex)
+            {
+                if (m_viewOrder[i_viewSelectorIndex] == sender)
+                {
+                    m_viewSelectionIndex = i_viewSelectorIndex;
+                    Canvas.SetZIndex(m_viewOrder[i_viewSelectorIndex], 1); // bring to front the element that was clicked
+                }
+                else
+                {
+                    Canvas.SetZIndex(m_viewOrder[i_viewSelectorIndex], 0);
+                }
+            }
+        }
+
+        private void canvasViewSelector_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (m_viewSelectionMouseDown == false)
+            {
+                return;
+            }
+
+            if (m_viewSelectionMouseMoved)
+            {
+                UpdateViewOrder();
+            }
+            else
+            {
+                if (m_viewSelectionIndex == 2)
+                {
+                    if (m_viewOrder[2] == borderInstructionView) // instruction view prefers left panel
+                    {
+                        Border l_swap = m_viewOrder[2];
+                        m_viewOrder[2] = m_viewOrder[0];
+                        m_viewOrder[0] = l_swap;
+
+                        contentControlLeftPanel.Content = m_instructionView;
+                    }
+                    else if (m_viewOrder[2] == borderMemoryView) // memory view prefers right panel
+                    {
+                        Border l_swap = m_viewOrder[2];
+                        m_viewOrder[2] = m_viewOrder[1];
+                        m_viewOrder[1] = l_swap;
+
+                        contentControlRightPanel.Content = m_memoryView;
+                    }
+                    else if (m_viewOrder[2] == borderStackView) // stack view prefers right panel
+                    {
+                        Border l_swap = m_viewOrder[2];
+                        m_viewOrder[2] = m_viewOrder[1];
+                        m_viewOrder[1] = l_swap;
+
+                        contentControlRightPanel.Content = m_stackView;
+                    }
+                }
+            }
+
+            UpdateCanvasLayout();
+
+            m_viewSelectionMouseDown = false;
+            m_viewSelectionMouseMoved = false;
+            m_viewSelectionMouseDelta = 0;
+            m_viewSelectionIndex = -1;
+        }
+
+        private void canvasViewSelector_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (m_viewSelectionMouseDown == false)
+            {
+                return;
+            }
+
+            m_viewSelectionMouseMoved = true;
+
+            double l_leftPosition = Mouse.GetPosition(canvasViewSelector).X - m_viewSelectionMouseDelta;
+            if (l_leftPosition < 2)
+            {
+                l_leftPosition = 2;
+            }
+            else if (l_leftPosition + 2 + m_viewOrder[m_viewSelectionIndex].ActualWidth > canvasViewSelector.ActualWidth)
+            {
+                l_leftPosition = canvasViewSelector.ActualWidth - m_viewOrder[m_viewSelectionIndex].ActualWidth - 2;
+            }
+
+            // check if index must change
+            bool l_updateCanvasLayoutRequired = false;
+            switch (m_viewSelectionIndex)
+            {
+                case 0:
+                {
+                    if (l_leftPosition > Canvas.GetLeft(m_viewOrder[1]))
+                    {
+                        Border l_swap = m_viewOrder[0];
+                        m_viewOrder[0] = m_viewOrder[1];
+                        m_viewOrder[1] = l_swap;
+
+                        m_viewSelectionIndex = 1;
+
+                        l_updateCanvasLayoutRequired = true;
+                    }
+                    if (l_leftPosition > Canvas.GetLeft(m_viewOrder[2]))
+                    {
+                        Border l_swap = m_viewOrder[1];
+                        m_viewOrder[1] = m_viewOrder[2];
+                        m_viewOrder[2] = l_swap;
+
+                        m_viewSelectionIndex = 2;
+                    }
+                }
+                break;
+
+                case 1:
+                {
+                    if (l_leftPosition < Canvas.GetLeft(m_viewOrder[0]))
+                    {
+                        Border l_swap = m_viewOrder[1];
+                        m_viewOrder[1] = m_viewOrder[0];
+                        m_viewOrder[0] = l_swap;
+
+                        m_viewSelectionIndex = 0;
+
+                        l_updateCanvasLayoutRequired = true;
+                    }
+                    else if (l_leftPosition > Canvas.GetLeft(m_viewOrder[2]))
+                    {
+                        Border l_swap = m_viewOrder[1];
+                        m_viewOrder[1] = m_viewOrder[2];
+                        m_viewOrder[2] = l_swap;
+
+                        m_viewSelectionIndex = 2;
+
+                        l_updateCanvasLayoutRequired = true;
+                    }
+                }
+                break;
+
+                case 2:
+                {
+                    if (l_leftPosition < Canvas.GetLeft(m_viewOrder[1]))
+                    {
+                        Border l_swap = m_viewOrder[2];
+                        m_viewOrder[2] = m_viewOrder[1];
+                        m_viewOrder[1] = l_swap;
+
+                        m_viewSelectionIndex = 1;
+
+                        l_updateCanvasLayoutRequired = true;
+                    }
+                    if (l_leftPosition < Canvas.GetLeft(m_viewOrder[0]))
+                    {
+                        Border l_swap = m_viewOrder[1];
+                        m_viewOrder[1] = m_viewOrder[0];
+                        m_viewOrder[0] = l_swap;
+
+                        m_viewSelectionIndex = 0;
+                    }
+                }
+                break;
+            }
+
+            if (l_updateCanvasLayoutRequired)
+            {
+                UpdateCanvasLayout();
+            }
+
+            Canvas.SetLeft(m_viewOrder[m_viewSelectionIndex], l_leftPosition);
+        }
+
+        private void canvasViewSelector_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (m_viewSelectionMouseDown == false)
+            {
+                return;
+            }
+
+            UpdateViewOrder();
+
+            m_viewSelectionMouseDown = false;
+            m_viewSelectionMouseMoved = false;
+            m_viewSelectionMouseDelta = 0;
+            m_viewSelectionIndex = -1;
+
+            UpdateCanvasLayout();
+        }
+
+        private void UpdateCanvasLayout()
+        {
+            double l_view0Left = canvasViewSelector.ActualWidth / 4 - m_viewOrder[0].ActualWidth / 2;
+            double l_view1Left = canvasViewSelector.ActualWidth / 2 - m_viewOrder[1].ActualWidth / 2;
+            double l_view2Left = canvasViewSelector.ActualWidth / 4 * 3 - m_viewOrder[2].ActualWidth / 2;
+
+            double l_rectangleLeft = l_view0Left - 4;
+            double l_rectangleWidth = l_view1Left - l_view0Left + m_viewOrder[1].ActualWidth + 8;
+
+            Canvas.SetLeft(m_viewOrder[0], l_view0Left);
+            Canvas.SetLeft(m_viewOrder[1], l_view1Left);
+            Canvas.SetLeft(m_viewOrder[2], l_view2Left);
+            Canvas.SetLeft(rectangleSelectedViews, l_rectangleLeft);
+
+            rectangleSelectedViews.Width = l_rectangleWidth;
+        }
+
+        private void UpdateViewOrder()
+        {
+            contentControlLeftPanel.Content = null;
+            contentControlRightPanel.Content = null;
+
+            if (m_viewOrder[0] == borderInstructionView)
+            {
+                contentControlLeftPanel.Content = m_instructionView;
+            }
+            else if (m_viewOrder[0] == borderMemoryView)
+            {
+                contentControlLeftPanel.Content = m_memoryView;
+            }
+            else if (m_viewOrder[0] == borderStackView)
+            {
+                contentControlLeftPanel.Content = m_stackView;
+            }
+
+            if (m_viewOrder[1] == borderInstructionView)
+            {
+                contentControlRightPanel.Content = m_instructionView;
+            }
+            else if (m_viewOrder[1] == borderMemoryView)
+            {
+                contentControlRightPanel.Content = m_memoryView;
+            }
+            else if (m_viewOrder[1] == borderStackView)
+            {
+                contentControlRightPanel.Content = m_stackView;
             }
         }
     }
