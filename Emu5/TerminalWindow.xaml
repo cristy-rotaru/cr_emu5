@@ -4,7 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Terminal" Height="746" Width="1080" Background="#FFF0F0F0" FontSize="13" ResizeMode="CanMinimize">
+        Title="Terminal" Height="746" Width="1080" Background="#FFF0F0F0" FontSize="13" ResizeMode="CanMinimize"
+        Closing="TerminalWindow_Closing">
     <DockPanel>
         <TextBox Name="textBoxTerminal" DockPanel.Dock="Top" Margin="1" Background="Black" Foreground="Lime" FontFamily="Consolas" FontSize="15" Height="566" CaretBrush="Lime" IsReadOnlyCaretVisible="True" IsReadOnly="true" TextWrapping="NoWrap" HorizontalScrollBarVisibility="Disabled" PreviewMouseWheel="textBoxTerminal_PreviewMouseWheel" PreviewMouseDown="textBoxTerminal_PreviewMouseDown" PreviewMouseUp="textBoxTerminal_MouseUp" MouseUp="textBoxTerminal_MouseUp" PreviewKeyDown="textBoxTerminal_PreviewKeyDown" />
 
@@ -30,7 +31,7 @@
 
                 <CheckBox Name="checkBoxEchoSentCharacters" Grid.Row="0" Grid.Column="0" IsChecked="True" Content="Echo sent characters" VerticalAlignment="Top" Checked="checkBox_Toggled" Unchecked="checkBox_Toggled" />
                 <CheckBox Name="checkBoxBackspaceDeletesCharacters" Grid.Row="1" Grid.Column="0" IsChecked="True" Content="Backspace deletes characters" VerticalAlignment="Center" Checked="checkBox_Toggled" Unchecked="checkBox_Toggled" />
-                <CheckBox Name="checkBoxNewLineSetsCaretTo0" Grid.Row="2" Grid.Column="0" IsChecked="True" Content="\n puts the caret to the beginning of the line" VerticalAlignment="Bottom" Checked="checkBox_Toggled" Unchecked="checkBox_Toggled" />
+                <CheckBox Name="checkBoxNewLineSetsCaretTo0" Grid.Row="2" Grid.Column="0" IsChecked="True" Content="send \r along with \n" VerticalAlignment="Bottom" Checked="checkBox_Toggled" Unchecked="checkBox_Toggled" />
             </Grid>
 
             <Grid Grid.Row="0" Grid.Column="1" Margin="6, 6, 6, 0">

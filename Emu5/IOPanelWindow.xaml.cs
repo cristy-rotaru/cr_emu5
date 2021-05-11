@@ -20,6 +20,7 @@ namespace Emu5
         Slider[] m_switches = new Slider[16];
 
         bool m_threadShutdown;
+        bool m_disposeWhenClosing = false;
 
         public IOPanelWindow(IOPanel peripheral)
         {
@@ -129,7 +130,15 @@ namespace Emu5
 
         private void IOPanelWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            m_threadShutdown = true;
+            if (m_disposeWhenClosing)
+            {
+                m_threadShutdown = true;
+            }
+            else
+            {
+                e.Cancel = true;
+                this.Hide();
+            }
         }
 
         private void buttonB_Click(object sender, RoutedEventArgs e)
@@ -177,6 +186,12 @@ namespace Emu5
                 m_leds[i_ledIndex].Fill = (leds & (1 << i_ledIndex)) != 0 ? Brushes.Red : new SolidColorBrush(Color.FromArgb(0x40, 0xFF, 0x00, 0x00));
                 m_leds[i_ledIndex].UpdateLayout();
             }
+        }
+
+        public void Close(bool dispose)
+        {
+            m_disposeWhenClosing = dispose;
+            this.Close();
         }
     }
 }

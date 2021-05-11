@@ -581,8 +581,8 @@ namespace Emu5
 
         public void CloseAllPeripheralWindows()
         {
-            m_terminalWindowHandle?.Close();
-            m_IOPanelWindowHandle?.Close();
+            m_terminalWindowHandle?.Close(true);
+            m_IOPanelWindowHandle?.Close(true);
         }
 
         private void ClockTick(object sender, System.Timers.ElapsedEventArgs e)

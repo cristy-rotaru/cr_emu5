@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
 
@@ -16,6 +15,7 @@ namespace Emu5
         int m_caretPosition;
 
         bool m_initialized = false;
+        bool m_disposeWhenClosing = false;
 
         public TerminalWindow(Terminal peripheral)
         {
@@ -364,6 +364,21 @@ namespace Emu5
             m_terminal.SendCharacters(checkBoxEchoSentCharacters.IsChecked == true, textBoxInput.Text.ToCharArray());
 
             textBoxInput.Clear();
+        }
+
+        private void TerminalWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (m_disposeWhenClosing == false)
+            {
+                e.Cancel = true;
+                this.Hide();
+            }
+        }
+
+        public void Close(bool dispose)
+        {
+            m_disposeWhenClosing = dispose;
+            this.Close();
         }
     }
 }
