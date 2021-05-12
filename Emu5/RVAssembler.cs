@@ -408,11 +408,11 @@ namespace Emu5
                                     throw new RVAssemblyException("Expected separator ','.", l_tokenLine[4].line, l_tokenLine[4].column);
                                 }
 
-                                if (l_tokenLine[5].type != RVTokenType.Integer)
+                                if (l_tokenLine[5].type != RVTokenType.Integer && l_tokenLine[5].type != RVTokenType.Char)
                                 {
                                     throw new RVAssemblyException("Expected integer immediate.", l_tokenLine[5].line, l_tokenLine[5].column);
                                 }
-                                UInt32 l_immediate = (UInt32)l_tokenLine[5].value;
+                                UInt32 l_immediate = (l_tokenLine[5].type == RVTokenType.Integer) ? (UInt32)l_tokenLine[5].value : (UInt32)(char)l_tokenLine[5].value;
                                 UInt32 l_mask = 0xFFFFF800;
                                 if ((l_immediate & l_mask) != l_mask && (l_immediate & l_mask) != 0)
                                 {
