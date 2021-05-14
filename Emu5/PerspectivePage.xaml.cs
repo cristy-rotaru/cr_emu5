@@ -305,7 +305,7 @@ namespace Emu5
 
         public void SaveMemory()
         {
-            MessageBox.Show("Save memory UI not created yet");
+            (new SaveMemoryWindow(m_rvEmulator.GetMemoryMapReference(), GetFileName())).ShowDialog();
         }
 
         public bool Open()

@@ -7,8 +7,8 @@
         Title="Save Memory Chunk" Height="214" Width="532" Background="#FFF0F0F0" FontSize="13" ResizeMode="NoResize" ShowInTaskbar="False">
     <DockPanel>
         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" FlowDirection="RightToLeft" Height="44">
-            <Button Name="buttonCancel" Margin="7" Width="64" Content="Cancel" />
-            <Button Name="buttonSave" Margin="7" Width="64" Content="Save" />
+            <Button Name="buttonCancel" Margin="7" Width="64" Content="Cancel" Click="buttonCancel_Click" />
+            <Button Name="buttonSave" Margin="7" Width="64" Content="Save" Click="buttonSave_Click" />
         </StackPanel>
 
         <Grid>
@@ -36,8 +36,8 @@
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="2, 15, 1, 1" Text="File path:" />
 
             <DockPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4">
-                <Button Name="buttonBrowse" DockPanel.Dock="Right" Margin="2" Width="22" Content="..." />
-                <TextBox Name="textBoxFileName" Margin="2" />
+                <Button Name="buttonBrowse" DockPanel.Dock="Right" Margin="2" Width="22" Content="..." Click="buttonBrowse_Click" />
+                <TextBox Name="textBoxFileName" Margin="2" IsReadOnly="True" />
             </DockPanel>
         </Grid>
     </DockPanel>
