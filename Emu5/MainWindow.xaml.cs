@@ -383,6 +383,16 @@ namespace Emu5
         #endregion
 
         #region r_emulatorCommands
+        void commandSaveMemory_Executed(object target, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        void commandSaveMemory_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+
+        }
+
         void commandStartEmulator_Executed(object target, ExecutedRoutedEventArgs e)
         {
             TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];

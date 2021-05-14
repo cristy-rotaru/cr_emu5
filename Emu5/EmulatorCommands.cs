@@ -4,6 +4,8 @@ namespace Emu5
 {
     class EmulatorCommands
     {
+        public static RoutedCommand SaveMemory = new RoutedCommand();
+
         public static RoutedCommand StartEmulator = new RoutedCommand();
         public static RoutedCommand Step = new RoutedCommand();
         public static RoutedCommand RunClocked = new RoutedCommand();

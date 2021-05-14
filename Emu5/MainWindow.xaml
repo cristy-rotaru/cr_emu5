@@ -21,6 +21,7 @@
         <CommandBinding Command="ApplicationCommands.Copy" Executed="commandCopy_Executed" CanExecute="commandCopy_CanExecute" />
         <CommandBinding Command="ApplicationCommands.Paste" Executed="commandPaste_Executed" CanExecute="commandPaste_CanExecute" />
 
+        <CommandBinding Command="local:EmulatorCommands.SaveMemory" Executed="commandSaveMemory_Executed" CanExecute="commandSaveMemory_CanExecute" />
         <CommandBinding Command="local:EmulatorCommands.StartEmulator" Executed="commandStartEmulator_Executed" CanExecute="commandStartEmulator_CanExecute" />
         <CommandBinding Command="local:EmulatorCommands.Step" Executed="commandStep_Executed" CanExecute="commandStep_CanExecute" />
         <CommandBinding Command="local:EmulatorCommands.RunClocked" Executed="commandRunClocked_Executed" CanExecute="commandRunClocked_CanExecute" />
@@ -71,9 +72,14 @@
                         <Image Source="Icons/file_save.png" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Name="menuItemFileSaveAs"  Header="Save As" InputGestureText="Ctrl+Shift+S" Command="ApplicationCommands.SaveAs">
+                <MenuItem Name="menuItemFileSaveAs" Header="Save As" InputGestureText="Ctrl+Shift+S" Command="ApplicationCommands.SaveAs">
                     <MenuItem.Icon>
                         <Image Source="Icons/file_save_as.png" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="menuItemFileSaveMemory" Header="Save Memory" Command="local:EmulatorCommands.SaveMemory">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/file_save_memory.png" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator />
@@ -201,6 +207,9 @@
                 </Button>
                 <Button Name="buttonFileSaveAs" Width="24" Height="24" Margin="3" ToolTip="Save As" Command="ApplicationCommands.SaveAs">
                     <Image Source="Icons/file_save_as.png" />
+                </Button>
+                <Button Name="buttonFileSaveMemory" Width="24" Height="24" Margin="3" ToolTip="Save Memory" Command="local:EmulatorCommands.SaveMemory">
+                    <Image Source="Icons/file_save_memory.png" />
                 </Button>
                 <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
                 <Button Name="buttonEditUndo" Width="24" Height="24" Margin="3" ToolTip="Undo" Command="ApplicationCommands.Undo">
