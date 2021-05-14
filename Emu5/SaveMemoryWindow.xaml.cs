@@ -117,35 +117,11 @@ namespace Emu5
                 return;
             }
 
-            
-
             UInt64 l_delta = ((UInt64)(l_endAddress - l_startAddress) & 0xFFFFFFFF) + 1;
 
-            if (l_delta > 1073741824) // set limit to 1GB
+            if (l_delta > 16777216) // set limit to 16 MB
             {
-                MessageBox.Show("The selected range exceeds the 1GB limit.", "", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            bool l_continue = true;
-            if (l_delta >= 67108864) // 64 MB
-            {
-                l_continue = false;
-
-                double l_divider = l_delta > 1130254551 ? 1073741824.0 : 1048576.0;
-                String l_unit = l_delta > 1130254551 ? "GB" : "MB"; // about .95 GB
-
-                String l_message = "You are trying to save a large file (" + (l_delta / l_divider).ToString("n2") + ' ' + l_unit + ")\n";
-                l_message += "Are you sure you want to continue?";
-
-                if (MessageBox.Show(l_message, "Large file warning", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
-                {
-                    l_continue = true;
-                }
-            }
-
-            if (l_continue == false)
-            {
+                MessageBox.Show("The selected range exceeds the 16MB limit.", "", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
