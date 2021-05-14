@@ -56,8 +56,8 @@
         </GroupBox>
 
         <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" FlowDirection="RightToLeft">
-            <Button x:Name="buttonCancel" Margin="7" Width="64" Content="Cancel" Click="buttonCancel_Click" />
-            <Button x:Name="buttonInject" Margin="7" Width="64" Content="Inject" Click="buttonInject_Click" />
+            <Button Name="buttonCancel" Margin="7" Width="64" Content="Cancel" Click="buttonCancel_Click" />
+            <Button Name="buttonInject" Margin="7" Width="64" Content="Inject" Click="buttonInject_Click" />
         </StackPanel>
     </Grid>
 </Window>
