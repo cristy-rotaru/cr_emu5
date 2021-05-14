@@ -255,5 +255,8 @@
     <Resource Include="Icons\memory_view.png" />
     <Resource Include="Icons\stack_view.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\file_save_memory.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
