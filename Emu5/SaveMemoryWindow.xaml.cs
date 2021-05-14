@@ -125,9 +125,10 @@ namespace Emu5
                 return;
             }
 
+            BinaryWriter l_fileWriter = null;
             try
             {
-                BinaryWriter l_fileWriter = new BinaryWriter(File.Open(textBoxFileName.Text, FileMode.OpenOrCreate, FileAccess.Write));
+                l_fileWriter = new BinaryWriter(File.Open(textBoxFileName.Text, FileMode.OpenOrCreate, FileAccess.Write));
 
                 byte?[] l_memoryData = m_memoryMap.ReadIgnorePeripherals(l_startAddress, (int)l_delta);
                 byte[] l_saveData = new byte[l_memoryData.Length];
@@ -144,6 +145,11 @@ namespace Emu5
             catch (Exception e_saveError)
             {
                 MessageBox.Show(e_saveError.Message, "Error saving file", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                if (l_fileWriter != null)
+                {
+                    l_fileWriter.Close();
+                }
             }
         }
 
