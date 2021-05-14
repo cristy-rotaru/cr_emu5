@@ -42,7 +42,7 @@ namespace Emu5
         Thread m_simulationThread;
         object m_threadSync;
 
-        bool m_simulationRunning, m_compiling;
+        bool m_simulationRunning, m_compiling, m_wasCompiled;
         bool m_runningClocked, m_runningFast;
         bool m_simulationJustStarted, m_simulationJustPaused, m_breakpointHit;
 
@@ -108,6 +108,7 @@ namespace Emu5
 
             m_simulationRunning = false;
             m_compiling = false;
+            m_wasCompiled = false;
             m_runningClocked = false;
             m_runningFast = false;
             m_simulationJustStarted = false;
@@ -171,6 +172,11 @@ namespace Emu5
 
                 m_perspectiveChangedCallback?.Invoke();
             }
+        }
+
+        public bool CanSaveMemory()
+        {
+            return m_wasCompiled && !m_compiling && !m_runningClocked && !m_runningFast;
         }
 
         public bool CanUndo()
@@ -297,6 +303,11 @@ namespace Emu5
             }
         }
 
+        public void SaveMemory()
+        {
+            MessageBox.Show("Save memory UI not created yet");
+        }
+
         public bool Open()
         {
             bool l_result = m_editor.Open();
@@ -401,6 +412,7 @@ namespace Emu5
                         m_processor.HighlightingEnabled = true;
 
                         m_compiling = false;
+                        m_wasCompiled = true;
 
                         ChangePerspective(Perspective.Emulator);
                     });
