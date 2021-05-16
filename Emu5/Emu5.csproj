@@ -212,6 +212,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Resource Include="Resources\ecall_handler.hex" />
     <Resource Include="Resources\SyntaxHighlighter.xshd" />
   </ItemGroup>
   <ItemGroup>

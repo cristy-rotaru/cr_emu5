@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Emu5
 {
@@ -99,8 +100,11 @@ namespace Emu5
             List<RVInstructionBuilder> l_instructionList = new List<RVInstructionBuilder>();
             List<RVDataBuilder> l_dataList = new List<RVDataBuilder>();
             List<Interval> l_memoryIntervals = new List<Interval>();
+            Stream l_ecallHandlerStream = new MemoryStream(Properties.Resources.ecall_handler);
 
             pseudoInstructions.Clear();
+
+            l_memoryIntervals.Add(new Interval { start = 0xFFFFF000, end = (UInt32)(0xFFFFF000 + l_ecallHandlerStream.Length - 1) });
 
             for (int i_line = 0; i_line < l_tokens.Length; ++i_line)
             {
@@ -2228,6 +2232,10 @@ namespace Emu5
                     l_instructionList[i_index] = l_instructionBuilder;
                 }
             }
+
+            byte[] l_ecallHandlerData = new byte[l_ecallHandlerStream.Length];
+            l_ecallHandlerStream.Read(l_ecallHandlerData, 0, (int)l_ecallHandlerStream.Length);
+            memoryMap.Write(0xFFFFF000, l_ecallHandlerData);
 
             foreach (RVDataBuilder i_dataBuilder in l_dataList)
             {

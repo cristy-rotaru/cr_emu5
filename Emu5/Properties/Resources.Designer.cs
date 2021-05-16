@@ -63,6 +63,16 @@ namespace Emu5.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] ecall_handler {
+            get {
+                object obj = ResourceManager.GetObject("ecall_handler", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] SyntaxHighlighter {
             get {
                 object obj = ResourceManager.GetObject("SyntaxHighlighter", resourceCulture);
