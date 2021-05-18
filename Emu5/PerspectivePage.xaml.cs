@@ -384,6 +384,8 @@ namespace Emu5
                 }
             }
 
+            m_logger.Log("Simulation started: " + GetCurrentTimeString());
+
             m_simulationRunning = true;
             m_compiling = true;
 
@@ -416,6 +418,9 @@ namespace Emu5
                         m_compiling = false;
                         m_wasCompiled = true;
 
+                        m_logger.Log("Compilation succesful: " + GetCurrentTimeString());
+                        m_logger.NewLine();
+
                         ChangePerspective(Perspective.Emulator);
                     });
 
@@ -427,8 +432,14 @@ namespace Emu5
                     () => {
                         ChangePerspective(Perspective.Editor);
 
+                        m_logger.Log("Compilation failed! Line " + e_assemblyException.Line + ", Column " + e_assemblyException.Column + ": \"" + e_assemblyException.Message + "\"");
+
                         MessageBox.Show("L: " + e_assemblyException.Line + "; C: " + e_assemblyException.Column + "\n" + e_assemblyException.Message, "Compilation error!", MessageBoxButton.OK, MessageBoxImage.Error);
                         m_editor.SetEditable(true);
+
+                        m_logger.Log("Simulation ended: " + GetCurrentTimeString());
+                        m_logger.NewLine();
+                        m_logger.NewLine();
 
                         m_compiling = false;
                         m_simulationRunning = false;
@@ -454,6 +465,10 @@ namespace Emu5
             {
                 m_simulationRunning = false;
                 m_processor.UpdateInfo();
+
+                m_logger.Log("Simulation ended: " + GetCurrentTimeString() + " (Core halted)");
+                m_logger.NewLine();
+                m_logger.NewLine();
 
                 MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -543,6 +558,10 @@ namespace Emu5
 
             m_rvEmulator.Halted = true;
 
+            m_logger.Log("Simulation ended: " + GetCurrentTimeString() + " (Stopped by user)");
+            m_logger.NewLine();
+            m_logger.NewLine();
+
             m_processor.UpdateInfo();
         }
 
@@ -613,6 +632,10 @@ namespace Emu5
                     m_runningClocked = false;
                     m_processor.UpdateInfo();
 
+                    m_logger.Log("Simulation ended: " + GetCurrentTimeString() + " (Core halted)");
+                    m_logger.NewLine();
+                    m_logger.NewLine();
+
                     MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
 
                     CommandManager.InvalidateRequerySuggested();
@@ -663,6 +686,10 @@ namespace Emu5
                         m_processor.UpdateInfo();
                         m_processor.HighlightingEnabled = true;
 
+                        m_logger.Log("Simulation ended: " + GetCurrentTimeString() + " (Core halted)");
+                        m_logger.NewLine();
+                        m_logger.NewLine();
+
                         MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
 
                         CommandManager.InvalidateRequerySuggested();
@@ -692,6 +719,28 @@ namespace Emu5
                     return;
                 }
             }
+        }
+
+        private String GetCurrentTimeString()
+        {
+            DateTime l_currentTime = DateTime.Now;
+
+            String l_timeString = "";
+            l_timeString += String.Format("{0:0000}", l_currentTime.Year);
+            l_timeString += '-';
+            l_timeString += String.Format("{0:00}", l_currentTime.Month);
+            l_timeString += '-';
+            l_timeString += String.Format("{0:00}", l_currentTime.Day);
+            l_timeString += ' ';
+            l_timeString += l_currentTime.Hour;
+            l_timeString += ':';
+            l_timeString += String.Format("{0:00}", l_currentTime.Minute);
+            l_timeString += ':';
+            l_timeString += String.Format("{0:00}", l_currentTime.Second);
+            l_timeString += '.';
+            l_timeString += String.Format("{0:000}", l_currentTime.Millisecond);
+
+            return l_timeString;
         }
     }
 }
