@@ -1,0 +1,8 @@
+﻿<UserControl x:Class="Emu5.LogPerspective"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Emu5">
+    <TextBox Name="textBoxLog" FontFamily="Consolas" FontSize="15" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" IsReadOnly="True" VerticalScrollBarVisibility="Auto" />
+</UserControl>

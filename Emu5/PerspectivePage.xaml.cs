@@ -28,6 +28,7 @@ namespace Emu5
 
         EditorPerspective m_editor = null;
         EmulatorPerspective m_processor = null;
+        LogPerspective m_logger = null;
 
         RVEmulator m_rvEmulator = null;
 
@@ -96,6 +97,7 @@ namespace Emu5
 
             m_editor = new EditorPerspective();
             m_processor = new EmulatorPerspective(this);
+            m_logger = new LogPerspective();
 
             m_rvEmulator = new RVEmulator();
 
@@ -165,7 +167,7 @@ namespace Emu5
 
                     case Perspective.Log:
                     {
-                        // will add log perspective once implemented
+                        dockPanelMain.Children.Add(m_logger);
                     }
                     break;
                 }

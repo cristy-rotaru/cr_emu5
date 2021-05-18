@@ -87,6 +87,9 @@
       <DependentUpon>IOPanelWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="I_RVPeripheral.cs" />
+    <Compile Include="LogPerspective.xaml.cs">
+      <DependentUpon>LogPerspective.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PerspectivePage.xaml.cs">
       <DependentUpon>PerspectivePage.xaml</DependentUpon>
     </Compile>
@@ -144,6 +147,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="IOPanelWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LogPerspective.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
