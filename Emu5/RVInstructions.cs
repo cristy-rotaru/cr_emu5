@@ -47,6 +47,14 @@ namespace Emu5
         Dictionary<String, RVInstructionDescription> m_instructionDictionary;
         Dictionary<String, RVRegister> m_registerDictionary;
 
+        Dictionary<byte, String> m_bTypeInstructions = null; // key = func3
+        Dictionary<byte, String> m_loadTypeInstructions = null; // key = func3
+        Dictionary<byte, String> m_sTypeInstructions = null; // key = func3
+        Dictionary<byte, String> m_iTypeInstructions = null; // key = func3
+        Dictionary<UInt16, String> m_shiftTypeInstructions = null; // key = {func7, func3}
+        Dictionary<UInt16, String> m_rTypeInstructions = null; // key = {func7, func3}
+        Dictionary<UInt16, String> m_systemInstructions = null; // key = func12
+
         private RVInstructions()
         {
             m_instructionDictionary = new Dictionary<string, RVInstructionDescription>();
@@ -478,11 +486,81 @@ namespace Emu5
 
             m_registerDictionary.Add("a7", RVRegister.x17);
             m_registerDictionary.Add("A7", RVRegister.x17);
+
+            m_bTypeInstructions = new Dictionary<byte, String>();
+
+            m_bTypeInstructions.Add(0b000, "beq");
+            m_bTypeInstructions.Add(0b001, "bne");
+            m_bTypeInstructions.Add(0b100, "blt");
+            m_bTypeInstructions.Add(0b101, "bge");
+            m_bTypeInstructions.Add(0b110, "bltu");
+            m_bTypeInstructions.Add(0b111, "bgeu");
+
+            m_loadTypeInstructions = new Dictionary<byte, String>();
+
+            m_loadTypeInstructions.Add(0b000, "lb");
+            m_loadTypeInstructions.Add(0b001, "lh");
+            m_loadTypeInstructions.Add(0b010, "lw");
+            m_loadTypeInstructions.Add(0b100, "lbu");
+            m_loadTypeInstructions.Add(0b101, "lhu");
+
+            m_sTypeInstructions = new Dictionary<byte, String>();
+
+            m_sTypeInstructions.Add(0b000, "sb");
+            m_sTypeInstructions.Add(0b001, "sh");
+            m_sTypeInstructions.Add(0b010, "sw");
+
+            m_iTypeInstructions = new Dictionary<byte, String>();
+
+            m_iTypeInstructions.Add(0b000, "addi");
+            m_iTypeInstructions.Add(0b010, "slti");
+            m_iTypeInstructions.Add(0b011, "sltiu");
+            m_iTypeInstructions.Add(0b100, "xori");
+            m_iTypeInstructions.Add(0b110, "ori");
+            m_iTypeInstructions.Add(0b111, "andi");
+
+            m_shiftTypeInstructions = new Dictionary<UInt16, String>();
+
+            m_shiftTypeInstructions.Add(0b0000000001, "slli");
+            m_shiftTypeInstructions.Add(0b0000000101, "srli");
+            m_shiftTypeInstructions.Add(0b0100000101, "srai");
+
+            m_rTypeInstructions = new Dictionary<UInt16, String>();
+
+            m_rTypeInstructions.Add(0b0000000000, "add");
+            m_rTypeInstructions.Add(0b0100000000, "sub");
+            m_rTypeInstructions.Add(0b0000000001, "sll");
+            m_rTypeInstructions.Add(0b0000000010, "slt");
+            m_rTypeInstructions.Add(0b0000000011, "sltu");
+            m_rTypeInstructions.Add(0b0000000100, "xor");
+            m_rTypeInstructions.Add(0b0000000101, "srl");
+            m_rTypeInstructions.Add(0b0100000101, "sra");
+            m_rTypeInstructions.Add(0b0000000110, "or");
+            m_rTypeInstructions.Add(0b0000000111, "and");
+            m_rTypeInstructions.Add(0b0000001000, "mul");
+            m_rTypeInstructions.Add(0b0000001001, "mulh");
+            m_rTypeInstructions.Add(0b0000001010, "mulhsu");
+            m_rTypeInstructions.Add(0b0000001011, "mulhu");
+            m_rTypeInstructions.Add(0b0000001100, "div");
+            m_rTypeInstructions.Add(0b0000001101, "divu");
+            m_rTypeInstructions.Add(0b0000001110, "rem");
+            m_rTypeInstructions.Add(0b0000001111, "remu");
+
+            m_systemInstructions = new Dictionary<UInt16, String>();
+
+            m_systemInstructions.Add(0x000, "ecall");
+            m_systemInstructions.Add(0x001, "ebreak");
+            m_systemInstructions.Add(0xFFF, "hlt");
+            m_systemInstructions.Add(0xFFE, "rst");
+            m_systemInstructions.Add(0x107, "ien");
+            m_systemInstructions.Add(0x106, "idis");
+            m_systemInstructions.Add(0x105, "wfi");
+            m_systemInstructions.Add(0x102, "iret");
         }
 
         public static RVInstructionDescription? GetInstructionByString(String inst)
         {
-            lock (s_lock) // multiple threads may compile at the same time, so lock is required here
+            lock (s_lock) // multiple threads may compile/decompile at the same time, so lock is required here
             {
                 if (s_instance == null)
                 {
@@ -501,7 +579,7 @@ namespace Emu5
 
         public static RVRegister? GetRegisterByString(String reg)
         {
-            lock (s_lock) // multiple threads may compile at the same time, so lock is required here
+            lock (s_lock) // multiple threads may compile/decompile at the same time, so lock is required here
             {
                 if (s_instance == null)
                 {
@@ -516,6 +594,267 @@ namespace Emu5
             }
 
             return null;
+        }
+
+        public static Tuple<String, String> DisassembleIntruction(UInt32 encodedInstruction, RVLabelReferenceMap labelMap = null, UInt32 address = 0)
+        {// returns a pair of strings (1st is the decoded instruction) (2nd is the split instruction bits)
+            lock (s_lock) // multiple threads may compile/decompile at the same time, so lock is required here
+            {
+                if (s_instance == null)
+                {
+                    s_instance = new RVInstructions();
+                }
+            }
+
+            Tuple<String, String> l_notAnInstruction = new Tuple<String, String>("", String.Format("0x{0,8:X8}", encodedInstruction));
+
+            byte l_opcode = (byte)(encodedInstruction & 0x7F);
+            switch (l_opcode)
+            {
+                case 0b0110111: // LUI
+                {
+                    byte l_destinationRegister = (byte)((encodedInstruction >> 7) & 0x1F);
+                    UInt32 l_immediate = encodedInstruction >> 12;
+
+                    String l_assembly = String.Format("lui x{0}, 0x{1:X}", l_destinationRegister, l_immediate);
+                    String l_splitBits = Convert.ToString(l_immediate, 2).PadLeft(20, '0') + '_' + Convert.ToString(l_destinationRegister, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_opcode, 2).PadLeft(7, '0');
+
+                    return new Tuple<String, String>(l_assembly, l_splitBits);
+                }
+
+                case 0b0010111: // AUIPC
+                {
+                    byte l_destinationRegister = (byte)((encodedInstruction >> 7) & 0x1F);
+                    UInt32 l_immediate = encodedInstruction >> 12;
+
+                    String l_assembly = String.Format("auipc x{0}, 0x{1:X}", l_destinationRegister, l_immediate);
+                    String l_splitBits = Convert.ToString(l_immediate, 2).PadLeft(20, '0') + '_' + Convert.ToString(l_destinationRegister, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_opcode, 2).PadLeft(7, '0');
+
+                    return new Tuple<String, String>(l_assembly, l_splitBits);
+                }
+
+                case 0b1101111: // JAL
+                {
+                    byte l_destinationRegister = (byte)((encodedInstruction >> 7) & 0x1F);
+                    UInt32 l_immediate = (encodedInstruction & 0x80000000) >> (31 - 20);
+                    l_immediate |= (encodedInstruction & 0x7FE00000) >> (21 - 1);
+                    l_immediate |= (encodedInstruction & 0x00100000) >> (20 - 11);
+                    l_immediate |= encodedInstruction & 0x000FF000;
+                    Int32 l_offset = ((Int32)l_immediate << (31 - 20)) >> (31 - 20); // sign extend
+                    l_immediate = encodedInstruction >> 12;
+
+                    String l_assembly = String.Format("jal x{0}, {1}", l_destinationRegister, l_offset);
+                    String l_splitBits = Convert.ToString(l_immediate, 2).PadLeft(20, '0') + '_' + Convert.ToString(l_destinationRegister, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_opcode, 2).PadLeft(7, '0');
+
+                    if (labelMap != null)
+                    {
+                        String[] l_labels = labelMap.FindByAddress(address + (UInt32)l_offset);
+                        for (int i_labelIndex = 0; i_labelIndex < l_labels.Length; ++i_labelIndex)
+                        {
+                            l_assembly += i_labelIndex == 0 ? " [" : ", ";
+                            l_assembly += l_labels[i_labelIndex];
+
+                            if (i_labelIndex == l_labels.Length - 1)
+                            {
+                                l_assembly += "]";
+                            }
+                        }
+                    }
+
+                    return new Tuple<String, String>(l_assembly, l_splitBits);
+                }
+
+                case 0b1100111: // JALR
+                {
+                    if (((encodedInstruction >> 12) & 0x7) != 0b000) // check func3
+                    {
+                        return l_notAnInstruction;
+                    }
+
+                    byte l_destinationRegister = (byte)((encodedInstruction >> 7) & 0x1F);
+                    byte l_sourceRegister1 = (byte)((encodedInstruction >> 15) & 0x1F);
+                    UInt16 l_immediate = (UInt16)(encodedInstruction >> 20);
+                    Int32 l_offset = ((Int32)l_immediate << (31 - 11)) >> (31 - 11); // sign extend
+
+                    String l_assembly = String.Format("jalr x{0}, {1}(x{2})", l_destinationRegister, l_offset, l_sourceRegister1);
+                    String l_splitBits = Convert.ToString(l_immediate, 2).PadLeft(12, '0') + '_' + Convert.ToString(l_sourceRegister1, 2).PadLeft(5, '0') + "_000_" + Convert.ToString(l_destinationRegister, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_opcode, 2).PadLeft(7, '0');
+
+                    return new Tuple<String, String>(l_assembly, l_splitBits);
+                }
+
+                case 0b1100011: // B-type
+                {
+                    byte l_func3 = (byte)((encodedInstruction >> 12) & 0x7);
+                    String l_mnemonic;
+
+                    if (s_instance.m_bTypeInstructions.TryGetValue(l_func3, out l_mnemonic) == false)
+                    {
+                        return l_notAnInstruction;
+                    }
+
+                    byte l_sourceRegister1 = (byte)((encodedInstruction >> 15) & 0x1F);
+                    byte l_sourceRegister2 = (byte)((encodedInstruction >> 20) & 0x1F);
+                    UInt32 l_immediate = (encodedInstruction & 0x80000000) >> (31 - 12);
+                    l_immediate |= (encodedInstruction & 0x7E000000) >> (25 - 5);
+                    l_immediate |= (encodedInstruction & 0x00000F00) >> (8 - 1);
+                    l_immediate |= (encodedInstruction & 0x00000080) << (11 - 7);
+                    Int32 l_offset = ((Int32)l_immediate << (31 - 12)) >> (31 - 12);
+                    byte l_immHigh = (byte)(encodedInstruction >> 25);
+                    byte l_immLow = (byte)((encodedInstruction >> 7) & 0x1F);
+
+                    String l_assembly = String.Format("{0} x{1}, x{2}, {3}", l_mnemonic, l_sourceRegister1, l_sourceRegister2, l_offset);
+                    String l_splitBits = Convert.ToString(l_immHigh, 2).PadLeft(7, '0') + '_' + Convert.ToString(l_sourceRegister2, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_sourceRegister1, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_func3, 2).PadLeft(3, '0') + '_' + Convert.ToString(l_immLow, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_opcode, 2).PadLeft(7, '0');
+
+                    if (labelMap != null)
+                    {
+                        String[] l_labels = labelMap.FindByAddress((UInt32)address + (UInt32)l_offset);
+                        for (int i_labelIndex = 0; i_labelIndex < l_labels.Length; ++i_labelIndex)
+                        {
+                            l_assembly += i_labelIndex == 0 ? " [" : ", ";
+                            l_assembly += l_labels[i_labelIndex];
+
+                            if (i_labelIndex == l_labels.Length - 1)
+                            {
+                                l_assembly += "]";
+                            }
+                        }
+                    }
+
+                    return new Tuple<String, String>(l_assembly, l_splitBits);
+                }
+
+                case 0b0000011: // loads
+                {
+                    byte l_func3 = (byte)((encodedInstruction >> 12) & 0x7);
+                    String l_mnemonic;
+
+                    if (s_instance.m_loadTypeInstructions.TryGetValue(l_func3, out l_mnemonic) == false)
+                    {
+                        return l_notAnInstruction;
+                    }
+
+                    byte l_destinationRegister = (byte)((encodedInstruction >> 7) & 0x1F);
+                    byte l_sourceRegister1 = (byte)((encodedInstruction >> 15) & 0x1F);
+                    UInt32 l_immediate = encodedInstruction >> 20;
+                    Int32 l_offset = ((Int32)l_immediate << (31 - 11)) >> (31 - 11);
+
+                    String l_assembly = String.Format("{0} x{1}, {2}(x{3})", l_mnemonic, l_destinationRegister, l_offset, l_sourceRegister1);
+                    String l_splitBits = Convert.ToString(l_immediate, 2).PadLeft(12, '0') + '_' + Convert.ToString(l_sourceRegister1, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_func3, 2).PadLeft(3, '0') + '_' + Convert.ToString(l_destinationRegister, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_opcode, 2).PadLeft(7, '0');
+
+                    return new Tuple<String, String>(l_assembly, l_splitBits);
+                }
+
+                case 0b0100011: // stores
+                {
+                    byte l_func3 = (byte)((encodedInstruction >> 12) & 0x7);
+                    String l_mnemonic;
+
+                    if (s_instance.m_sTypeInstructions.TryGetValue(l_func3, out l_mnemonic) == false)
+                    {
+                        return l_notAnInstruction;
+                    }
+
+                    byte l_sourceRegister1 = (byte)((encodedInstruction >> 15) & 0x1F);
+                    byte l_sourceRegister2 = (byte)((encodedInstruction >> 20) & 0x1F);
+                    UInt32 l_immediate = (encodedInstruction & 0xFE000000) >> (25 - 5);
+                    l_immediate |= (encodedInstruction & 0x00000F80) >> 7;
+                    Int32 l_offset = ((Int32)l_immediate << (31 - 11)) >> (31 - 11);
+                    byte l_immHigh = (byte)(l_immediate >> 5);
+                    byte l_immLow = (byte)(l_immediate & 0x1F);
+
+                    String l_assembly = String.Format("{0} x{1}, {2}(x{3})", l_mnemonic, l_sourceRegister2, l_offset, l_sourceRegister1);
+                    String l_splitBits = Convert.ToString(l_immHigh, 2).PadLeft(7, '0') + '_' + Convert.ToString(l_sourceRegister2, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_sourceRegister1, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_func3, 2).PadLeft(3, '0') + '_' + Convert.ToString(l_immLow, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_opcode, 2).PadLeft(7, '0');
+
+                    return new Tuple<String, String>(l_assembly, l_splitBits);
+                }
+
+                case 0b0010011: // I-type
+                {
+                    byte l_func3 = (byte)((encodedInstruction >> 12) & 0x7);
+                    byte l_func7 = (byte)((encodedInstruction >> 25) & 0x7F);
+                    UInt16 l_extendedFunction = (UInt16)(((UInt16)l_func7 << 3) | l_func3);
+                    String l_mnemonic;
+
+                    if (s_instance.m_iTypeInstructions.TryGetValue(l_func3, out l_mnemonic))
+                    {
+                        byte l_destinationRegister = (byte)((encodedInstruction >> 7) & 0x1F);
+                        byte l_sourceRegister1 = (byte)((encodedInstruction >> 15) & 0x1F);
+                        UInt32 l_immediate = encodedInstruction >> 20;
+                        Int32 l_offset = ((Int32)l_immediate << (31 - 11)) >> (31 - 11);
+
+                        String l_assembly = String.Format("{0} x{1}, x{2}, {3}", l_mnemonic, l_destinationRegister, l_sourceRegister1, l_offset);
+                        String l_splitBits = Convert.ToString(l_immediate, 2).PadLeft(12, '0') + '_' + Convert.ToString(l_sourceRegister1, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_func3, 2).PadLeft(3, '0') + '_' + Convert.ToString(l_destinationRegister, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_opcode, 2).PadLeft(7, '0');
+
+                        return new Tuple<String, String>(l_assembly, l_splitBits);
+                    }
+                    else if (s_instance.m_shiftTypeInstructions.TryGetValue(l_extendedFunction, out l_mnemonic))
+                    {
+                        byte l_destinationRegister = (byte)((encodedInstruction >> 7) & 0x1F);
+                        byte l_sourceRegister1 = (byte)((encodedInstruction >> 15) & 0x1F);
+                        byte l_shift = (byte)((encodedInstruction >> 20) & 0x1F);
+
+                        String l_assembly = String.Format("{0} x{1}, x{2}, {3}", l_mnemonic, l_destinationRegister, l_sourceRegister1, l_shift);
+                        String l_splitBits = Convert.ToString(l_func7, 2).PadLeft(7, '0') + '_' + Convert.ToString(l_shift, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_sourceRegister1, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_func3, 2).PadLeft(3, '0') + '_' + Convert.ToString(l_destinationRegister, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_opcode, 2).PadLeft(7, '0');
+
+                        return new Tuple<String, String>(l_assembly, l_splitBits);
+                    }
+                    else
+                    {
+                        return l_notAnInstruction;
+                    }
+                }
+
+                case 0b0110011: // R-type
+                {
+                    byte l_func3 = (byte)((encodedInstruction >> 12) & 0x7);
+                    byte l_func7 = (byte)((encodedInstruction >> 25) & 0x7F);
+                    UInt16 l_extendedFunction = (UInt16)(((UInt16)l_func7 << 3) | l_func3);
+                    String l_mnemonic;
+
+                    if (s_instance.m_rTypeInstructions.TryGetValue(l_extendedFunction, out l_mnemonic) == false)
+                    {
+                        return l_notAnInstruction;
+                    }
+
+                    byte l_destinationRegister = (byte)((encodedInstruction >> 7) & 0x1F);
+                    byte l_sourceRegister1 = (byte)((encodedInstruction >> 15) & 0x1F);
+                    byte l_sourceRegister2 = (byte)((encodedInstruction >> 20) & 0x1F);
+
+                    String l_assembly = String.Format("{0} x{1}, x{2}, x{3}", l_mnemonic, l_destinationRegister, l_sourceRegister1, l_sourceRegister2);
+                    String l_splitBits = Convert.ToString(l_func7, 2).PadLeft(7, '0') + '_' + Convert.ToString(l_sourceRegister2, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_sourceRegister1, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_func3, 2).PadLeft(3, '0') + '_' + Convert.ToString(l_destinationRegister, 2).PadLeft(5, '0') + '_' + Convert.ToString(l_opcode, 2).PadLeft(7, '0');
+
+                    return new Tuple<String, String>(l_assembly, l_splitBits);
+                }
+
+                case 0b1110011: // system
+                {
+                    byte l_func3 = (byte)((encodedInstruction >> 12) & 0x7);
+                    byte l_destinationRegister = (byte)((encodedInstruction >> 7) & 0x1F);
+                    byte l_sourceRegister1 = (byte)((encodedInstruction >> 15) & 0x1F);
+
+                    if (l_func3 != 0 || l_destinationRegister != 0 || l_sourceRegister1 != 0)
+                    {
+                        return l_notAnInstruction;
+                    }
+
+                    UInt16 l_func12 = (UInt16)(encodedInstruction >> 20);
+                    String l_mnemonic;
+
+                    if (s_instance.m_systemInstructions.TryGetValue(l_func12, out l_mnemonic) == false)
+                    {
+                        return l_notAnInstruction;
+                    }
+
+                    String l_splitBits = Convert.ToString((UInt32)l_func12, 2).PadLeft(12, '0') + "_00000_000_00000_" + Convert.ToString(l_opcode, 2).PadLeft(7, '0');
+
+                    return new Tuple<String, String>(l_mnemonic, l_splitBits);
+                }
+
+                default:
+                {
+                    return l_notAnInstruction;
+                }
+            }
         }
 
         public static RVInstructionDescription LUI
