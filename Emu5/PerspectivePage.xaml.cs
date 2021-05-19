@@ -102,6 +102,7 @@ namespace Emu5
             m_logger = new LogPerspective();
 
             m_rvEmulator = new RVEmulator();
+            m_rvEmulator.RegisterLogger(m_logger);
 
             dockPanelMain.Children.Add(m_editor);
 
@@ -384,6 +385,13 @@ namespace Emu5
 
                     return;
                 }
+
+                m_logger.LogText("Simulation ended:", false);
+                m_logger.LogCurrentTime(false);
+                m_logger.LogText("(Stopped by user)", true);
+                m_logger.NewLine();
+                m_logger.NewLine();
+                m_logger.UpdateLogUI();
             }
 
             m_stepCount = 0;

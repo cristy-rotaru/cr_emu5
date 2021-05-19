@@ -62,6 +62,8 @@ namespace Emu5
         List<UInt32> m_breakpoints;
         bool m_ebreakExecuted;
 
+        LogPerspective m_logger;
+
         public bool Halted
         {
             get
@@ -96,6 +98,13 @@ namespace Emu5
 
             m_breakpoints = new List<UInt32>();
             m_ebreakExecuted = false;
+
+            m_logger = null;
+        }
+
+        public void RegisterLogger(LogPerspective logger)
+        {
+            m_logger = logger;
         }
 
         public void Assemble(String code, RVLabelReferenceMap labelMap, Dictionary<UInt32, String> pseudoInstructions)
@@ -229,17 +238,27 @@ namespace Emu5
 
         public void ResetProcessor()
         {
+            m_logger?.LogText("Processor reset", true);
+
             for (int i_index = 0; i_index < 32; ++i_index)
             {
                 m_registerFile[i_index] = 0x0;
                 m_pendingInterrupts[i_index] = false;
+
+                m_logger?.LogText(String.Format("x{0}\t<=  0x{1,8:X8}", i_index, 0), true);
             }
 
             m_trapHandled = null;
             m_interruptsEnabled = false;
             m_waitForInterrupt = false;
             m_programCounter = 0x0;
+
             byte?[] l_initialProgramCounter = m_memoryMap.Read(0x0, 4);
+
+            m_logger?.LogText("Memory read:", false);
+            m_logger?.LogByteArray(l_initialProgramCounter, false);
+            m_logger?.LogText(String.Format("<= [0x{0,8:X8}]", 0), true);
+
             for (int i_byteIndex = 3; i_byteIndex >= 0; --i_byteIndex)
             {
                 if (l_initialProgramCounter[i_byteIndex] == null)
@@ -249,6 +268,8 @@ namespace Emu5
                 m_programCounter <<= 8;
                 m_programCounter |= (UInt32)l_initialProgramCounter[i_byteIndex];
             }
+
+            m_logger?.LogText(String.Format("PC\t<=  0x{0,8:X8}", m_programCounter), true);
 
             m_memoryMap.ResetAllPeripherals();
         }
@@ -324,6 +345,7 @@ namespace Emu5
 
             if (m_waitForInterrupt)
             {
+                m_logger?.LogText("Waiting for interrupt", true);
                 return;
             }
 

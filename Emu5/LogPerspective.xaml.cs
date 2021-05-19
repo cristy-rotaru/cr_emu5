@@ -54,6 +54,38 @@ namespace Emu5
             m_log += newLine ? '\n' : ' ';
         }
 
+        public void LogByteArray(byte[] bytes, bool newLine)
+        {
+            if (bytes != null)
+            {
+                foreach (byte i_byte in bytes)
+                {
+                    m_log += String.Format("{0, 2:X2}", i_byte) + ' ';
+                }
+            }
+
+            if (newLine)
+            {
+                m_log += '\n';
+            }
+        }
+
+        public void LogByteArray(byte?[] bytes, bool newLine)
+        {
+            if (bytes != null)
+            {
+                foreach (byte? i_byte in bytes)
+                {
+                    m_log += (i_byte == null ? "xx" : String.Format("{0, 2:X2}", i_byte)) + ' ';
+                }
+            }
+
+            if (newLine)
+            {
+                m_log += '\n';
+            }
+        }
+
         public void NewLine()
         {
             lock (m_log)
