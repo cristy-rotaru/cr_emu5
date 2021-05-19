@@ -47,6 +47,8 @@ namespace Emu5
         bool m_runningClocked, m_runningFast;
         bool m_simulationJustStarted, m_simulationJustPaused, m_breakpointHit;
 
+        int m_stepCount;
+
         public bool IsRunning
         {
             get
@@ -384,7 +386,10 @@ namespace Emu5
                 }
             }
 
-            m_logger.Log("Simulation started: " + GetCurrentTimeString());
+            m_stepCount = 0;
+
+            m_logger.LogText("Simulation started:", false);
+            m_logger.LogCurrentTime(true);
 
             m_simulationRunning = true;
             m_compiling = true;
@@ -401,7 +406,19 @@ namespace Emu5
                     Dictionary<UInt32, String> l_pseudoInstructionMap = new Dictionary<UInt32, String>();
 
                     m_rvEmulator.Assemble(l_code, l_labelMap, l_pseudoInstructionMap);
+
+                    m_logger.LogText("Compilation succesful:", false);
+                    m_logger.LogCurrentTime(true);
+                    m_logger.NewLine();
+                    m_logger.UpdateLogUI();
+
+                    m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+                    ++m_stepCount;
+
                     m_rvEmulator.ResetProcessor();
+
+                    m_logger.NewLine();
+                    m_logger.UpdateLogUI();
 
                     Delegate l_compilationFinishedDelegate = new Action(
                     () => {
@@ -418,10 +435,6 @@ namespace Emu5
                         m_compiling = false;
                         m_wasCompiled = true;
 
-                        m_logger.Log("Compilation succesful: " + GetCurrentTimeString());
-                        m_logger.NewLine();
-                        m_logger.UpdateLogUI();
-
                         ChangePerspective(Perspective.Emulator);
                     });
 
@@ -433,13 +446,14 @@ namespace Emu5
                     () => {
                         ChangePerspective(Perspective.Editor);
 
-                        m_logger.Log("Compilation failed! Line " + e_assemblyException.Line + ", Column " + e_assemblyException.Column + ": \"" + e_assemblyException.Message + "\"");
+                        m_logger.LogText("Compilation failed! Line " + e_assemblyException.Line + ", Column " + e_assemblyException.Column + ": \"" + e_assemblyException.Message + "\"", false);
                         m_logger.UpdateLogUI();
 
                         MessageBox.Show("L: " + e_assemblyException.Line + "; C: " + e_assemblyException.Column + "\n" + e_assemblyException.Message, "Compilation error!", MessageBoxButton.OK, MessageBoxImage.Error);
                         m_editor.SetEditable(true);
 
-                        m_logger.Log("Simulation ended: " + GetCurrentTimeString());
+                        m_logger.LogText("Simulation ended:", false);
+                        m_logger.LogCurrentTime(true);
                         m_logger.NewLine();
                         m_logger.NewLine();
                         m_logger.UpdateLogUI();
@@ -458,7 +472,13 @@ namespace Emu5
 
         public void Step()
         {
+            m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+            ++m_stepCount;
+
             m_rvEmulator.SingleStep();
+
+            m_logger.NewLine();
+            m_logger.UpdateLogUI();
 
             m_simulationJustStarted = false;
             m_simulationJustPaused = false;
@@ -469,7 +489,9 @@ namespace Emu5
                 m_simulationRunning = false;
                 m_processor.UpdateInfo();
 
-                m_logger.Log("Simulation ended: " + GetCurrentTimeString() + " (Core halted)");
+                m_logger.LogText("Simulation ended:", false);
+                m_logger.LogCurrentTime(false);
+                m_logger.LogText("(Core halted)", true);
                 m_logger.NewLine();
                 m_logger.NewLine();
                 m_logger.UpdateLogUI();
@@ -531,6 +553,8 @@ namespace Emu5
 
                 m_processor.UpdateInfo();
                 m_processor.HighlightingEnabled = true;
+
+                m_logger.UpdateLogUI();
             }
         }
 
@@ -562,7 +586,9 @@ namespace Emu5
 
             m_rvEmulator.Halted = true;
 
-            m_logger.Log("Simulation ended: " + GetCurrentTimeString() + " (Stopped by user)");
+            m_logger.LogText("Simulation ended:", false);
+            m_logger.LogCurrentTime(false);
+            m_logger.LogText("(Stopped by user)", true);
             m_logger.NewLine();
             m_logger.NewLine();
             m_logger.UpdateLogUI();
@@ -627,7 +653,13 @@ namespace Emu5
         {
             Dispatcher.BeginInvoke(new Action(
             () => {
+                m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+                ++m_stepCount;
+
                 m_rvEmulator.SingleStep();
+
+                m_logger.NewLine();
+                m_logger.UpdateLogUI();
 
                 if (m_rvEmulator.Halted)
                 {
@@ -637,7 +669,9 @@ namespace Emu5
                     m_runningClocked = false;
                     m_processor.UpdateInfo();
 
-                    m_logger.Log("Simulation ended: " + GetCurrentTimeString() + " (Core halted)");
+                    m_logger.LogText("Simulation ended:", false);
+                    m_logger.LogCurrentTime(false);
+                    m_logger.LogText("(Core halted)", true);
                     m_logger.NewLine();
                     m_logger.NewLine();
                     m_logger.UpdateLogUI();
@@ -680,7 +714,12 @@ namespace Emu5
                     return; // stop simulation per external request
                 }
 
+                m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+                ++m_stepCount;
+
                 m_rvEmulator.SingleStep();
+
+                m_logger.NewLine();
 
                 if (m_rvEmulator.Halted)
                 {
@@ -692,7 +731,9 @@ namespace Emu5
                         m_processor.UpdateInfo();
                         m_processor.HighlightingEnabled = true;
 
-                        m_logger.Log("Simulation ended: " + GetCurrentTimeString() + " (Core halted)");
+                        m_logger.LogText("Simulation ended:", false);
+                        m_logger.LogCurrentTime(false);
+                        m_logger.LogText("(Core halted)", true);
                         m_logger.NewLine();
                         m_logger.NewLine();
                         m_logger.UpdateLogUI();
@@ -718,6 +759,8 @@ namespace Emu5
                         m_processor.UpdateInfo();
                         m_processor.HighlightingEnabled = true;
 
+                        m_logger.UpdateLogUI();
+
                         CommandManager.InvalidateRequerySuggested();
                     });
 
@@ -726,28 +769,6 @@ namespace Emu5
                     return;
                 }
             }
-        }
-
-        private String GetCurrentTimeString()
-        {
-            DateTime l_currentTime = DateTime.Now;
-
-            String l_timeString = "";
-            l_timeString += String.Format("{0:0000}", l_currentTime.Year);
-            l_timeString += '-';
-            l_timeString += String.Format("{0:00}", l_currentTime.Month);
-            l_timeString += '-';
-            l_timeString += String.Format("{0:00}", l_currentTime.Day);
-            l_timeString += ' ';
-            l_timeString += l_currentTime.Hour;
-            l_timeString += ':';
-            l_timeString += String.Format("{0:00}", l_currentTime.Minute);
-            l_timeString += ':';
-            l_timeString += String.Format("{0:00}", l_currentTime.Second);
-            l_timeString += '.';
-            l_timeString += String.Format("{0:000}", l_currentTime.Millisecond);
-
-            return l_timeString;
         }
     }
 }
