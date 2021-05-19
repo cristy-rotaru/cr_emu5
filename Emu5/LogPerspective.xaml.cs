@@ -8,24 +8,48 @@ namespace Emu5
     /// </summary>
     public partial class LogPerspective : UserControl
     {
+        String m_log;
+
         public LogPerspective()
         {
             InitializeComponent();
+
+            m_log = "";
         }
 
         public void Clear()
         {
-            textBoxLog.Clear();
+            lock (m_log)
+            {
+                m_log = "";
+            }
         }
 
         public void Log(String text)
         {
-            textBoxLog.AppendText(text + "\n");
+            lock (m_log)
+            {
+                m_log += text + '\n';
+            }
         }
 
         public void NewLine()
         {
-            textBoxLog.AppendText("\n");
+            lock (m_log)
+            {
+                m_log += '\n';
+            }
+        }
+
+        public void UpdateLogUI()
+        {
+            Dispatcher.BeginInvoke(new Action(
+            () => {
+                lock (m_log)
+                {
+                    textBoxLog.Text = m_log;
+                }
+            }));
         }
     }
 }

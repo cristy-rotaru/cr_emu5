@@ -420,6 +420,7 @@ namespace Emu5
 
                         m_logger.Log("Compilation succesful: " + GetCurrentTimeString());
                         m_logger.NewLine();
+                        m_logger.UpdateLogUI();
 
                         ChangePerspective(Perspective.Emulator);
                     });
@@ -433,6 +434,7 @@ namespace Emu5
                         ChangePerspective(Perspective.Editor);
 
                         m_logger.Log("Compilation failed! Line " + e_assemblyException.Line + ", Column " + e_assemblyException.Column + ": \"" + e_assemblyException.Message + "\"");
+                        m_logger.UpdateLogUI();
 
                         MessageBox.Show("L: " + e_assemblyException.Line + "; C: " + e_assemblyException.Column + "\n" + e_assemblyException.Message, "Compilation error!", MessageBoxButton.OK, MessageBoxImage.Error);
                         m_editor.SetEditable(true);
@@ -440,6 +442,7 @@ namespace Emu5
                         m_logger.Log("Simulation ended: " + GetCurrentTimeString());
                         m_logger.NewLine();
                         m_logger.NewLine();
+                        m_logger.UpdateLogUI();
 
                         m_compiling = false;
                         m_simulationRunning = false;
@@ -469,6 +472,7 @@ namespace Emu5
                 m_logger.Log("Simulation ended: " + GetCurrentTimeString() + " (Core halted)");
                 m_logger.NewLine();
                 m_logger.NewLine();
+                m_logger.UpdateLogUI();
 
                 MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -561,6 +565,7 @@ namespace Emu5
             m_logger.Log("Simulation ended: " + GetCurrentTimeString() + " (Stopped by user)");
             m_logger.NewLine();
             m_logger.NewLine();
+            m_logger.UpdateLogUI();
 
             m_processor.UpdateInfo();
         }
@@ -635,6 +640,7 @@ namespace Emu5
                     m_logger.Log("Simulation ended: " + GetCurrentTimeString() + " (Core halted)");
                     m_logger.NewLine();
                     m_logger.NewLine();
+                    m_logger.UpdateLogUI();
 
                     MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -689,6 +695,7 @@ namespace Emu5
                         m_logger.Log("Simulation ended: " + GetCurrentTimeString() + " (Core halted)");
                         m_logger.NewLine();
                         m_logger.NewLine();
+                        m_logger.UpdateLogUI();
 
                         MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
 
