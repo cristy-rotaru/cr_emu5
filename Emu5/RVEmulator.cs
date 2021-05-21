@@ -245,7 +245,7 @@ namespace Emu5
                 m_registerFile[i_index] = 0x0;
                 m_pendingInterrupts[i_index] = false;
 
-                m_logger?.LogText(String.Format("x{0}\t<=  0x{1,8:X8}", i_index, 0), true);
+                m_logger?.LogText(String.Format("x{0,-2} <= 0x{1,8:X8}", i_index, 0), true);
             }
 
             m_trapHandled = null;
@@ -269,7 +269,7 @@ namespace Emu5
                 m_programCounter |= (UInt32)l_initialProgramCounter[i_byteIndex];
             }
 
-            m_logger?.LogText(String.Format("PC\t<=  0x{0,8:X8}", m_programCounter), true);
+            m_logger?.LogText(String.Format("Register write: PC <= 0x{0,8:X8}", m_programCounter), true);
 
             m_memoryMap.ResetAllPeripherals();
         }
@@ -356,6 +356,11 @@ namespace Emu5
             }
 
             byte?[] l_rawData = m_memoryMap.Read(m_programCounter, 4);
+
+            m_logger?.LogText("Code read:", false);
+            m_logger?.LogByteArray(l_rawData, false);
+            m_logger?.LogText(String.Format("<= [0x{0, 8:X8}]", m_programCounter), true);
+
             UInt32 l_instructionData = 0x0;
             for (int i_byteIndex = 3; i_byteIndex >= 0; --i_byteIndex)
             {
@@ -369,7 +374,19 @@ namespace Emu5
                 l_instructionData |= (UInt32)l_rawData[i_byteIndex];
             }
 
+            Tuple<String, String> l_dissassembly = RVInstructions.DisassembleIntruction(l_instructionData);
+            if (String.IsNullOrEmpty(l_dissassembly.Item1))
+            {
+                m_logger?.LogText(String.Format("Decode error: 0x{0,8:X8} is not a valid instruction", l_instructionData), true);
+            }
+            else
+            {
+                m_logger?.LogText(String.Format("Decoded: {0} ({1})", l_dissassembly.Item1, l_dissassembly.Item2), true);
+            }
+
             DecodeAndExecute(l_instructionData);
+
+            m_logger?.LogText(String.Format("Register write: PC <= 0x{0,8:X8}", m_programCounter), true);
         }
 
         public UInt32 GetProgramCounter()
@@ -451,9 +468,16 @@ namespace Emu5
                 throw new RVEmulationException("Register index out of range."); // if this happens I fucked something up really bad
             }
 
+            m_logger.LogText(String.Format("Register write: x{0} <= 0x{1,8:X8}", index, data), false);
+
             if (index != 0)
             {
+                m_logger.NewLine();
                 m_registerFile[index] = data;
+            }
+            else
+            {
+                m_logger.LogText("(Write to x0 suppressed)", true);
             }
         }
 
