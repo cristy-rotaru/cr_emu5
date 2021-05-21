@@ -135,7 +135,7 @@ namespace Emu5
         public bool HasBreakpoint(UInt32 address)
         {
             bool l_result;
-            
+
             lock (m_breakpoints)
             {
                 l_result = m_breakpoints.Contains(address);
@@ -289,7 +289,7 @@ namespace Emu5
                 {
                     Tuple<RVVector, ushort> l_interrupt = m_queuedInterrupts[i_interruptIndex];
                     ushort l_newTimeout = (ushort)(l_interrupt.Item2 - 1);
-                    
+
                     if (l_newTimeout == 0)
                     {
                         m_queuedInterrupts.RemoveAt(i_interruptIndex);
@@ -504,29 +504,22 @@ namespace Emu5
             {
                 case 0b000: // SB
                 {
+                    byte[] l_writeData = new byte[1];
+                    l_writeData[0] = (byte)(data & 0xFF);
                     try
                     {
-                        byte[] l_writeData = new byte[1];
-                        l_writeData[0] = (byte)(data & 0xFF);
-                        try
-                        {
-                            m_memoryMap.Write(address, l_writeData);
-                        }
-                        catch (RVMemoryException)
-                        {
-                            LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
-                            return false;
-                        }
-
-                        m_logger?.LogText(String.Format("Memory write: [0x{0,8:X8}] <=", address), false);
-                        m_logger?.LogByteArray(l_writeData, true);
-
-                        return true;
+                        m_memoryMap.Write(address, l_writeData);
                     }
-                    catch
+                    catch (RVMemoryException)
                     {
+                        LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                         return false;
                     }
+
+                    m_logger?.LogText(String.Format("Memory write: [0x{0,8:X8}] <=", address), false);
+                    m_logger?.LogByteArray(l_writeData, true);
+
+                    return true;
                 }
 
                 case 0b001: // SH
@@ -537,30 +530,23 @@ namespace Emu5
                         return false;
                     }
 
+                    byte[] l_writeData = new byte[2];
+                    l_writeData[0] = (byte)(data & 0xFF);
+                    l_writeData[1] = (byte)((data >> 8) & 0xFF);
                     try
                     {
-                        byte[] l_writeData = new byte[2];
-                        l_writeData[0] = (byte)(data & 0xFF);
-                        l_writeData[1] = (byte)((data >> 8) & 0xFF);
-                        try
-                        {
-                            m_memoryMap.Write(address, l_writeData);
-                        }
-                        catch (RVMemoryException)
-                        {
-                            LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
-                            return false;
-                        }
-
-                        m_logger?.LogText(String.Format("Memory write: [0x{0,8:X8}] <=", address), false);
-                        m_logger?.LogByteArray(l_writeData, true);
-
-                        return true;
+                        m_memoryMap.Write(address, l_writeData);
                     }
-                    catch
+                    catch (RVMemoryException)
                     {
+                        LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                         return false;
                     }
+
+                    m_logger?.LogText(String.Format("Memory write: [0x{0,8:X8}] <=", address), false);
+                    m_logger?.LogByteArray(l_writeData, true);
+
+                    return true;
                 }
 
                 case 0b010: // SW
@@ -571,32 +557,25 @@ namespace Emu5
                         return false;
                     }
 
+                    byte[] l_writeData = new byte[4];
+                    l_writeData[0] = (byte)(data & 0xFF);
+                    l_writeData[1] = (byte)((data >> 8) & 0xFF);
+                    l_writeData[2] = (byte)((data >> 16) & 0xFF);
+                    l_writeData[3] = (byte)((data >> 24) & 0xFF);
                     try
                     {
-                        byte[] l_writeData = new byte[4];
-                        l_writeData[0] = (byte)(data & 0xFF);
-                        l_writeData[1] = (byte)((data >> 8) & 0xFF);
-                        l_writeData[2] = (byte)((data >> 16) & 0xFF);
-                        l_writeData[3] = (byte)((data >> 24) & 0xFF);
-                        try
-                        {
-                            m_memoryMap.Write(address, l_writeData);
-                        }
-                        catch (RVMemoryException)
-                        {
-                            LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
-                            return false;
-                        }
-
-                        m_logger?.LogText(String.Format("Memory write: [0x{0,8:X8}] <=", address), false);
-                        m_logger?.LogByteArray(l_writeData, true);
-
-                        return true;
+                        m_memoryMap.Write(address, l_writeData);
                     }
-                    catch
+                    catch (RVMemoryException)
                     {
+                        LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                         return false;
                     }
+
+                    m_logger?.LogText(String.Format("Memory write: [0x{0,8:X8}] <=", address), false);
+                    m_logger?.LogByteArray(l_writeData, true);
+
+                    return true;
                 }
 
                 default:
@@ -1099,7 +1078,7 @@ namespace Emu5
                 {
                     LoadVector(RVVector.InvalidInstruction, CreateByteStream(m_programCounter)); // invalid instruction fault
                     return false;
-                }    
+                }
             }
         }
 
