@@ -518,6 +518,9 @@ namespace Emu5
                             return false;
                         }
 
+                        m_logger?.LogText(String.Format("Memory write: [0x{0,8:X8}] <=", address), false);
+                        m_logger?.LogByteArray(l_writeData, true);
+
                         return true;
                     }
                     catch
@@ -548,6 +551,9 @@ namespace Emu5
                             LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                             return false;
                         }
+
+                        m_logger?.LogText(String.Format("Memory write: [0x{0,8:X8}] <=", address), false);
+                        m_logger?.LogByteArray(l_writeData, true);
 
                         return true;
                     }
@@ -581,6 +587,9 @@ namespace Emu5
                             LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                             return false;
                         }
+
+                        m_logger?.LogText(String.Format("Memory write: [0x{0,8:X8}] <=", address), false);
+                        m_logger?.LogByteArray(l_writeData, true);
 
                         return true;
                     }
@@ -1237,9 +1246,13 @@ namespace Emu5
                     l_offset = (UInt32)(((Int32)l_offset << (31 - 11)) >> (31 - 11));
 
                     UInt32 l_base = ReadRegister(l_sourceRegister1);
+                    UInt32 l_storeAddress = l_base + l_offset;
+
+                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 0x{1,8:X8} = 0x{2,8:X8} (x{3} + imm)", l_base, l_offset, l_storeAddress, l_sourceRegister1), true);
+
                     UInt32 l_data = ReadRegister(l_sourceRegister2);
 
-                    if (StoreToMemory(l_func3, l_base + l_offset, l_data) == false)
+                    if (StoreToMemory(l_func3, l_storeAddress, l_data) == false)
                     {
                         return; // fault triggering is handled in StoreToMemory
                     }
