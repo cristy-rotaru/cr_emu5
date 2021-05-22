@@ -61,6 +61,7 @@ namespace Emu5
 
         List<UInt32> m_breakpoints;
         bool m_ebreakExecuted;
+        bool m_softReset;
 
         LogPerspective m_logger;
 
@@ -98,6 +99,7 @@ namespace Emu5
 
             m_breakpoints = new List<UInt32>();
             m_ebreakExecuted = false;
+            m_softReset = false;
 
             m_logger = null;
         }
@@ -351,7 +353,12 @@ namespace Emu5
 
             if ((m_programCounter & 0x3) != 0)
             {
+                m_logger?.LogText("Taking trap: MisalignedPC (PC is not aligned to 32 bits)", true);
+
                 LoadVector(RVVector.MisalignedPC, CreateByteStream(m_programCounter)); // misaligned PC fault
+
+                m_logger?.LogText(String.Format("Register write: PC <= 0x{0,8:X8}", m_programCounter), true);
+
                 return;
             }
 
@@ -378,18 +385,23 @@ namespace Emu5
             if (String.IsNullOrEmpty(l_dissassembly.Item1))
             {
                 m_logger?.LogText(String.Format("Decode error: 0x{0,8:X8} is not a valid instruction", l_instructionData), true);
+                m_logger?.LogText("Taking trap: InvalidInstruction (Invalid instruction code)", true);
+
+                LoadVector(RVVector.InvalidInstruction, CreateByteStream(m_programCounter));
             }
             else
             {
                 m_logger?.LogText(String.Format("Decoded: {0} ({1})", l_dissassembly.Item1, l_dissassembly.Item2), true);
+
+                DecodeAndExecute(l_instructionData);
             }
 
-            DecodeAndExecute(l_instructionData);
-
-            if (m_halted == false)
+            if (m_halted == false && m_softReset == false)
             {
                 m_logger?.LogText(String.Format("Register write: PC <= 0x{0,8:X8}", m_programCounter), true);
             }
+
+            m_softReset = false;
         }
 
         public UInt32 GetProgramCounter()
@@ -426,6 +438,9 @@ namespace Emu5
         {
             if (m_trapHandled != null)
             {
+                m_logger?.LogText("Fault during exception/interrupt handling", true);
+                m_logger?.LogText("Halting core", true);
+
                 m_halted = true;
                 m_haltReason = "Fault during exception/interrupt handling";
                 return;
@@ -433,10 +448,25 @@ namespace Emu5
 
             m_memoryMap.Write(0x100, contextInfo); // save trap info
 
-            m_memoryMap.Write(0x80, CreateByteStream(m_registerFile)); // backup registers
+            m_logger?.LogText(String.Format("Memory write: [0x{0,8:X8}] <=", 0x100), false);
+            m_logger?.LogByteArray(contextInfo, false);
+            m_logger?.LogText("(Context info)", true);
+
+            byte[] l_registerBackup = CreateByteStream(m_registerFile);
+            m_memoryMap.Write(0x80, l_registerBackup); // backup registers
+
+            m_logger?.LogText(String.Format("Memory write: [0x{0,8:X8}] <=", 0x80), false);
+            m_logger?.LogByteArray(l_registerBackup, false);
+            m_logger?.LogText("(Saved registers)", true);
 
             // load corresponding PC
-            byte?[] l_vector = m_memoryMap.Read(0x4 * (UInt32)vectorIndex, 4);
+            UInt32 l_vectorAddress = 0x4 * (UInt32)vectorIndex;
+            byte?[] l_vector = m_memoryMap.Read(l_vectorAddress, 4);
+
+            m_logger?.LogText("Memory read:", false);
+            m_logger?.LogByteArray(l_vector, false);
+            m_logger?.LogText(String.Format("<= [0x{0,8:X8}] (Vector)", l_vectorAddress), true);
+
             m_programCounter = 0x0;
             for (int i_byteIndex = 3; i_byteIndex >= 0; --i_byteIndex)
             {
@@ -512,6 +542,8 @@ namespace Emu5
                     }
                     catch (RVMemoryException)
                     {
+                        m_logger?.LogText("Taking trap: UndefinedAddressSpace (The memory address is not defined)", true);
+
                         LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                         return false;
                     }
@@ -526,6 +558,8 @@ namespace Emu5
                 {
                     if ((address & 0x1) != 0)
                     {
+                        m_logger?.LogText("Taking trap: MisalignedMemoryAddress (The store address is not aligned to the data size)", true);
+
                         LoadVector(RVVector.MisalignedMemory, CreateByteStream(m_programCounter, address)); // misaligned access fault
                         return false;
                     }
@@ -539,6 +573,8 @@ namespace Emu5
                     }
                     catch (RVMemoryException)
                     {
+                        m_logger?.LogText("Taking trap: UndefinedAddressSpace (The memory address is not defined)", true);
+
                         LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                         return false;
                     }
@@ -553,6 +589,8 @@ namespace Emu5
                 {
                     if ((address & 0x3) != 0)
                     {
+                        m_logger?.LogText("Taking trap: MisalignedMemoryAddress (The store address is not aligned to the data size)", true);
+
                         LoadVector(RVVector.MisalignedMemory, CreateByteStream(m_programCounter, address)); // misaligned access fault
                         return false;
                     }
@@ -568,6 +606,8 @@ namespace Emu5
                     }
                     catch (RVMemoryException)
                     {
+                        m_logger?.LogText("Taking trap: UndefinedAddressSpace (The memory address is not defined)", true);
+
                         LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                         return false;
                     }
@@ -602,6 +642,8 @@ namespace Emu5
 
                     if (l_rawData[0] == null)
                     {
+                        m_logger?.LogText("Taking trap: UndefinedAddressSpace (The memory address is not defined)", true);
+
                         LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                         return false;
                     }
@@ -617,6 +659,8 @@ namespace Emu5
                 {
                     if ((address & 0x1) != 0)
                     {
+                        m_logger?.LogText("Taking trap: MisalignedMemoryAddress (The load address is not aligned to the data size)", true);
+
                         LoadVector(RVVector.MisalignedMemory, CreateByteStream(m_programCounter, address)); // misaligned access fault
                         return false;
                     }
@@ -629,6 +673,8 @@ namespace Emu5
 
                     if (l_rawData[0] == null || l_rawData[1] == null)
                     {
+                        m_logger?.LogText("Taking trap: UndefinedAddressSpace (The memory address is not defined)", true);
+
                         LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                         return false;
                     }
@@ -644,6 +690,8 @@ namespace Emu5
                 {
                     if ((address & 0x3) != 0)
                     {
+                        m_logger?.LogText("Taking trap: MisalignedMemoryAddress (The load address is not aligned to the data size)", true);
+
                         LoadVector(RVVector.MisalignedMemory, CreateByteStream(m_programCounter, address)); // misaligned access fault
                         return false;
                     }
@@ -659,6 +707,8 @@ namespace Emu5
                     {
                         if (l_rawData[i_byteIndex] == null)
                         {
+                            m_logger?.LogText("Taking trap: UndefinedAddressSpace (The memory address is not defined)", true);
+
                             LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                             return false;
                         }
@@ -678,6 +728,8 @@ namespace Emu5
 
                     if (l_rawData[0] == null)
                     {
+                        m_logger?.LogText("Taking trap: UndefinedAddressSpace (The memory address is not defined)", true);
+
                         LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                         return false;
                     }
@@ -690,6 +742,8 @@ namespace Emu5
                 {
                     if ((address & 0x1) != 0)
                     {
+                        m_logger?.LogText("Taking trap: MisalignedMemoryAddress (The load address is not aligned to the data size)", true);
+
                         LoadVector(RVVector.MisalignedMemory, CreateByteStream(m_programCounter, address)); // misaligned access fault
                         return false;
                     }
@@ -702,6 +756,8 @@ namespace Emu5
 
                     if (l_rawData[0] == null || l_rawData[1] == null)
                     {
+                        m_logger?.LogText("Taking trap: UndefinedAddressSpace (The memory address is not defined)", true);
+
                         LoadVector(RVVector.UndefinedMemory, CreateByteStream(m_programCounter, address)); // undefined memory address fault
                         return false;
                     }
@@ -1005,9 +1061,19 @@ namespace Emu5
 
                 case 0b0000001100: // DIV
                 {
-                    if (l_data2 == 0 || (l_data1 == 0x80000000 && l_data2 == 0xFFFFFFFF))
+                    if (l_data2 == 0)
                     {
-                        LoadVector(RVVector.DivisionBy0, CreateByteStream(m_programCounter)); // division by 0 or division overflow fault
+                        m_logger?.LogText("Taking trap: DivisionBy0 (Divider is 0)", true);
+
+                        LoadVector(RVVector.DivisionBy0, CreateByteStream(m_programCounter)); // division by 0 fault
+                        return false;
+                    }
+
+                    if (l_data1 == 0x80000000 && l_data2 == 0xFFFFFFFF)
+                    {
+                        m_logger?.LogText("Taking trap: DivisionBy0 (Division overflow)", true);
+
+                        LoadVector(RVVector.DivisionBy0, CreateByteStream(m_programCounter)); // division overflow fault
                         return false;
                     }
 
@@ -1031,6 +1097,8 @@ namespace Emu5
                 {
                     if (l_data2 == 0)
                     {
+                        m_logger?.LogText("Taking trap: DivisionBy0 (Divider is 0)", true);
+
                         LoadVector(RVVector.DivisionBy0, CreateByteStream(m_programCounter)); // division by 0 or division overflow fault
                         return false;
                     }
@@ -1055,6 +1123,8 @@ namespace Emu5
                 {
                     if (l_data2 == 0)
                     {
+                        m_logger?.LogText("Taking trap: DivisionBy0 (Divider is 0)", true);
+
                         LoadVector(RVVector.DivisionBy0, CreateByteStream(m_programCounter)); // division by 0 or division overflow fault
                         return false;
                     }
@@ -1079,6 +1149,8 @@ namespace Emu5
                 {
                     if (l_data2 == 0)
                     {
+                        m_logger?.LogText("Taking trap: DivisionBy0 (Divider is 0)", true);
+
                         LoadVector(RVVector.DivisionBy0, CreateByteStream(m_programCounter)); // division by 0 or division overflow fault
                         return false;
                     }
@@ -1189,12 +1261,16 @@ namespace Emu5
 
                 case 0x001: // ebreak
                 {
+                    m_logger?.LogText("Forcing breakpoint", true);
+
                     m_ebreakExecuted = true;
                     return true;
                 }
 
                 case 0xFFF: // hlt
                 {
+                    m_logger?.LogText("Halting core", true);
+
                     m_halted = true;
                     m_haltReason = "Halt instruction executed";
                     return false;
@@ -1202,12 +1278,15 @@ namespace Emu5
 
                 case 0xFFE: // rst
                 {
+                    m_softReset = true;
                     ResetProcessor();
                     return false;
                 }
 
                 case 0x107: // ien
                 {
+                    m_logger?.LogText("Enabling interrupts", true);
+
                     lock (m_pendingInterrupts)
                     {
                         m_interruptsEnabled = true;
@@ -1222,6 +1301,8 @@ namespace Emu5
 
                 case 0x106: // idis
                 {
+                    m_logger?.LogText("Disabling interrupts", true);
+
                     lock (m_pendingInterrupts)
                     {
                         m_interruptsEnabled = false;
@@ -1238,6 +1319,8 @@ namespace Emu5
                 {
                     if (m_trapHandled == null) // no effect if already in interrupt handler
                     {
+                        m_logger?.LogText("Execution stopped until next interrupt", true);
+
                         m_waitForInterrupt = true;
                     }
 
@@ -1250,6 +1333,11 @@ namespace Emu5
                     {
                         // restore registers
                         byte?[] l_registerBackup = m_memoryMap.Read(0x80, 128);
+
+                        m_logger?.LogText("Memory read:", false);
+                        m_logger?.LogByteArray(l_registerBackup, false);
+                        m_logger?.LogText(String.Format("<= [0x{0,8:X8}] (Saved registers)", 0x80), true);
+
                         for (int i_registerIndex = 0; i_registerIndex < 32; ++i_registerIndex)
                         {
                             UInt32 l_registerValue = 0x0;
@@ -1267,6 +1355,11 @@ namespace Emu5
 
                         // load return PC
                         byte?[] l_returnPC = m_memoryMap.Read(0x100, 4);
+
+                        m_logger?.LogText("Memory read:", false);
+                        m_logger?.LogByteArray(l_returnPC, false);
+                        m_logger?.LogText(String.Format("<= [0x{0,8:X8}] (Saved registers)", 0x100), true);
+
                         m_programCounter = 0x0;
                         for (int i_byteIndex = 3; i_byteIndex >= 0; --i_byteIndex)
                         {
@@ -1282,6 +1375,8 @@ namespace Emu5
                     }
                     else
                     {
+                        m_logger?.LogText("Taking trap: InvalidInstruction (The iret instruction is not valid in the current context)", true);
+
                         // instruction is not defined outside of interrupt handlers
                         LoadVector(RVVector.InvalidInstruction, CreateByteStream(m_programCounter)); // invalid instruction fault
                     }
