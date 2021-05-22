@@ -721,166 +721,381 @@ namespace Emu5
             return true;
         }
 
-        private bool ExecuteALU(UInt16 opType, UInt32 operand1, UInt32 operand2, byte destination)
+        private bool ExecuteALU(UInt16 opType, byte operand1, UInt32 operand2, byte destination, bool imm)
         {
+            /* To allow accurate logging this function will behave differently for I-type and R-type instructions
+             * aperand1 is always a register index
+             * operand2 is a register index if imm==false and 32-bit immediate if imm==true
+             */
+
+            UInt32 l_data1 = ReadRegister(operand1);
+            UInt32 l_data2 = imm ? operand2 : ReadRegister((byte)operand2);
+
             switch (opType)
             {
                 case 0b0000000000: // ADD
                 {
-                    WriteRegister(destination, operand1 + operand2);
+                    UInt32 l_result = l_data1 + l_data2;
+
+                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("(x{0} + imm)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("(x{0} + x{1})", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result);
                 }
                 break;
 
                 case 0b0100000000: // SUB
                 {
-                    WriteRegister(destination, operand1 - operand2);
+                    UInt32 l_result = l_data1 - l_data2;
+
+                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} - 0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("(x{0} - imm)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("(x{0} - x{1})", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result);
                 }
                 break;
 
                 case 0b0000000001: // SLL
                 {
-                    WriteRegister(destination, operand1 << (int)operand2);
+                    UInt32 l_result = l_data1 << (int)(l_data2 & 0x1F);
+
+                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} << 0x{1,2:X2} = 0x{2,8:X8}", l_data1, l_data2 & 0x1F, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("(x{0} << imm)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("(x{0} << x{1}[4:0])", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result);
                 }
                 break;
 
                 case 0b0000000010: // SLT
                 {
-                    WriteRegister(destination, (Int32)operand1 < (Int32)operand2 ? (UInt32)1 : (UInt32)0);
+                    bool l_result = (Int32)l_data1 < (Int32)l_data2;
+
+                    m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} < (int)0x{1,8:X8} = {2}", l_data1, l_data2, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("((int)x{0} < (int)imm)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("((int)x{0} < (int)x{1})", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result ? (UInt32)1 : (UInt32)0);
                 }
                 break;
 
                 case 0b0000000011: // SLTU
                 {
-                    WriteRegister(destination, operand1 < operand2 ? (UInt32)1 : (UInt32)0);
+                    bool l_result = l_data1 < l_data2;
+
+                    m_logger?.LogText(String.Format("Executing: (uint)0x{0,8:X8} < (uint)0x{1,8:X8} = {2}", l_data1, l_data2, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("((uint)x{0} < (uint)imm)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("((uint)x{0} < (uint)x{1})", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result ? (UInt32)1 : (UInt32)0);
                 }
                 break;
 
                 case 0b0000000100: // XOR
                 {
-                    WriteRegister(destination, operand1 ^ operand2);
+                    UInt32 l_result = l_data1 ^ l_data2;
+
+                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} ^ 0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("(x{0} ^ imm)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("(x{0} ^ x{1})", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result);
                 }
                 break;
 
                 case 0b0000000101: // SRL
                 {
-                    WriteRegister(destination, operand1 >> (int)operand2);
+                    UInt32 l_result = l_data1 >> (int)(l_data2 & 0x1F);
+
+                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} >> 0x{1,2:X2} = 0x{2,8:X8}", l_data1, l_data2 & 0x1F, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("(x{0} >> imm)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("(x{0} >> x{1}[4:0])", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result);
                 }
                 break;
 
                 case 0b0100000101: // SRA
                 {
-                    WriteRegister(destination, (UInt32)((Int32)operand1 >> (int)operand2));
+                    UInt32 l_result = (UInt32)((Int32)l_data1 >> (int)(l_data2 & 0x1F));
+
+                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} >>> 0x{1,2:X2} = 0x{2,8:X8}", l_data1, l_data2 & 0x1F, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("(x{0} >>> imm)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("(x{0} >>> x{1}[4:0])", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result);
                 }
                 break;
 
                 case 0b0000000110: // OR
                 {
-                    WriteRegister(destination, operand1 | operand2);
+                    UInt32 l_result = l_data1 | l_data2;
+
+                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} | 0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("(x{0} | imm)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("(x{0} | x{1})", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result);
                 }
                 break;
 
                 case 0b0000000111: // AND
                 {
-                    WriteRegister(destination, operand1 & operand2);
+                    UInt32 l_result = l_data1 & l_data2;
+
+                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} & 0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("(x{0} & imm)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("(x{0} & x{1})", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result);
                 }
                 break;
 
                 case 0b0000001000: // MUL
                 {
-                    WriteRegister(destination, operand1 * operand2);
+                    UInt32 l_result = l_data1 * l_data2;
+
+                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} * 0x{1,8:X8} & 0xFFFFFFFF = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("(x{0} * imm & 0xFFFFFFFF)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("(x{0} * x{1} & 0xFFFFFFFF)", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result);
                 }
                 break;
 
                 case 0b0000001001: // MULH
                 {
-                    Int64 l_extendedOperand1 = (Int64)operand1;
-                    Int64 l_extendedOperand2 = (Int64)operand2;
+                    Int64 l_extendedData1 = (Int64)l_data1;
+                    Int64 l_extendedData2 = (Int64)l_data2;
 
                     // sign extend
-                    l_extendedOperand1 <<= 32;
-                    l_extendedOperand2 <<= 32;
-                    l_extendedOperand1 >>= 32;
-                    l_extendedOperand2 >>= 32;
+                    l_extendedData1 <<= 32;
+                    l_extendedData2 <<= 32;
+                    l_extendedData1 >>= 32;
+                    l_extendedData2 >>= 32;
 
-                    Int64 l_result = l_extendedOperand1 * l_extendedOperand2;
-                    l_result >>= 32;
+                    UInt32 l_result = (UInt32)((l_extendedData1 * l_extendedData2) >> 32);
 
-                    WriteRegister(destination, (UInt32)l_result);
+                    m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} * (int)0x{1,8:X8} >> 32 = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("((int)x{0} * (int)imm >> 32)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("((int)x{0} * (int)x{1} >> 32)", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result);
                 }
                 break;
 
                 case 0b0000001010: // MULHSU
                 {
-                    Int64 l_extendedOperand1 = (Int64)operand1;
-                    Int64 l_extendedOperand2 = (Int64)operand2;
+                    Int64 l_extendedData1 = (Int64)l_data1;
+                    Int64 l_extendedData2 = (Int64)l_data2;
 
                     // sign extend
-                    l_extendedOperand1 <<= 32;
-                    l_extendedOperand1 >>= 32;
+                    l_extendedData1 <<= 32;
+                    l_extendedData1 >>= 32;
 
-                    l_extendedOperand2 &= 0xFFFFFFFF;
+                    l_extendedData2 &= 0xFFFFFFFF;
 
-                    Int64 l_result = l_extendedOperand1 * l_extendedOperand2;
-                    l_result >>= 32;
+                    UInt32 l_result = (UInt32)((l_extendedData1 * l_extendedData2) >> 32);
 
-                    WriteRegister(destination, (UInt32)l_result);
+                    m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} * (uint)0x{1,8:X8} >> 32 = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("((int)x{0} * (uint)imm >> 32)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("((int)x{0} * (uint)x{1} >> 32)", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result);
                 }
                 break;
 
                 case 0b0000001011: // MULHU
                 {
-                    UInt64 l_result = (UInt64)operand1 * (UInt64)operand2;
-                    l_result >>= 32;
+                    UInt32 l_result = (UInt32)(((UInt64)l_data1 * (UInt64)l_data2) >> 32);
 
-                    WriteRegister(destination, (UInt32)l_result);
+                    m_logger?.LogText(String.Format("Executing: (uint)0x{0,8:X8} * (uint)0x{1,8:X8} >> 32 = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("((uint)x{0} * (uint)imm >> 32)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("((uint)x{0} * (uint)x{1} >> 32)", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result);
                 }
                 break;
 
                 case 0b0000001100: // DIV
                 {
-                    if (operand2 == 0 || (operand1 == 0x80000000 && operand2 == 0xFFFFFFFF))
+                    if (l_data2 == 0 || (l_data1 == 0x80000000 && l_data2 == 0xFFFFFFFF))
                     {
                         LoadVector(RVVector.DivisionBy0, CreateByteStream(m_programCounter)); // division by 0 or division overflow fault
                         return false;
                     }
 
-                    WriteRegister(destination, (UInt32)((Int32)operand1 / (Int32)operand2));
+                    UInt32 l_result = (UInt32)((Int32)l_data1 / (Int32)l_data2);
+
+                    m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} / (int)0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("((int)x{0} / (int)imm)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("((int)x{0} / (int)x{1})", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result);
                 }
                 break;
 
                 case 0b0000001101: // DIVU
                 {
-                    if (operand2 == 0)
+                    if (l_data2 == 0)
                     {
                         LoadVector(RVVector.DivisionBy0, CreateByteStream(m_programCounter)); // division by 0 or division overflow fault
                         return false;
                     }
 
-                    WriteRegister(destination, operand1 / operand2);
+                    UInt32 l_result = l_data1 / l_data2;
+
+                    m_logger?.LogText(String.Format("Executing: (uint)0x{0,8:X8} / (uint)0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("((uint)x{0} / (uint)imm)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("((uint)x{0} / (uint)x{1})", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result);
                 }
                 break;
 
                 case 0b0000001110: // REM
                 {
-                    if (operand2 == 0)
+                    if (l_data2 == 0)
                     {
                         LoadVector(RVVector.DivisionBy0, CreateByteStream(m_programCounter)); // division by 0 or division overflow fault
                         return false;
                     }
 
-                    WriteRegister(destination, (UInt32)((Int32)operand1 % (Int32)operand2));
+                    UInt32 l_result = (UInt32)((Int32)l_data1 % (Int32)l_data2);
+
+                    m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} % (int)0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("((int)x{0} % (int)imm)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("((int)x{0} % (int)x{1})", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result);
                 }
                 break;
 
                 case 0b0000001111: // REMU
                 {
-                    if (operand2 == 0)
+                    if (l_data2 == 0)
                     {
                         LoadVector(RVVector.DivisionBy0, CreateByteStream(m_programCounter)); // division by 0 or division overflow fault
                         return false;
                     }
 
-                    WriteRegister(destination, operand1 % operand2);
+                    UInt32 l_result = l_data1 % l_data2;
+
+                    m_logger?.LogText(String.Format("Executing: (uint)0x{0,8:X8} % (uint)0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                    if (imm)
+                    {
+                        m_logger?.LogText(String.Format("((uint)x{0} % (uint)imm)", operand1), true);
+                    }
+                    else
+                    {
+                        m_logger?.LogText(String.Format("((uint)x{0} % (uint)x{1})", operand1, operand2), true);
+                    }
+
+                    WriteRegister(destination, l_result);
                 }
                 break;
 
@@ -1258,7 +1473,7 @@ namespace Emu5
                         l_immediate = (UInt32)(((Int32)l_immediate << (31 - 11)) >> (31 - 11));
                     }
 
-                    if (ExecuteALU(l_operation, ReadRegister(l_sourceRegister1), l_immediate, l_destinationRegister) == false)
+                    if (ExecuteALU(l_operation, l_sourceRegister1, l_immediate, l_destinationRegister, true) == false)
                     {
                         return; // fault triggering is handled in ExecuteALU
                     }
@@ -1275,7 +1490,7 @@ namespace Emu5
                     byte l_sourceRegister1 = (byte)((instruction >> 15) & 0x1F);
                     byte l_sourceRegister2 = (byte)((instruction >> 20) & 0x1F);
 
-                    if (ExecuteALU(l_extendedFunction, ReadRegister(l_sourceRegister1), ReadRegister(l_sourceRegister2), l_destinationRegister) == false)
+                    if (ExecuteALU(l_extendedFunction, l_sourceRegister1, l_sourceRegister2, l_destinationRegister, false) == false)
                     {
                         return; // fault triggering is handled in ExecuteALU
                     }
