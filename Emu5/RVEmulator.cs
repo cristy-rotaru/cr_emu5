@@ -285,6 +285,8 @@ namespace Emu5
 
             m_ebreakExecuted = false;
 
+            bool l_mustReset = false;
+
             lock (m_queuedInterrupts)
             {
                 for (int i_interruptIndex = m_queuedInterrupts.Count - 1; i_interruptIndex >= 0; --i_interruptIndex)
@@ -298,7 +300,7 @@ namespace Emu5
 
                         if (l_interrupt.Item1 == RVVector.Reset)
                         {
-                            ResetProcessor();
+                            l_mustReset = true;
                             continue;
                         }
 
@@ -317,31 +319,56 @@ namespace Emu5
                 }
             }
 
+            if (l_mustReset)
+            {
+                ResetProcessor();
+                return;
+            }
+
             if (m_trapHandled == null)
             {
                 lock (m_pendingInterrupts)
                 {
                     if (m_pendingInterrupts[1])
                     {
+                        m_logger?.LogText("Taking interrupt: NMI", true);
+
                         m_pendingInterrupts[1] = false;
                         LoadVector(RVVector.NMI, CreateByteStream(m_programCounter)); // NMI can not be masked
                         m_waitForInterrupt = false;
                         return;
                     }
 
-                    if (m_interruptsEnabled)
+                    bool l_alreadyLogged = false;
+
+                    for (int i_vectorIndex = 8; i_vectorIndex < 32; ++i_vectorIndex)
                     {
-                        for (int i_vectorIndex = 8; i_vectorIndex < 32; ++i_vectorIndex)
+                        if (m_pendingInterrupts[i_vectorIndex])
                         {
-                            if (m_pendingInterrupts[i_vectorIndex])
+                            m_pendingInterrupts[i_vectorIndex] = false;
+
+                            if (m_interruptsEnabled)
                             {
-                                m_pendingInterrupts[i_vectorIndex] = false;
+                                m_logger?.LogText(String.Format("Taking interrupt: External{0}", i_vectorIndex), true);
+
                                 LoadVector((RVVector)i_vectorIndex, CreateByteStream(m_programCounter));
                                 m_waitForInterrupt = false;
+
+                                m_logger?.LogText(String.Format("Register write: PC <= 0x{0,8:X8}", m_programCounter), true);
+
                                 return;
+                            }
+                            else
+                            {
+                                if (l_alreadyLogged == false)
+                                {
+                                    l_alreadyLogged = true;
+                                    m_logger?.LogText(String.Format("Ignoring external{0} because interrupts are disabled", i_vectorIndex), true);
+                                }
                             }
                         }
                     }
+
                 }
             }
 
@@ -1358,7 +1385,7 @@ namespace Emu5
 
                         m_logger?.LogText("Memory read:", false);
                         m_logger?.LogByteArray(l_returnPC, false);
-                        m_logger?.LogText(String.Format("<= [0x{0,8:X8}] (Saved registers)", 0x100), true);
+                        m_logger?.LogText(String.Format("<= [0x{0,8:X8}] (Return PC)", 0x100), true);
 
                         m_programCounter = 0x0;
                         for (int i_byteIndex = 3; i_byteIndex >= 0; --i_byteIndex)
