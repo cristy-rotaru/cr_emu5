@@ -114,7 +114,6 @@ namespace Emu5
         #region r_applicationCommands
         void commandNew_Executed(object target, ExecutedRoutedEventArgs e)
         {
-
             TabItem l_firstTab = (TabItem)tabControlMain.Items[0];
 
             if (l_firstTab.Content.GetType() == typeof(WelcomePage))
@@ -682,16 +681,39 @@ namespace Emu5
                 TabHeader l_header = (TabHeader)tab.Header;
                 PerspectivePage l_page = (PerspectivePage)tab.Content;
 
-                if (l_header.IsUnsaved() == false)
+                if (l_page.IsRunning)
                 {
-                    tabControlMain.Items.Remove(tab);
-                    l_page.CloseAllPeripheralWindows();
+                    if (MessageBox.Show("This simulation is running.\nAre you sure you want to stop it?", "Simulation running", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    {
+                        l_page.StopSimulation();
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
-                else if (MessageBox.Show("The file is not saved.\nAll progress will be lost.\nAre you sure you want to close this tab?", "File not saved", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+
+                if (l_header.IsUnsaved())
                 {
-                    tabControlMain.Items.Remove(tab);
-                    l_page.CloseAllPeripheralWindows();
+                    l_page.ChangePerspective(Perspective.Editor);
+                    MessageBoxResult l_result = MessageBox.Show("The file is not saved.\nDo you want to save it before closing?", "File not saved", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+
+                    if (l_result == MessageBoxResult.Cancel)
+                    {
+                        return;
+                    }
+
+                    if (l_result == MessageBoxResult.Yes)
+                    {
+                        if (l_page.Save() == false)
+                        {
+                            return;
+                        }
+                    }
                 }
+
+                tabControlMain.Items.Remove(tab);
+                l_page.CloseAllPeripheralWindows();
             }
 
             if (tabControlMain.Items.Count == 0) // add welcome tab if no other tabs are available
