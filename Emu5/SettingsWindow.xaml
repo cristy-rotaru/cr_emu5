@@ -6,10 +6,12 @@
         xmlns:local="clr-namespace:Emu5"
         Title="Settings" Icon="Icons/help_settings.png" Height="430" Width="540" Background="#FFF0F0F0" FontSize="13" ResizeMode="NoResize" ShowInTaskbar="False">
     <DockPanel Margin="3">
-        <StackPanel DockPanel.Dock="Bottom" Margin="0,3,0,0" Orientation="Horizontal" FlowDirection="RightToLeft">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" FlowDirection="RightToLeft">
             <Button Name="buttonClose" Margin="0,0,3,0" Width="70" Height="24" Content="Close" Click="buttonClose_Click" />
             <Button Name="buttonApply" Width="70" Height="24" Content="Apply" Click="buttonApply_Click" />
         </StackPanel>
+
+        <Separator DockPanel.Dock="Bottom" />
 
         <TreeView DockPanel.Dock="Left" Width="150">
             <TreeViewItem Name="treeViewItemEditor" Header="Editor" Selected="treeViewItemEditor_Selected" />
