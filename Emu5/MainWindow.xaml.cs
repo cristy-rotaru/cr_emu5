@@ -660,7 +660,7 @@ namespace Emu5
 
         private void menuItemHelpSettings_Click(object sender, RoutedEventArgs e)
         {
-
+            (new SettingsWindow()).ShowDialog();
         }
 
         private void menuItemHelpAbout_Click(object sender, RoutedEventArgs e)
