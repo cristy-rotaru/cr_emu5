@@ -29,7 +29,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <CheckBox Name="checkBoxEchoSentCharacters" Grid.Row="0" Grid.Column="0" IsChecked="True" Content="Echo sent characters" VerticalAlignment="Top" Checked="checkBox_Toggled" Unchecked="checkBox_Toggled" />
+                <CheckBox Name="checkBoxEchoSentCharacters" Grid.Row="0" Grid.Column="0" IsChecked="False" Content="Echo sent characters" VerticalAlignment="Top" Checked="checkBox_Toggled" Unchecked="checkBox_Toggled" />
                 <CheckBox Name="checkBoxBackspaceDeletesCharacters" Grid.Row="1" Grid.Column="0" IsChecked="True" Content="Backspace deletes characters" VerticalAlignment="Center" Checked="checkBox_Toggled" Unchecked="checkBox_Toggled" />
                 <CheckBox Name="checkBoxNewLineSetsCaretTo0" Grid.Row="2" Grid.Column="0" IsChecked="True" Content="send \r along with \n" VerticalAlignment="Bottom" Checked="checkBox_Toggled" Unchecked="checkBox_Toggled" />
             </Grid>
