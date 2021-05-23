@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 
 namespace Emu5
 {
@@ -41,6 +40,16 @@ namespace Emu5
         }
 
         private void treeViewItemLogging_Selected(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void buttonApply_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void buttonClose_Click(object sender, RoutedEventArgs e)
         {
 
         }

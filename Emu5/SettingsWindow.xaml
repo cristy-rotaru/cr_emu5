@@ -4,8 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Emu5"
-        Title="Settings" Icon="Icons/help_settings.png" Height="430" Width="540" Background="#FFF0F0F0" FontSize="13">
+        Title="Settings" Icon="Icons/help_settings.png" Height="430" Width="540" Background="#FFF0F0F0" FontSize="13" ResizeMode="NoResize" ShowInTaskbar="False">
     <DockPanel Margin="3">
+        <StackPanel DockPanel.Dock="Bottom" Margin="0,3,0,0" Orientation="Horizontal" FlowDirection="RightToLeft">
+            <Button Name="buttonClose" Margin="0,0,3,0" Width="70" Height="24" Content="Close" Click="buttonClose_Click" />
+            <Button Name="buttonApply" Width="70" Height="24" Content="Apply" Click="buttonApply_Click" />
+        </StackPanel>
+
         <TreeView DockPanel.Dock="Left" Width="150">
             <TreeViewItem Name="treeViewItemEditor" Header="Editor" Selected="treeViewItemEditor_Selected" />
             <TreeViewItem Name="treeViewItemEmulator" Header="Emulator" IsExpanded="True" Selected="treeViewItemEmulator_Selected">
