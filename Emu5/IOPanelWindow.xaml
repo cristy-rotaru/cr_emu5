@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="I/O panel" Height="355" Width="625" ResizeMode="CanMinimize" Background="#FFF0F0F0" Closing="IOPanelWindow_Closing">
+        Title="I/O panel" Icon="Icons/tools_io_panel.png" Height="355" Width="625" ResizeMode="CanMinimize" Background="#FFF0F0F0" Closing="IOPanelWindow_Closing">
     <Grid Margin="4">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
