@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="Emu5.EditorSettingsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Emu5"
+             FontSize="13">
+    <StackPanel>
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4">
+            <StackPanel Margin="6">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Font size:" Margin="0,0,4,0" />
+                    <TextBox Name="textBoxFontSize" Margin="0,0,4,0" Width="42" TextAlignment="Right" TextChanged="textBoxFontSize_TextChanged" />
+                    <TextBlock Name="textBlockInvalidFontSize" Foreground="Red" Text="(Invalid font size)" Visibility="Hidden" />
+                </StackPanel>
+
+                <CheckBox Name="checkBoxSyntaxHighlighting" Margin="0,4,0,0" Content="Enable syntax highlighting" />
+            </StackPanel>
+        </Border>
+
+        <Border Margin="0,3,0,0" BorderBrush="Black" BorderThickness="1" CornerRadius="4">
+            <StackPanel Margin="6">
+                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                    <TextBlock Text="New file template:" Margin="0,0,4,0" />
+                    <ComboBox Name="comboBoxFileTemplate" Width="170" SelectedIndex="0" IsEditable="False" SelectionChanged="comboBoxFileTemplate_SelectionChanged">
+                        <ComboBoxItem Content="Empty" />
+                        <ComboBoxItem Content="Basic template" />
+                        <ComboBoxItem Content="Advanced template" />
+                    </ComboBox>
+                </StackPanel>
+
+                <TextBlock Name="textBlockTemplateDescription" Margin="0,4,0,0" TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>
