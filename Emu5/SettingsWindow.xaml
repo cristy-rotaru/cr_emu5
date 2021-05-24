@@ -24,6 +24,6 @@
             <TreeViewItem Name="treeViewItemLogging" Header="Logging" Selected="treeViewItemLogging_Selected" />
         </TreeView>
 
-        <ContentControl Name="contentControlSettings" Margin="3,0,0,0" />
+        <ScrollViewer Name="scrollViewerSettings" Margin="3,0,0,0" VerticalScrollBarVisibility="Auto" />
     </DockPanel>
 </Window>

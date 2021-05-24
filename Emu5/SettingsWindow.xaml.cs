@@ -28,7 +28,7 @@ namespace Emu5
 
         private void treeViewItemEditor_Selected(object sender, RoutedEventArgs e)
         {
-            contentControlSettings.Content = m_editorSettings;
+            scrollViewerSettings.Content = m_editorSettings;
         }
 
         private void treeViewItemEmulator_Selected(object sender, RoutedEventArgs e)
