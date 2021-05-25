@@ -20,7 +20,7 @@
 
         <Border Margin="0,3,0,0" BorderBrush="Black" BorderThickness="1" CornerRadius="4">
             <StackPanel Margin="6">
-                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                <StackPanel Orientation="Horizontal">
                     <TextBlock Text="New file template:" Margin="0,0,4,0" />
                     <ComboBox Name="comboBoxFileTemplate" Width="170" SelectedIndex="0" IsEditable="False" SelectionChanged="comboBoxFileTemplate_SelectionChanged">
                         <ComboBoxItem Content="Empty" />
