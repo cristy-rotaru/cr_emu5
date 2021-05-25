@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
 
 namespace Emu5
 {
@@ -9,6 +10,7 @@ namespace Emu5
     {
         EditorSettingsPanel m_editorSettings;
         EmulatorSettingsPanel m_emulatorSettings;
+        MemoryMapSettingsPanel m_memoryMapSettings;
 
         public SettingsWindow()
         {
@@ -16,6 +18,7 @@ namespace Emu5
 
             m_editorSettings = new EditorSettingsPanel();
             m_emulatorSettings = new EmulatorSettingsPanel();
+            m_memoryMapSettings = new MemoryMapSettingsPanel();
 
             LoadSettings();
             treeViewItemEditor.IsSelected = true;
@@ -30,6 +33,12 @@ namespace Emu5
             m_emulatorSettings.SetClearMemoryMap(false);
             m_emulatorSettings.SetUseIntegratedEcall(true);
             m_emulatorSettings.SetEcallBase(0xFFFFF000);
+
+            List<Interval> l_memoryRanges = new List<Interval>();
+            l_memoryRanges.Add(new Interval { start = 0x00000000, end = 0x9FFFFFFF });
+            l_memoryRanges.Add(new Interval { start = 0xC0000000, end = 0xFFFFFFFF });
+            m_memoryMapSettings.SetMemoryRanges(l_memoryRanges);
+            m_memoryMapSettings.SetDefaultMemoryValue(0xFF);
         }
 
         private void treeViewItemEditor_Selected(object sender, RoutedEventArgs e)
@@ -44,7 +53,8 @@ namespace Emu5
 
         private void treeViewItemMemoryMap_Selected(object sender, RoutedEventArgs e)
         {
-
+            scrollViewerSettings.Content = m_memoryMapSettings;
+            e.Handled = true; // prevent the event from triggering up the tree
         }
 
         private void treeViewItemPeripherals_Selected(object sender, RoutedEventArgs e)
