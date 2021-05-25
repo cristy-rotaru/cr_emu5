@@ -75,6 +75,9 @@
     <Compile Include="EmulatorPerspective.xaml.cs">
       <DependentUpon>EmulatorPerspective.xaml</DependentUpon>
     </Compile>
+    <Compile Include="EmulatorSettingsPanel.xaml.cs">
+      <DependentUpon>EmulatorSettingsPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="InjectInterruptWindow.xaml.cs">
       <DependentUpon>InjectInterruptWindow.xaml</DependentUpon>
     </Compile>
@@ -141,6 +144,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="EmulatorPerspective.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EmulatorSettingsPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

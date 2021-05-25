@@ -8,12 +8,14 @@ namespace Emu5
     public partial class SettingsWindow : Window
     {
         EditorSettingsPanel m_editorSettings;
+        EmulatorSettingsPanel m_emulatorSettings;
 
         public SettingsWindow()
         {
             InitializeComponent();
 
             m_editorSettings = new EditorSettingsPanel();
+            m_emulatorSettings = new EmulatorSettingsPanel();
 
             LoadSettings();
             treeViewItemEditor.IsSelected = true;
@@ -24,6 +26,10 @@ namespace Emu5
             m_editorSettings.SetFontSize(15);
             m_editorSettings.SetSyntaxHighlighting(true);
             m_editorSettings.SetNewFileTemplate(ProgramTemplate.Basic);
+
+            m_emulatorSettings.SetClearMemoryMap(false);
+            m_emulatorSettings.SetUseIntegratedEcall(true);
+            m_emulatorSettings.SetEcallBase(0xFFFFF000);
         }
 
         private void treeViewItemEditor_Selected(object sender, RoutedEventArgs e)
@@ -33,7 +39,7 @@ namespace Emu5
 
         private void treeViewItemEmulator_Selected(object sender, RoutedEventArgs e)
         {
-
+            scrollViewerSettings.Content = m_emulatorSettings;
         }
 
         private void treeViewItemMemoryMap_Selected(object sender, RoutedEventArgs e)
