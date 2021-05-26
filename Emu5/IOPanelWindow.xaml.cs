@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -128,7 +129,7 @@ namespace Emu5
             l_monitorThread.Start();
         }
 
-        private void IOPanelWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void IOPanelWindow_Closing(object sender, CancelEventArgs e)
         {
             if (m_disposeWhenClosing)
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -128,7 +129,7 @@ namespace Emu5
             return (UInt32)m_address;
         }
 
-        private void buttonToggleBreakpoint_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonToggleBreakpoint_Click(object sender, RoutedEventArgs e)
         {
             m_breakpoint = !m_breakpoint;
 

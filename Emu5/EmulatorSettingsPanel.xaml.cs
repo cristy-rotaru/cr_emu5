@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -55,7 +56,7 @@ namespace Emu5
             }
         }
 
-        private void checkBoxUseIntegratedEcallHandler_CheckChanged(object sender, System.Windows.RoutedEventArgs e)
+        private void checkBoxUseIntegratedEcallHandler_CheckChanged(object sender, RoutedEventArgs e)
         {
             UpdateEcallUIElements();
         }

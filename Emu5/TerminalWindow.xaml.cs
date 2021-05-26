@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
@@ -366,7 +367,7 @@ namespace Emu5
             textBoxInput.Clear();
         }
 
-        private void TerminalWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void TerminalWindow_Closing(object sender, CancelEventArgs e)
         {
             if (m_disposeWhenClosing == false)
             {
