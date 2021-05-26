@@ -130,6 +130,9 @@
       <DependentUpon>TabHeader.xaml</DependentUpon>
     </Compile>
     <Compile Include="Terminal.cs" />
+    <Compile Include="TerminalSettingsPanel.xaml.cs">
+      <DependentUpon>TerminalSettingsPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TerminalWindow.xaml.cs">
       <DependentUpon>TerminalWindow.xaml</DependentUpon>
     </Compile>
@@ -226,6 +229,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="TabHeader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TerminalSettingsPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
