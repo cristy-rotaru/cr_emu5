@@ -99,6 +99,9 @@
     <Compile Include="MemoryMapSettingsPanel.xaml.cs">
       <DependentUpon>MemoryMapSettingsPanel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PeripheralsSettingsPanel.xaml.cs">
+      <DependentUpon>PeripheralsSettingsPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PerspectivePage.xaml.cs">
       <DependentUpon>PerspectivePage.xaml</DependentUpon>
     </Compile>
@@ -188,6 +191,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="MemoryMapSettingsPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PeripheralsSettingsPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

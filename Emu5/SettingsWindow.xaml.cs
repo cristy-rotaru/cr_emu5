@@ -11,6 +11,7 @@ namespace Emu5
         EditorSettingsPanel m_editorSettings;
         EmulatorSettingsPanel m_emulatorSettings;
         MemoryMapSettingsPanel m_memoryMapSettings;
+        PeripheralsSettingsPanel m_peripheralsSettings;
 
         public SettingsWindow()
         {
@@ -19,6 +20,7 @@ namespace Emu5
             m_editorSettings = new EditorSettingsPanel();
             m_emulatorSettings = new EmulatorSettingsPanel();
             m_memoryMapSettings = new MemoryMapSettingsPanel();
+            m_peripheralsSettings = new PeripheralsSettingsPanel();
 
             LoadSettings();
             treeViewItemEditor.IsSelected = true;
@@ -39,6 +41,10 @@ namespace Emu5
             l_memoryRanges.Add(new Interval { start = 0xC0000000, end = 0xFFFFFFFF });
             m_memoryMapSettings.SetMemoryRanges(l_memoryRanges);
             m_memoryMapSettings.SetDefaultMemoryValue(0xFF);
+
+            m_peripheralsSettings.SetIOPanelEnabled(true);
+            m_peripheralsSettings.SetTerminalEnabled(true);
+            m_peripheralsSettings.SetInterruptInjectorEnabled(false);
         }
 
         private void treeViewItemEditor_Selected(object sender, RoutedEventArgs e)
@@ -59,7 +65,8 @@ namespace Emu5
 
         private void treeViewItemPeripherals_Selected(object sender, RoutedEventArgs e)
         {
-
+            scrollViewerSettings.Content = m_peripheralsSettings;
+            e.Handled = true;
         }
 
         private void treeViewItemTerminal_Selected(object sender, RoutedEventArgs e)

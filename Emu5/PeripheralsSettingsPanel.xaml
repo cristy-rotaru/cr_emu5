@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="Emu5.PeripheralsSettingsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Emu5"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" FontSize="13">
+    <StackPanel>
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4">
+            <StackPanel Margin="6">
+                <CheckBox Name="checkBoxIOPanel" Content="Enable I/O panel peripheral" />
+                <TextBlock Margin="0,4,0,0" Text="I/O panel is a peripheral that allows the user to interract with the system using buttons, switches, LEDs and 7-segment displays. It's registers are situated at addresses 0x110-0x117 and it can generate external interrupt 8." TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <Border Margin="0,3,0,0" BorderBrush="Black" BorderThickness="1" CornerRadius="4">
+            <StackPanel Margin="6">
+                <CheckBox Name="checkBoxTerminal" Content="Enable terminal peripheral" />
+                <TextBlock Margin="0,4,0,0" Text="The terminal peripheral allows the user to interact with the system using the keyboard. It's registers are situated at addresses 0x11C-0x11F and can generate external interrupt 9." TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <Border Margin="0,3,0,0" BorderBrush="Black" BorderThickness="1" CornerRadius="4">
+            <StackPanel Margin="6">
+                <CheckBox Name="checkBoxInterruptInjector" Content="Enable interrupt injector peripheral" />
+                <TextBlock Margin="0,4,0,0" Text="The interrupt injector allows the program to set up timed* events (external interrupts and reset). It's register is located at address 0x118 and is 32-bit wide." TextWrapping="Wrap" />
+                <TextBlock Margin="0,3,0,0" Text="*timing is based on the number of simulation steps executed" TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>
