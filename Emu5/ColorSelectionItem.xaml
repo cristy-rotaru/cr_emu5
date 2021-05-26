@@ -1,0 +1,20 @@
+﻿<UserControl x:Class="Emu5.ColorSelectionItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Emu5"
+             FontSize="13">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Rectangle Name="rectangleColorPreview" Grid.Row="0" Grid.Column="0" Margin="5" Height="10" Width="10" />
+        <TextBlock Name="textBlockColorName" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" />
+    </Grid>
+</UserControl>

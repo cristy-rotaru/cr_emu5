@@ -60,6 +60,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ColorSelectionItem.xaml.cs">
+      <DependentUpon>ColorSelectionItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DataView.xaml.cs">
       <DependentUpon>DataView.xaml</DependentUpon>
     </Compile>
@@ -133,6 +136,10 @@
     <Compile Include="WelcomePage.xaml.cs">
       <DependentUpon>WelcomePage.xaml</DependentUpon>
     </Compile>
+    <Page Include="ColorSelectionItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DataView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
