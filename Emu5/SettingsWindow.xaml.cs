@@ -13,6 +13,7 @@ namespace Emu5
         MemoryMapSettingsPanel m_memoryMapSettings;
         PeripheralsSettingsPanel m_peripheralsSettings;
         TerminalSettingsPanel m_terminalSettings;
+        LogSettingsPanel m_logSettings;
 
         public SettingsWindow()
         {
@@ -23,6 +24,7 @@ namespace Emu5
             m_memoryMapSettings = new MemoryMapSettingsPanel();
             m_peripheralsSettings = new PeripheralsSettingsPanel();
             m_terminalSettings = new TerminalSettingsPanel();
+            m_logSettings = new LogSettingsPanel();
 
             LoadSettings();
             treeViewItemEditor.IsSelected = true;
@@ -50,6 +52,10 @@ namespace Emu5
 
             m_terminalSettings.SetTextColorIndex(21);
             m_terminalSettings.SetBackgroundColorIndex(0);
+
+            m_logSettings.SetLoggingEnabled(true);
+            m_logSettings.SetVerbosityLevel(Verbosity.Normal);
+            m_logSettings.SetEcallLoggingDisable(true);
         }
 
         private void treeViewItemEditor_Selected(object sender, RoutedEventArgs e)
@@ -82,7 +88,7 @@ namespace Emu5
 
         private void treeViewItemLogging_Selected(object sender, RoutedEventArgs e)
         {
-
+            scrollViewerSettings.Content = m_logSettings;
         }
 
         private void buttonApply_Click(object sender, RoutedEventArgs e)

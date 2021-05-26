@@ -1,0 +1,26 @@
+﻿<UserControl x:Class="Emu5.LogSettingsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Emu5"
+             FontSize="13">
+    <StackPanel>
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4">
+            <StackPanel Margin="6">
+                <CheckBox Name="checkBoxEnableLogging" Content="Enable logging" Checked="checkBoxEnableLogging_CheckChanged" Unchecked="checkBoxEnableLogging_CheckChanged" />
+
+                <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
+                    <TextBlock Text="Verbosity:" Margin="0,0,4,0" />
+                    <ComboBox Name="comboBoxVerbosity" Width="130" IsEditable="False">
+                        <ComboBoxItem Content="Minimal" />
+                        <ComboBoxItem Content="Normal" />
+                        <ComboBoxItem Content="Detailed" />
+                    </ComboBox>
+                </StackPanel>
+
+                <CheckBox Name="checkBoxDontLogEcall" Content="Don't log instructions within the ECALL handler" />
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

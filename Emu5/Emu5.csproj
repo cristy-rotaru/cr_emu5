@@ -99,6 +99,9 @@
     <Compile Include="LogPerspective.xaml.cs">
       <DependentUpon>LogPerspective.xaml</DependentUpon>
     </Compile>
+    <Compile Include="LogSettingsPanel.xaml.cs">
+      <DependentUpon>LogSettingsPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MemoryMapSettingsPanel.xaml.cs">
       <DependentUpon>MemoryMapSettingsPanel.xaml</DependentUpon>
     </Compile>
@@ -184,6 +187,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="LogPerspective.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LogSettingsPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
