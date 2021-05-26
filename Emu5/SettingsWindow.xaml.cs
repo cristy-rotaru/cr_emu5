@@ -55,6 +55,7 @@ namespace Emu5
 
             m_logSettings.SetLoggingEnabled(true);
             m_logSettings.SetVerbosityLevel(Verbosity.Normal);
+            m_logSettings.SetClearLogOnNewSimulation(false);
             m_logSettings.SetEcallLoggingDisable(true);
         }
 

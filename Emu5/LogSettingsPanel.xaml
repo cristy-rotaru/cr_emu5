@@ -16,7 +16,9 @@
                     </ComboBox>
                 </StackPanel>
 
-                <CheckBox Name="checkBoxDontLogEcall" Content="Don't log instructions within the ECALL handler" />
+                <CheckBox Name="checkBoxClearLogOnNewSimulation" Margin="0,4,0,0" Content="Clear log when starting a new simulation" />
+
+                <CheckBox Name="checkBoxDontLogEcall" Margin="0,4,0,0" Content="Don't log instructions within the ECALL handler" />
             </StackPanel>
         </Border>
     </StackPanel>

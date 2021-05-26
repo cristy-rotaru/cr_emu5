@@ -32,6 +32,11 @@ namespace Emu5
             comboBoxVerbosity.SelectedIndex = (int)level;
         }
 
+        public void SetClearLogOnNewSimulation(bool clear)
+        {
+            checkBoxClearLogOnNewSimulation.IsChecked = clear;
+        }
+
         public void SetEcallLoggingDisable(bool disable)
         {
             checkBoxDontLogEcall.IsChecked = disable;
@@ -45,6 +50,11 @@ namespace Emu5
         public Verbosity GetVerbosityLevel()
         {
             return (Verbosity)comboBoxVerbosity.SelectedIndex;
+        }
+
+        public bool GetClearLogOnNewSimulation()
+        {
+            return checkBoxClearLogOnNewSimulation.IsChecked == null ? false : (bool)checkBoxClearLogOnNewSimulation.IsChecked;
         }
 
         public bool GetEcallLoggingDisable()
@@ -62,6 +72,7 @@ namespace Emu5
             bool l_checked = checkBoxEnableLogging.IsChecked == null ? false : (bool)checkBoxEnableLogging.IsChecked;
 
             comboBoxVerbosity.IsEnabled = l_checked;
+            checkBoxClearLogOnNewSimulation.IsEnabled = l_checked;
             checkBoxDontLogEcall.IsEnabled = l_checked;
         }
     }
