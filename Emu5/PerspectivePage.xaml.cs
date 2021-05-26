@@ -287,7 +287,7 @@ namespace Emu5
             }
             else if (m_currentPerspective == Perspective.Log)
             {
-                // save log
+                m_logger.Save();
             }
 
             return l_result;
@@ -304,7 +304,7 @@ namespace Emu5
             }
             else if (m_currentPerspective == Perspective.Log)
             {
-                // save log
+                m_logger.Save();
             }
         }
 

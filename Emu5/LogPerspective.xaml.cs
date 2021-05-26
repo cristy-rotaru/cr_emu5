@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
+using System.IO;
+using System.Text;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Emu5
@@ -104,6 +108,28 @@ namespace Emu5
                     textBoxLog.ScrollToEnd();
                 }
             }));
+        }
+
+        public void Save()
+        {
+            SaveFileDialog l_sfd = new SaveFileDialog();
+            l_sfd.Filter = "Log file (*.log, *.txt)|*.log;*.txt|All files|*";
+            l_sfd.FileName = "SimulationResults.log";
+
+            if (l_sfd.ShowDialog() == true)
+            {
+                try
+                {
+                    StreamWriter l_fileWriter = new StreamWriter(l_sfd.FileName, false, Encoding.Unicode);
+                    l_fileWriter.Write(textBoxLog.Text);
+
+                    l_fileWriter.Close();
+                }
+                catch (Exception e_fileSaveException)
+                {
+                    MessageBox.Show(e_fileSaveException.Message, "Could not save the file", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                }
+            }
         }
     }
 }
