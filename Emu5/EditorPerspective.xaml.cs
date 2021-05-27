@@ -178,6 +178,121 @@ namespace Emu5
             return true;
         }
 
+        public void GenerateTemplate(ProgramTemplate template, UInt32 codeBase, UInt32 initialStack, bool usingInternalEcall = false, UInt32 ecallBase = 0xFFFFF000, UInt32 dataBase = 0x1000)
+        {
+            textEditorMain.Clear();
+
+            if (template == ProgramTemplate.Basic)
+            {
+                textEditorMain.AppendText("@0" + Environment.NewLine);
+                textEditorMain.AppendText("\tDW _program_start" + Environment.NewLine);
+
+                if (usingInternalEcall)
+                {
+                    textEditorMain.AppendText("\tDW _NMI_handler" + Environment.NewLine);
+                    textEditorMain.AppendText(String.Format("\tDW 0x{0,8:X8}", ecallBase) + Environment.NewLine);
+                }
+
+                textEditorMain.AppendText(Environment.NewLine);
+
+                textEditorMain.AppendText(String.Format("@{0:X}", codeBase) + Environment.NewLine);
+                textEditorMain.AppendText("_program_start:" + Environment.NewLine);
+                textEditorMain.AppendText(String.Format("\tli sp, 0x{0:X}", initialStack) + Environment.NewLine);
+                textEditorMain.AppendText("\t# your code goes here" + Environment.NewLine + Environment.NewLine + Environment.NewLine);
+
+                if (usingInternalEcall)
+                {
+                    textEditorMain.AppendText("\taddi a0, zero, 1" + Environment.NewLine);
+                    textEditorMain.AppendText("\tecall # stop simulation" + Environment.NewLine + Environment.NewLine);
+
+                    textEditorMain.AppendText("_NMI_handler:" + Environment.NewLine);
+                    textEditorMain.AppendText("\tiret");
+                }
+                else
+                {
+                    textEditorMain.AppendText("\thlt # stop simulation");
+                }
+            }
+            else if (template == ProgramTemplate.Advanced)
+            {
+                textEditorMain.AppendText("@0" + Environment.NewLine);
+                textEditorMain.AppendText("\tDW _program_start" + Environment.NewLine);
+                textEditorMain.AppendText("\tDW _NMI_handler" + Environment.NewLine);
+
+                if (usingInternalEcall)
+                {
+                    textEditorMain.AppendText(String.Format("\tDW 0x{0,8:X8}", ecallBase) + Environment.NewLine);
+                }
+                else
+                {
+                    textEditorMain.AppendText("\tDW _ECALL_handler" + Environment.NewLine);
+                }
+
+                textEditorMain.AppendText("\tDW _MisalignedPC_handler" + Environment.NewLine);
+                textEditorMain.AppendText("\tDW _MisalignedMemory_handler" + Environment.NewLine);
+                textEditorMain.AppendText("\tDW _UndefinedMemory_handler" + Environment.NewLine);
+                textEditorMain.AppendText("\tDW _InvalidInstruction_handler" + Environment.NewLine);
+                textEditorMain.AppendText("\tDW _DivisionBy0_handler" + Environment.NewLine);
+
+                for (int i_interrupt = 8; i_interrupt < 32; ++i_interrupt)
+                {
+                    textEditorMain.AppendText(String.Format("\tDW _int{0}_handler", i_interrupt) + Environment.NewLine);
+                }
+
+                textEditorMain.AppendText(Environment.NewLine);
+
+                textEditorMain.AppendText(String.Format("@{0:X}", dataBase) + Environment.NewLine);
+                textEditorMain.AppendText("\tDB 0, 1, 2, 3, 4, 5, 6, 7" + Environment.NewLine);
+
+                textEditorMain.AppendText(Environment.NewLine);
+
+                textEditorMain.AppendText(String.Format("@{0:X}", codeBase) + Environment.NewLine);
+                textEditorMain.AppendText("_program_start:" + Environment.NewLine);
+                textEditorMain.AppendText(String.Format("\tli sp, 0x{0:X}", initialStack) + Environment.NewLine);
+                textEditorMain.AppendText("\t# your code goes here" + Environment.NewLine + Environment.NewLine + Environment.NewLine);
+
+                if (usingInternalEcall)
+                {
+                    textEditorMain.AppendText("\taddi a0, zero, 1" + Environment.NewLine);
+                    textEditorMain.AppendText("\tecall # stop simulation" + Environment.NewLine);
+                }
+                else
+                {
+                    textEditorMain.AppendText("\thlt # stop simulation");
+                }
+
+                textEditorMain.AppendText(Environment.NewLine);
+
+                textEditorMain.AppendText("_NMI_handler:" + Environment.NewLine);
+                textEditorMain.AppendText("\tiret" + Environment.NewLine);
+
+                textEditorMain.AppendText(Environment.NewLine);
+
+                if (usingInternalEcall == false)
+                {
+                    textEditorMain.AppendText("_ECALL_handler:" + Environment.NewLine);
+                    textEditorMain.AppendText("\tiret" + Environment.NewLine);
+
+                    textEditorMain.AppendText(Environment.NewLine);
+                }
+
+                textEditorMain.AppendText("_MisalignedPC_handler:" + Environment.NewLine);
+                textEditorMain.AppendText("_MisalignedMemory_handler:" + Environment.NewLine);
+                textEditorMain.AppendText("_UndefinedMemory_handler:" + Environment.NewLine);
+                textEditorMain.AppendText("_InvalidInstruction_handler:" + Environment.NewLine);
+                textEditorMain.AppendText("_DivisionBy0_handler:" + Environment.NewLine);
+                textEditorMain.AppendText("\thlt" + Environment.NewLine);
+
+                textEditorMain.AppendText(Environment.NewLine);
+
+                for (int i_interrupt = 8; i_interrupt < 32; ++i_interrupt)
+                {
+                    textEditorMain.AppendText(String.Format("_int{0}_handler:", i_interrupt) + Environment.NewLine);
+                }
+                textEditorMain.AppendText("\tiret");
+            }
+        }
+
         public bool Open()
         {
             OpenFileDialog l_ofd = new OpenFileDialog();

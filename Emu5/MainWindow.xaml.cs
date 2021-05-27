@@ -130,6 +130,7 @@ namespace Emu5
             l_newTab.Header = new TabHeader("Untitled", true, () => RemoveTab(l_newTab));
             l_newTab.Content = new PerspectivePage((TabHeader)l_newTab.Header);
             ((PerspectivePage)l_newTab.Content).RegisterPerspectiveChangedCallback(UpdatePerspectiveState);
+            ((PerspectivePage)l_newTab.Content).LoadTemplate();
             tabControlMain.Items.Add(l_newTab);
 
             tabControlMain.SelectedItem = l_newTab;

@@ -333,6 +333,12 @@ namespace Emu5
             return l_result;
         }
 
+        public void LoadTemplate()
+        {
+            ProgramTemplate l_template = (ProgramTemplate)Properties.Settings.Default.editor_defaultTemplate;
+            m_editor.GenerateTemplate(l_template, 0x2000, 0xFFFF0000, true);
+        }
+
         public void NotifyUpdateRequired()
         {
             Dispatcher.BeginInvoke(new Action(

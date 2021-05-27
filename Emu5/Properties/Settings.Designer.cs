@@ -46,5 +46,17 @@ namespace Emu5.Properties {
                 this["editor_enableHighlighting"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int editor_defaultTemplate {
+            get {
+                return ((int)(this["editor_defaultTemplate"]));
+            }
+            set {
+                this["editor_defaultTemplate"] = value;
+            }
+        }
     }
 }
