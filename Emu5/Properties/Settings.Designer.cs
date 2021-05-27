@@ -184,5 +184,17 @@ namespace Emu5.Properties {
                 this["terminal_backgroundColorIndex"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool logging_enable {
+            get {
+                return ((bool)(this["logging_enable"]));
+            }
+            set {
+                this["logging_enable"] = value;
+            }
+        }
     }
 }

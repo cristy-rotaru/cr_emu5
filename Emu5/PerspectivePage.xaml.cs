@@ -102,7 +102,6 @@ namespace Emu5
             m_logger = new LogPerspective();
 
             m_rvEmulator = new RVEmulator();
-            m_rvEmulator.RegisterLogger(m_logger);
 
             dockPanelMain.Children.Add(m_editor);
 
@@ -168,6 +167,16 @@ namespace Emu5
             if (Properties.Settings.Default.peripherals_enableInterruptInjector)
             {
                 l_memoryMap.RegisterPeripheral(m_interruptInjectorPeripheral, 0x0118, 4);
+            }
+
+            if (Properties.Settings.Default.logging_enable)
+            {
+                m_rvEmulator.RegisterLogger(m_logger);
+            }
+            else
+            {
+                m_rvEmulator.RegisterLogger(null);
+                m_logger.Clear();
             }
         }
 
@@ -434,18 +443,24 @@ namespace Emu5
                     return;
                 }
 
-                m_logger.LogText("Simulation ended:", false);
-                m_logger.LogCurrentTime(false);
-                m_logger.LogText("(Stopped by user)", true);
-                m_logger.NewLine();
-                m_logger.NewLine();
-                m_logger.UpdateLogUI();
+                if (Properties.Settings.Default.logging_enable)
+                {
+                    m_logger.LogText("Simulation ended:", false);
+                    m_logger.LogCurrentTime(false);
+                    m_logger.LogText("(Stopped by user)", true);
+                    m_logger.NewLine();
+                    m_logger.NewLine();
+                    m_logger.UpdateLogUI();
+                }
             }
 
             m_stepCount = 0;
 
-            m_logger.LogText("Simulation started:", false);
-            m_logger.LogCurrentTime(true);
+            if (Properties.Settings.Default.logging_enable)
+            {
+                m_logger.LogText("Simulation started:", false);
+                m_logger.LogCurrentTime(true);
+            }
 
             m_simulationRunning = true;
             m_compiling = true;
@@ -471,18 +486,24 @@ namespace Emu5
 
                     m_rvEmulator.Assemble(l_code, l_labelMap, l_pseudoInstructionMap, l_useIntegratedEcallHandler, l_ecallBase);
 
-                    m_logger.LogText("Compilation succesful:", false);
-                    m_logger.LogCurrentTime(true);
-                    m_logger.NewLine();
-                    m_logger.UpdateLogUI();
+                    if (Properties.Settings.Default.logging_enable)
+                    {
+                        m_logger.LogText("Compilation succesful:", false);
+                        m_logger.LogCurrentTime(true);
+                        m_logger.NewLine();
+                        m_logger.UpdateLogUI();
 
-                    m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+                        m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+                    }
                     ++m_stepCount;
 
                     m_rvEmulator.ResetProcessor();
 
-                    m_logger.NewLine();
-                    m_logger.UpdateLogUI();
+                    if (Properties.Settings.Default.logging_enable)
+                    {
+                        m_logger.NewLine();
+                        m_logger.UpdateLogUI();
+                    }
 
                     Delegate l_compilationFinishedDelegate = new Action(
                     () => {
@@ -510,17 +531,23 @@ namespace Emu5
                     () => {
                         ChangePerspective(Perspective.Editor);
 
-                        m_logger.LogText("Compilation failed! Line " + e_assemblyException.Line + ", Column " + e_assemblyException.Column + ": \"" + e_assemblyException.Message + "\"", false);
-                        m_logger.UpdateLogUI();
+                        if (Properties.Settings.Default.logging_enable)
+                        {
+                            m_logger.LogText("Compilation failed! Line " + e_assemblyException.Line + ", Column " + e_assemblyException.Column + ": \"" + e_assemblyException.Message + "\"", false);
+                            m_logger.UpdateLogUI();
+                        }
 
                         MessageBox.Show("L: " + e_assemblyException.Line + "; C: " + e_assemblyException.Column + "\n" + e_assemblyException.Message, "Compilation error!", MessageBoxButton.OK, MessageBoxImage.Error);
                         m_editor.SetEditable(true);
 
-                        m_logger.LogText("Simulation ended:", false);
-                        m_logger.LogCurrentTime(true);
-                        m_logger.NewLine();
-                        m_logger.NewLine();
-                        m_logger.UpdateLogUI();
+                        if (Properties.Settings.Default.logging_enable)
+                        {
+                            m_logger.LogText("Simulation ended:", false);
+                            m_logger.LogCurrentTime(true);
+                            m_logger.NewLine();
+                            m_logger.NewLine();
+                            m_logger.UpdateLogUI();
+                        }
 
                         m_compiling = false;
                         m_simulationRunning = false;
@@ -536,13 +563,19 @@ namespace Emu5
 
         public void Step()
         {
-            m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+            if (Properties.Settings.Default.logging_enable)
+            {
+                m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+            }
             ++m_stepCount;
 
             m_rvEmulator.SingleStep();
 
-            m_logger.NewLine();
-            m_logger.UpdateLogUI();
+            if (Properties.Settings.Default.logging_enable)
+            {
+                m_logger.NewLine();
+                m_logger.UpdateLogUI();
+            }
 
             m_simulationJustStarted = false;
             m_simulationJustPaused = false;
@@ -553,12 +586,15 @@ namespace Emu5
                 m_simulationRunning = false;
                 m_processor.UpdateInfo();
 
-                m_logger.LogText("Simulation ended:", false);
-                m_logger.LogCurrentTime(false);
-                m_logger.LogText("(Core halted)", true);
-                m_logger.NewLine();
-                m_logger.NewLine();
-                m_logger.UpdateLogUI();
+                if (Properties.Settings.Default.logging_enable)
+                {
+                    m_logger.LogText("Simulation ended:", false);
+                    m_logger.LogCurrentTime(false);
+                    m_logger.LogText("(Core halted)", true);
+                    m_logger.NewLine();
+                    m_logger.NewLine();
+                    m_logger.UpdateLogUI();
+                }
 
                 MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -618,7 +654,10 @@ namespace Emu5
                 m_processor.UpdateInfo();
                 m_processor.HighlightingEnabled = true;
 
-                m_logger.UpdateLogUI();
+                if (Properties.Settings.Default.logging_enable)
+                {
+                    m_logger.UpdateLogUI();
+                }
             }
         }
 
@@ -650,12 +689,15 @@ namespace Emu5
 
             m_rvEmulator.Halted = true;
 
-            m_logger.LogText("Simulation ended:", false);
-            m_logger.LogCurrentTime(false);
-            m_logger.LogText("(Stopped by user)", true);
-            m_logger.NewLine();
-            m_logger.NewLine();
-            m_logger.UpdateLogUI();
+            if (Properties.Settings.Default.logging_enable)
+            {
+                m_logger.LogText("Simulation ended:", false);
+                m_logger.LogCurrentTime(false);
+                m_logger.LogText("(Stopped by user)", true);
+                m_logger.NewLine();
+                m_logger.NewLine();
+                m_logger.UpdateLogUI();
+            }
 
             m_processor.UpdateInfo();
         }
@@ -720,13 +762,19 @@ namespace Emu5
         {
             Dispatcher.BeginInvoke(new Action(
             () => {
-                m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+                if (Properties.Settings.Default.logging_enable)
+                {
+                    m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+                }
                 ++m_stepCount;
 
                 m_rvEmulator.SingleStep();
 
-                m_logger.NewLine();
-                m_logger.UpdateLogUI();
+                if (Properties.Settings.Default.logging_enable)
+                {
+                    m_logger.NewLine();
+                    m_logger.UpdateLogUI();
+                }
 
                 if (m_rvEmulator.Halted)
                 {
@@ -736,12 +784,15 @@ namespace Emu5
                     m_runningClocked = false;
                     m_processor.UpdateInfo();
 
-                    m_logger.LogText("Simulation ended:", false);
-                    m_logger.LogCurrentTime(false);
-                    m_logger.LogText("(Core halted)", true);
-                    m_logger.NewLine();
-                    m_logger.NewLine();
-                    m_logger.UpdateLogUI();
+                    if (Properties.Settings.Default.logging_enable)
+                    {
+                        m_logger.LogText("Simulation ended:", false);
+                        m_logger.LogCurrentTime(false);
+                        m_logger.LogText("(Core halted)", true);
+                        m_logger.NewLine();
+                        m_logger.NewLine();
+                        m_logger.UpdateLogUI();
+                    }
 
                     MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -781,12 +832,18 @@ namespace Emu5
                     return; // stop simulation per external request
                 }
 
-                m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+                if (Properties.Settings.Default.logging_enable)
+                {
+                    m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+                }
                 ++m_stepCount;
 
                 m_rvEmulator.SingleStep();
 
-                m_logger.NewLine();
+                if (Properties.Settings.Default.logging_enable)
+                {
+                    m_logger.NewLine();
+                }
 
                 if (m_rvEmulator.Halted)
                 {
@@ -798,12 +855,15 @@ namespace Emu5
                         m_processor.UpdateInfo();
                         m_processor.HighlightingEnabled = true;
 
-                        m_logger.LogText("Simulation ended:", false);
-                        m_logger.LogCurrentTime(false);
-                        m_logger.LogText("(Core halted)", true);
-                        m_logger.NewLine();
-                        m_logger.NewLine();
-                        m_logger.UpdateLogUI();
+                        if (Properties.Settings.Default.logging_enable)
+                        {
+                            m_logger.LogText("Simulation ended:", false);
+                            m_logger.LogCurrentTime(false);
+                            m_logger.LogText("(Core halted)", true);
+                            m_logger.NewLine();
+                            m_logger.NewLine();
+                            m_logger.UpdateLogUI();
+                        }
 
                         MessageBox.Show("Simulation stopped.\nCore halted: " + m_rvEmulator.HaltReason, "Core halted", MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -826,7 +886,10 @@ namespace Emu5
                         m_processor.UpdateInfo();
                         m_processor.HighlightingEnabled = true;
 
-                        m_logger.UpdateLogUI();
+                        if (Properties.Settings.Default.logging_enable)
+                        {
+                            m_logger.UpdateLogUI();
+                        }
 
                         CommandManager.InvalidateRequerySuggested();
                     });

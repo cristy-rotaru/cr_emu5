@@ -528,16 +528,16 @@ namespace Emu5
                 throw new RVEmulationException("Register index out of range."); // if this happens I fucked something up really bad
             }
 
-            m_logger.LogText(String.Format("Register write: x{0} <= 0x{1,8:X8}", index, data), false);
+            m_logger?.LogText(String.Format("Register write: x{0} <= 0x{1,8:X8}", index, data), false);
 
             if (index != 0)
             {
-                m_logger.NewLine();
+                m_logger?.NewLine();
                 m_registerFile[index] = data;
             }
             else
             {
-                m_logger.LogText("(Write to x0 suppressed)", true);
+                m_logger?.LogText("(Write to x0 suppressed)", true);
             }
         }
 
