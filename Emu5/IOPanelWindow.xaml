@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Emu5.IOPanelWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="I/O panel" Icon="Icons/tools_io_panel.png" Height="355" Width="625" ResizeMode="CanMinimize" Background="#FFF0F0F0" Closing="IOPanelWindow_Closing">
+        Title="I/O panel" Icon="Icons/tools_io_panel.png" Height="355" Width="625" ResizeMode="CanMinimize" Background="#FFF0F0F0" Closing="IOPanelWindow_Closing" Closed="IOPanelWindow_Closed">
     <Grid Margin="4">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />

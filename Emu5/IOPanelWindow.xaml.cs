@@ -131,11 +131,7 @@ namespace Emu5
 
         private void IOPanelWindow_Closing(object sender, CancelEventArgs e)
         {
-            if (m_disposeWhenClosing)
-            {
-                m_threadShutdown = true;
-            }
-            else
+            if (m_disposeWhenClosing == false)
             {
                 e.Cancel = true;
                 this.Hide();
@@ -193,6 +189,11 @@ namespace Emu5
         {
             m_disposeWhenClosing = dispose;
             this.Close();
+        }
+
+        private void IOPanelWindow_Closed(object sender, EventArgs e)
+        {
+            m_threadShutdown = true;
         }
     }
 }
