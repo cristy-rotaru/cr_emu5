@@ -22,5 +22,29 @@ namespace Emu5.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("15")]
+        public int editor_fontSize {
+            get {
+                return ((int)(this["editor_fontSize"]));
+            }
+            set {
+                this["editor_fontSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool editor_enableHighlighting {
+            get {
+                return ((bool)(this["editor_enableHighlighting"]));
+            }
+            set {
+                this["editor_enableHighlighting"] = value;
+            }
+        }
     }
 }

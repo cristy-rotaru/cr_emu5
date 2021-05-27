@@ -49,6 +49,19 @@ namespace Emu5
             m_textChangedHandler = handler;
         }
 
+        public void SetFontSize(int size)
+        {
+            if (size >= 6 && size <= 48)
+            {
+                textEditorMain.FontSize = size;
+            }
+        }
+
+        public void SetSyntaxHighlightingEnabled(bool enabled)
+        {
+            textEditorMain.SyntaxHighlighting = enabled ? s_syntaxHighlightingDefinition : null;
+        }
+
         public void SetEditable(bool editable)
         {
             textEditorMain.IsReadOnly = !editable;

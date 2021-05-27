@@ -129,12 +129,20 @@ namespace Emu5
 
             m_IOPanelWindowHandle = null;
             m_terminalWindowHandle = null;
+
+            ApplySettings();
         }
 
         public PerspectivePage(TabHeader tabHeader) : this()
         {
             m_tabHeader = tabHeader;
             m_editor.RegisterFileModifiedCallback(() => m_tabHeader.SetSavedState(true));
+        }
+
+        public void ApplySettings()
+        {
+            m_editor.SetFontSize(Properties.Settings.Default.editor_fontSize);
+            m_editor.SetSyntaxHighlightingEnabled(Properties.Settings.Default.editor_enableHighlighting);
         }
 
         public Perspective GetCurrentPerspective()
