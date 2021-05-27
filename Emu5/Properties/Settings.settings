@@ -20,5 +20,17 @@
     <Setting Name="emulator_ecallBase" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">4294963200</Value>
     </Setting>
+    <Setting Name="memoryMap_memoryRanges" Type="System.UInt32[]" Scope="User">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfUnsignedInt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;unsignedInt&gt;0&lt;/unsignedInt&gt;
+  &lt;unsignedInt&gt;2684354559&lt;/unsignedInt&gt;
+  &lt;unsignedInt&gt;3221225472&lt;/unsignedInt&gt;
+  &lt;unsignedInt&gt;4294967295&lt;/unsignedInt&gt;
+&lt;/ArrayOfUnsignedInt&gt;</Value>
+    </Setting>
+    <Setting Name="memoryMap_uninitializedMemoryValue" Type="System.Byte" Scope="User">
+      <Value Profile="(Default)">255</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -94,5 +94,35 @@ namespace Emu5.Properties {
                 this["emulator_ecallBase"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
+<ArrayOfUnsignedInt xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  <unsignedInt>0</unsignedInt>
+  <unsignedInt>2684354559</unsignedInt>
+  <unsignedInt>3221225472</unsignedInt>
+  <unsignedInt>4294967295</unsignedInt>
+</ArrayOfUnsignedInt>")]
+        public uint[] memoryMap_memoryRanges {
+            get {
+                return ((uint[])(this["memoryMap_memoryRanges"]));
+            }
+            set {
+                this["memoryMap_memoryRanges"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("255")]
+        public byte memoryMap_uninitializedMemoryValue {
+            get {
+                return ((byte)(this["memoryMap_uninitializedMemoryValue"]));
+            }
+            set {
+                this["memoryMap_uninitializedMemoryValue"] = value;
+            }
+        }
     }
 }

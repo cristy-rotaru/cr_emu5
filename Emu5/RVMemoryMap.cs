@@ -42,8 +42,6 @@ namespace Emu5
             m_memoryDictionary = new Dictionary<UInt32, UInt64>();
 
             m_memoryRanges = new List<Interval>();
-            m_memoryRanges.Add(new Interval { start = 0x00000000, end = 0x9FFFFFFF }); // default ranges
-            m_memoryRanges.Add(new Interval { start = 0xC0000000, end = 0xFFFFFFFF }); // will be replaced in the future
 
             m_uninitializedValue = 0xFFFFFFFFFFFFFFFF;
 
@@ -65,6 +63,35 @@ namespace Emu5
                 m_uninitializedValue |= l_val << 48;
                 m_uninitializedValue |= l_val << 56;
             }
+        }
+
+        public void ResetMemoryRanges()
+        {
+            m_memoryRanges.Clear();
+        }
+
+        public void AddMemoryRange(Interval range)
+        {
+            if (range.end <= range.start)
+            {
+                return; // invalid range
+            }
+
+            // check is range does not overlap with existing one
+            foreach (Interval i_existingInterval in m_memoryRanges)
+            {
+                if (range.start >= i_existingInterval.start && range.start <= i_existingInterval.end)
+                {
+                    return;
+                }
+
+                if (range.end >= i_existingInterval.start && range.end <= i_existingInterval.end)
+                {
+                    return;
+                }
+            }
+
+            m_memoryRanges.Add(range);
         }
 
         public void RegisterPeripheral(I_RVPeripheral peripheral, UInt32 baseAddress, int addressSpaceSize)

@@ -143,6 +143,19 @@ namespace Emu5
         {
             m_editor.SetFontSize(Properties.Settings.Default.editor_fontSize);
             m_editor.SetSyntaxHighlightingEnabled(Properties.Settings.Default.editor_enableHighlighting);
+
+            RVMemoryMap l_memoryMap = m_rvEmulator.GetMemoryMapReference();
+            UInt32[] l_rangeSettingArray = Properties.Settings.Default.memoryMap_memoryRanges; // even positions contain start of range | odd positions contain end of range
+            l_memoryMap.ResetMemoryRanges();
+            if ((l_rangeSettingArray.Length & 1) == 0) // array must have an even number of entries
+            {
+                for (int i_rangeStart = 0; i_rangeStart < l_rangeSettingArray.Length; i_rangeStart += 2)
+                {
+                    Interval l_memoryRange = new Interval { start = l_rangeSettingArray[i_rangeStart], end = l_rangeSettingArray[i_rangeStart + 1] };
+                    l_memoryMap.AddMemoryRange(l_memoryRange);
+                }
+            }
+            l_memoryMap.UninitializedMemoryValue = Properties.Settings.Default.memoryMap_uninitializedMemoryValue;
         }
 
         public Perspective GetCurrentPerspective()
