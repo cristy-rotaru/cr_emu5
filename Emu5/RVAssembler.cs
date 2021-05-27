@@ -90,7 +90,7 @@ namespace Emu5
             m_dataTypeDictionary.Add("STRZ", RVDataType.STRZ);
         }
 
-        static public void Assemble(String code, RVMemoryMap memoryMap, RVLabelReferenceMap labelMap, Dictionary<UInt32, String> pseudoInstructions)
+        static public void Assemble(String code, RVMemoryMap memoryMap, RVLabelReferenceMap labelMap, Dictionary<UInt32, String> pseudoInstructions, bool useIntegratedEcallHandler, UInt32 ecallBase = 0xFFFFF000)
         {
             RVToken[][] l_tokens = RVParser.Tokenize(code);
             
@@ -100,11 +100,15 @@ namespace Emu5
             List<RVInstructionBuilder> l_instructionList = new List<RVInstructionBuilder>();
             List<RVDataBuilder> l_dataList = new List<RVDataBuilder>();
             List<Interval> l_memoryIntervals = new List<Interval>();
-            Stream l_ecallHandlerStream = new MemoryStream(Properties.Resources.ecall_handler);
+            Stream l_ecallHandlerStream = null;
+
+            if (useIntegratedEcallHandler)
+            {
+                l_ecallHandlerStream = new MemoryStream(Properties.Resources.ecall_handler);
+                l_memoryIntervals.Add(new Interval { start = ecallBase, end = (UInt32)(ecallBase + l_ecallHandlerStream.Length - 1) });
+            }
 
             pseudoInstructions.Clear();
-
-            l_memoryIntervals.Add(new Interval { start = 0xFFFFF000, end = (UInt32)(0xFFFFF000 + l_ecallHandlerStream.Length - 1) });
 
             for (int i_line = 0; i_line < l_tokens.Length; ++i_line)
             {
@@ -2233,9 +2237,12 @@ namespace Emu5
                 }
             }
 
-            byte[] l_ecallHandlerData = new byte[l_ecallHandlerStream.Length];
-            l_ecallHandlerStream.Read(l_ecallHandlerData, 0, (int)l_ecallHandlerStream.Length);
-            memoryMap.Write(0xFFFFF000, l_ecallHandlerData);
+            if (useIntegratedEcallHandler)
+            {
+                byte[] l_ecallHandlerData = new byte[l_ecallHandlerStream.Length];
+                l_ecallHandlerStream.Read(l_ecallHandlerData, 0, (int)l_ecallHandlerStream.Length);
+                memoryMap.Write(ecallBase, l_ecallHandlerData);
+            }
 
             foreach (RVDataBuilder i_dataBuilder in l_dataList)
             {

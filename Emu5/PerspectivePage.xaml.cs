@@ -336,7 +336,10 @@ namespace Emu5
         public void LoadTemplate()
         {
             ProgramTemplate l_template = (ProgramTemplate)Properties.Settings.Default.editor_defaultTemplate;
-            m_editor.GenerateTemplate(l_template, 0x2000, 0xFFFF0000, true);
+            bool l_useIntegratedEcallHandler = Properties.Settings.Default.emulator_useIntegratedEcallHandler;
+            UInt32 l_ecallBase = Properties.Settings.Default.emulator_ecallBase;
+
+            m_editor.GenerateTemplate(l_template, 0x2000, 0xFFFF0000, l_useIntegratedEcallHandler, l_ecallBase);
         }
 
         public void NotifyUpdateRequired()
@@ -424,10 +427,18 @@ namespace Emu5
             () => {
                 try
                 {
+                    if (Properties.Settings.Default.emulator_clearMemoryMap)
+                    {
+                        m_rvEmulator.GetMemoryMapReference().Clear();
+                    }
+
                     RVLabelReferenceMap l_labelMap = new RVLabelReferenceMap();
                     Dictionary<UInt32, String> l_pseudoInstructionMap = new Dictionary<UInt32, String>();
 
-                    m_rvEmulator.Assemble(l_code, l_labelMap, l_pseudoInstructionMap);
+                    bool l_useIntegratedEcallHandler = Properties.Settings.Default.emulator_useIntegratedEcallHandler;
+                    UInt32 l_ecallBase = Properties.Settings.Default.emulator_ecallBase;
+
+                    m_rvEmulator.Assemble(l_code, l_labelMap, l_pseudoInstructionMap, l_useIntegratedEcallHandler, l_ecallBase);
 
                     m_logger.LogText("Compilation succesful:", false);
                     m_logger.LogCurrentTime(true);

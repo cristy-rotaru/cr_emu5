@@ -11,5 +11,14 @@
     <Setting Name="editor_defaultTemplate" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
+    <Setting Name="emulator_clearMemoryMap" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="emulator_useIntegratedEcallHandler" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="emulator_ecallBase" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">4294963200</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -109,9 +109,9 @@ namespace Emu5
             m_logger = logger;
         }
 
-        public void Assemble(String code, RVLabelReferenceMap labelMap, Dictionary<UInt32, String> pseudoInstructions)
+        public void Assemble(String code, RVLabelReferenceMap labelMap, Dictionary<UInt32, String> pseudoInstructions, bool useIntegratedEcallHandler, UInt32 ecallBase = 0xFFFFF000)
         {
-            RVAssembler.Assemble(code, m_memoryMap, labelMap, pseudoInstructions);
+            RVAssembler.Assemble(code, m_memoryMap, labelMap, pseudoInstructions, useIntegratedEcallHandler, ecallBase);
             m_halted = false;
         }
 

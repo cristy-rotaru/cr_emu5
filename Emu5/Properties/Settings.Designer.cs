@@ -58,5 +58,41 @@ namespace Emu5.Properties {
                 this["editor_defaultTemplate"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool emulator_clearMemoryMap {
+            get {
+                return ((bool)(this["emulator_clearMemoryMap"]));
+            }
+            set {
+                this["emulator_clearMemoryMap"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool emulator_useIntegratedEcallHandler {
+            get {
+                return ((bool)(this["emulator_useIntegratedEcallHandler"]));
+            }
+            set {
+                this["emulator_useIntegratedEcallHandler"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4294963200")]
+        public uint emulator_ecallBase {
+            get {
+                return ((uint)(this["emulator_ecallBase"]));
+            }
+            set {
+                this["emulator_ecallBase"] = value;
+            }
+        }
     }
 }

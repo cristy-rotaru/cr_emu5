@@ -271,6 +271,11 @@ namespace Emu5
             }
         }
 
+        public void Clear()
+        {
+            m_memoryDictionary.Clear();
+        }
+
         public void ResetAllPeripherals()
         {
             foreach (PeripheralInfo i_peripheralDescription in m_peripherals)
