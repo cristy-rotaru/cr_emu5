@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Emu5
 {
@@ -28,6 +29,25 @@ namespace Emu5
             m_caretPosition = 0;
 
             m_initialized = true;
+
+            int l_textColorIndex = Properties.Settings.Default.terminal_textColorIndex;
+            int l_backgroundColorIndex = Properties.Settings.Default.terminal_backgroundColorIndex;
+
+            if (l_textColorIndex < 0 || l_textColorIndex > 30)
+            {
+                l_textColorIndex = 21;
+            }
+            if (l_backgroundColorIndex < 0 || l_backgroundColorIndex > 30)
+            {
+                l_backgroundColorIndex = 0;
+            }
+
+            Brush l_textColor = TerminalSettingsPanel.GetColorByIndex(l_textColorIndex);
+            Brush l_backgroundColor = TerminalSettingsPanel.GetColorByIndex(l_backgroundColorIndex);
+
+            textBoxTerminal.Foreground = l_textColor;
+            textBoxTerminal.SelectionBrush = l_textColor;
+            textBoxTerminal.Background = l_backgroundColor;
         }
 
         private void textBoxTerminal_PreviewMouseWheel(object sender, MouseWheelEventArgs e)

@@ -138,6 +138,8 @@ namespace Emu5
 
         public void ApplySettings()
         {
+            CloseAllPeripheralWindows();
+
             m_editor.SetFontSize(Properties.Settings.Default.editor_fontSize);
             m_editor.SetSyntaxHighlightingEnabled(Properties.Settings.Default.editor_enableHighlighting);
 
@@ -709,6 +711,9 @@ namespace Emu5
         {
             m_terminalWindowHandle?.Close(true);
             m_IOPanelWindowHandle?.Close(true);
+
+            m_terminalWindowHandle = null;
+            m_IOPanelWindowHandle = null;
         }
 
         private void ClockTick(object sender, System.Timers.ElapsedEventArgs e)

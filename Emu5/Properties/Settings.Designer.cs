@@ -160,5 +160,29 @@ namespace Emu5.Properties {
                 this["peripherals_enableInterruptInjector"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("21")]
+        public int terminal_textColorIndex {
+            get {
+                return ((int)(this["terminal_textColorIndex"]));
+            }
+            set {
+                this["terminal_textColorIndex"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int terminal_backgroundColorIndex {
+            get {
+                return ((int)(this["terminal_backgroundColorIndex"]));
+            }
+            set {
+                this["terminal_backgroundColorIndex"] = value;
+            }
+        }
     }
 }
