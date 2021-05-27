@@ -124,5 +124,41 @@ namespace Emu5.Properties {
                 this["memoryMap_uninitializedMemoryValue"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool peripherals_enableIOPanel {
+            get {
+                return ((bool)(this["peripherals_enableIOPanel"]));
+            }
+            set {
+                this["peripherals_enableIOPanel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool peripherals_enableTerminal {
+            get {
+                return ((bool)(this["peripherals_enableTerminal"]));
+            }
+            set {
+                this["peripherals_enableTerminal"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool peripherals_enableInterruptInjector {
+            get {
+                return ((bool)(this["peripherals_enableInterruptInjector"]));
+            }
+            set {
+                this["peripherals_enableInterruptInjector"] = value;
+            }
+        }
     }
 }

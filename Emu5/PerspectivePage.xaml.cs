@@ -123,9 +123,6 @@ namespace Emu5
             m_IOPeripheral = new IOPanel(m_rvEmulator, this);
             m_interruptInjectorPeripheral = new InterruptInjector(m_rvEmulator);
             m_terminalPeripheral = new Terminal(m_rvEmulator, this);
-            m_rvEmulator.GetMemoryMapReference().RegisterPeripheral(m_IOPeripheral, 0x0110, 8);
-            m_rvEmulator.GetMemoryMapReference().RegisterPeripheral(m_interruptInjectorPeripheral, 0x0118, 4);
-            m_rvEmulator.GetMemoryMapReference().RegisterPeripheral(m_terminalPeripheral, 0x011C, 4);
 
             m_IOPanelWindowHandle = null;
             m_terminalWindowHandle = null;
@@ -156,6 +153,20 @@ namespace Emu5
                 }
             }
             l_memoryMap.UninitializedMemoryValue = Properties.Settings.Default.memoryMap_uninitializedMemoryValue;
+
+            l_memoryMap.UnregisterAllPeripherals();
+            if (Properties.Settings.Default.peripherals_enableIOPanel)
+            {
+                l_memoryMap.RegisterPeripheral(m_IOPeripheral, 0x0110, 8);
+            }
+            if (Properties.Settings.Default.peripherals_enableTerminal)
+            {
+                l_memoryMap.RegisterPeripheral(m_terminalPeripheral, 0x011C, 4);
+            }
+            if (Properties.Settings.Default.peripherals_enableInterruptInjector)
+            {
+                l_memoryMap.RegisterPeripheral(m_interruptInjectorPeripheral, 0x0118, 4);
+            }
         }
 
         public Perspective GetCurrentPerspective()
@@ -240,9 +251,14 @@ namespace Emu5
             return m_simulationRunning && !m_compiling;
         }
 
-        public bool CanOpenPeripheralUI()
+        public bool CanOpenIOPanelPeripheralUI()
         {
-            return m_simulationRunning;
+            return m_simulationRunning & Properties.Settings.Default.peripherals_enableIOPanel;
+        }
+
+        public bool CanOpenTerminalPeripheralUI()
+        {
+            return m_simulationRunning & Properties.Settings.Default.peripherals_enableTerminal;
         }
 
         public void Undo()

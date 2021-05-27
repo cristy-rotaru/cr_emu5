@@ -94,6 +94,11 @@ namespace Emu5
             m_memoryRanges.Add(range);
         }
 
+        public void UnregisterAllPeripherals()
+        {
+            m_peripherals.Clear();
+        }
+
         public void RegisterPeripheral(I_RVPeripheral peripheral, UInt32 baseAddress, int addressSpaceSize)
         {
             PeripheralInfo l_peripheralDescription = new PeripheralInfo();

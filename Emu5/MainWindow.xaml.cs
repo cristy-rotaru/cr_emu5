@@ -622,14 +622,7 @@ namespace Emu5
             l_page.OpenTerminalPeripheralUI();
         }
 
-        void commandOpenIOPanel_Executed(object target, ExecutedRoutedEventArgs e)
-        {
-            TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
-            PerspectivePage l_page = (PerspectivePage)l_tab.Content;
-            l_page.OpenIOPanelPeripheralUI();
-        }
-
-        void commandOpenPeripheralUI_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        void commandOpenTerminal_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             bool l_canExecute = false;
 
@@ -643,7 +636,36 @@ namespace Emu5
                     {
                         PerspectivePage l_page = (PerspectivePage)l_tab.Content;
 
-                        l_canExecute = l_page.CanOpenPeripheralUI();
+                        l_canExecute = l_page.CanOpenTerminalPeripheralUI();
+                    }
+                }
+            }
+
+            e.CanExecute = l_canExecute;
+        }
+
+        void commandOpenIOPanel_Executed(object target, ExecutedRoutedEventArgs e)
+        {
+            TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+            PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+            l_page.OpenIOPanelPeripheralUI();
+        }
+
+        void commandOpenIOPanel_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            bool l_canExecute = false;
+
+            if (tabControlMain != null)
+            {
+                if (tabControlMain.SelectedIndex >= 0)
+                {
+                    TabItem l_tab = (TabItem)tabControlMain.Items[tabControlMain.SelectedIndex];
+
+                    if (l_tab.Content.GetType() == typeof(PerspectivePage))
+                    {
+                        PerspectivePage l_page = (PerspectivePage)l_tab.Content;
+
+                        l_canExecute = l_page.CanOpenIOPanelPeripheralUI();
                     }
                 }
             }
