@@ -64,6 +64,7 @@ namespace Emu5
         bool m_softReset;
 
         LogPerspective m_logger;
+        Verbosity m_loggingVerbosity;
 
         public bool Halted
         {
@@ -102,11 +103,17 @@ namespace Emu5
             m_softReset = false;
 
             m_logger = null;
+            m_loggingVerbosity = Verbosity.Normal;
         }
 
         public void RegisterLogger(LogPerspective logger)
         {
             m_logger = logger;
+        }
+
+        public void SetLoggingVerbosity(Verbosity level)
+        {
+            m_loggingVerbosity = level;
         }
 
         public void Assemble(String code, RVLabelReferenceMap labelMap, Dictionary<UInt32, String> pseudoInstructions, bool useIntegratedEcallHandler, UInt32 ecallBase = 0xFFFFF000)
@@ -247,7 +254,10 @@ namespace Emu5
                 m_registerFile[i_index] = 0x0;
                 m_pendingInterrupts[i_index] = false;
 
-                m_logger?.LogText(String.Format("x{0,-2} <= 0x{1,8:X8}", i_index, 0), true);
+                if (m_loggingVerbosity > Verbosity.Minimal)
+                {
+                    m_logger?.LogText(String.Format("x{0,-2} <= 0x{1,8:X8}", i_index, 0), true);
+                }
             }
 
             m_trapHandled = null;
@@ -257,9 +267,12 @@ namespace Emu5
 
             byte?[] l_initialProgramCounter = m_memoryMap.Read(0x0, 4);
 
-            m_logger?.LogText("Memory read:", false);
-            m_logger?.LogByteArray(l_initialProgramCounter, false);
-            m_logger?.LogText(String.Format("<= [0x{0,8:X8}]", 0), true);
+            if (m_loggingVerbosity == Verbosity.Detailed)
+            {
+                m_logger?.LogText("Memory read:", false);
+                m_logger?.LogByteArray(l_initialProgramCounter, false);
+                m_logger?.LogText(String.Format("<= [0x{0,8:X8}] (Reset vector)", 0), true);
+            }
 
             for (int i_byteIndex = 3; i_byteIndex >= 0; --i_byteIndex)
             {
@@ -336,6 +349,9 @@ namespace Emu5
                         m_pendingInterrupts[1] = false;
                         LoadVector(RVVector.NMI, CreateByteStream(m_programCounter)); // NMI can not be masked
                         m_waitForInterrupt = false;
+
+                        m_logger?.LogText(String.Format("Register write: PC <= 0x{0,8:X8}", m_programCounter), true);
+
                         return;
                     }
 
@@ -391,9 +407,12 @@ namespace Emu5
 
             byte?[] l_rawData = m_memoryMap.Read(m_programCounter, 4);
 
-            m_logger?.LogText("Code read:", false);
-            m_logger?.LogByteArray(l_rawData, false);
-            m_logger?.LogText(String.Format("<= [0x{0, 8:X8}]", m_programCounter), true);
+            if (m_loggingVerbosity > Verbosity.Minimal)
+            {
+                m_logger?.LogText("Code read:", false);
+                m_logger?.LogByteArray(l_rawData, false);
+                m_logger?.LogText(String.Format("<= [0x{0, 8:X8}]", m_programCounter), true);
+            }
 
             UInt32 l_instructionData = 0x0;
             for (int i_byteIndex = 3; i_byteIndex >= 0; --i_byteIndex)
@@ -418,7 +437,15 @@ namespace Emu5
             }
             else
             {
-                m_logger?.LogText(String.Format("Decoded: {0} ({1})", l_dissassembly.Item1, l_dissassembly.Item2), true);
+                m_logger?.LogText(String.Format("Decoded: {0}", l_dissassembly.Item1), false);
+                if (m_loggingVerbosity == Verbosity.Minimal)
+                {
+                    m_logger?.NewLine();
+                }
+                else
+                {
+                    m_logger?.LogText(String.Format("({0})", l_dissassembly.Item2), true);
+                }
 
                 DecodeAndExecute(l_instructionData);
             }
@@ -475,24 +502,33 @@ namespace Emu5
 
             m_memoryMap.Write(0x100, contextInfo); // save trap info
 
-            m_logger?.LogText(String.Format("Memory write: [0x{0,8:X8}] <=", 0x100), false);
-            m_logger?.LogByteArray(contextInfo, false);
-            m_logger?.LogText("(Context info)", true);
+            if (m_loggingVerbosity == Verbosity.Detailed)
+            {
+                m_logger?.LogText(String.Format("Memory write: [0x{0,8:X8}] <=", 0x100), false);
+                m_logger?.LogByteArray(contextInfo, false);
+                m_logger?.LogText("(Context info)", true);
+            }
 
             byte[] l_registerBackup = CreateByteStream(m_registerFile);
             m_memoryMap.Write(0x80, l_registerBackup); // backup registers
 
-            m_logger?.LogText(String.Format("Memory write: [0x{0,8:X8}] <=", 0x80), false);
-            m_logger?.LogByteArray(l_registerBackup, false);
-            m_logger?.LogText("(Saved registers)", true);
+            if (m_loggingVerbosity == Verbosity.Detailed)
+            {
+                m_logger?.LogText(String.Format("Memory write: [0x{0,8:X8}] <=", 0x80), false);
+                m_logger?.LogByteArray(l_registerBackup, false);
+                m_logger?.LogText("(Saved registers)", true);
+            }
 
             // load corresponding PC
             UInt32 l_vectorAddress = 0x4 * (UInt32)vectorIndex;
             byte?[] l_vector = m_memoryMap.Read(l_vectorAddress, 4);
 
-            m_logger?.LogText("Memory read:", false);
-            m_logger?.LogByteArray(l_vector, false);
-            m_logger?.LogText(String.Format("<= [0x{0,8:X8}] (Vector)", l_vectorAddress), true);
+            if (m_loggingVerbosity > Verbosity.Minimal)
+            {
+                m_logger?.LogText("Memory read:", false);
+                m_logger?.LogByteArray(l_vector, false);
+                m_logger?.LogText(String.Format("<= [0x{0,8:X8}] (Vector)", l_vectorAddress), true);
+            }
 
             m_programCounter = 0x0;
             for (int i_byteIndex = 3; i_byteIndex >= 0; --i_byteIndex)
@@ -528,7 +564,14 @@ namespace Emu5
                 throw new RVEmulationException("Register index out of range."); // if this happens I fucked something up really bad
             }
 
-            m_logger?.LogText(String.Format("Register write: x{0} <= 0x{1,8:X8}", index, data), false);
+            if (m_loggingVerbosity == Verbosity.Detailed)
+            {
+                m_logger?.LogText(String.Format("Register write: x{0} --0x{1,8:X8}-- <= 0x{2,8:X8}", index, m_registerFile[index], data), false);
+            }
+            else
+            {
+                m_logger?.LogText(String.Format("Register write: x{0} <= 0x{1,8:X8}", index, data), false);
+            }
 
             if (index != 0)
             {
@@ -537,7 +580,14 @@ namespace Emu5
             }
             else
             {
-                m_logger?.LogText("(Write to x0 suppressed)", true);
+                if (m_loggingVerbosity > Verbosity.Minimal)
+                {
+                    m_logger?.LogText("(Write to x0 suppressed)", true);
+                }
+                else
+                {
+                    m_logger?.NewLine();
+                }
             }
         }
 
@@ -550,7 +600,10 @@ namespace Emu5
 
             UInt32 l_registerValue = m_registerFile[index];
 
-            m_logger?.LogText(String.Format("Register read: 0x{0,8:X8} <= x{1}", l_registerValue, index), true);
+            if (m_loggingVerbosity == Verbosity.Detailed)
+            {
+                m_logger?.LogText(String.Format("Register read: 0x{0,8:X8} <= x{1}", l_registerValue, index), true);
+            }
 
             return l_registerValue;
         }
@@ -678,7 +731,10 @@ namespace Emu5
                     l_readValue = (UInt32)l_rawData[0];
                     l_readValue = (UInt32)(((Int32)l_readValue << 24) >> 24); // sign extend
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} (sign extended)", l_readValue), true);
+                    if (m_loggingVerbosity == Verbosity.Detailed)
+                    {
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} (sign extended)", l_readValue), true);
+                    }
                 }
                 break;
 
@@ -709,7 +765,10 @@ namespace Emu5
                     l_readValue = (UInt32)l_rawData[0] | ((UInt32)l_rawData[1] << 8);
                     l_readValue = (UInt32)(((Int32)l_readValue << 16) >> 16); // sign extend
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} (sign extended)", l_readValue), true);
+                    if (m_loggingVerbosity == Verbosity.Detailed)
+                    {
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} (sign extended)", l_readValue), true);
+                    }
                 }
                 break;
 
@@ -820,14 +879,17 @@ namespace Emu5
                 {
                     UInt32 l_result = l_data1 + l_data2;
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("(x{0} + imm)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("(x{0} + x{1})", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("(x{0} + imm)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("(x{0} + x{1})", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result);
@@ -838,14 +900,17 @@ namespace Emu5
                 {
                     UInt32 l_result = l_data1 - l_data2;
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} - 0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("(x{0} - imm)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("(x{0} - x{1})", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} - 0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("(x{0} - imm)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("(x{0} - x{1})", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result);
@@ -856,14 +921,17 @@ namespace Emu5
                 {
                     UInt32 l_result = l_data1 << (int)(l_data2 & 0x1F);
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} << 0x{1,2:X2} = 0x{2,8:X8}", l_data1, l_data2 & 0x1F, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("(x{0} << imm)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("(x{0} << x{1}[4:0])", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} << 0x{1,2:X2} = 0x{2,8:X8}", l_data1, l_data2 & 0x1F, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("(x{0} << imm)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("(x{0} << x{1}[4:0])", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result);
@@ -874,14 +942,17 @@ namespace Emu5
                 {
                     bool l_result = (Int32)l_data1 < (Int32)l_data2;
 
-                    m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} < (int)0x{1,8:X8} = {2}", l_data1, l_data2, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("((int)x{0} < (int)imm)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("((int)x{0} < (int)x{1})", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} < (int)0x{1,8:X8} = {2}", l_data1, l_data2, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("((int)x{0} < (int)imm)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("((int)x{0} < (int)x{1})", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result ? (UInt32)1 : (UInt32)0);
@@ -892,14 +963,17 @@ namespace Emu5
                 {
                     bool l_result = l_data1 < l_data2;
 
-                    m_logger?.LogText(String.Format("Executing: (uint)0x{0,8:X8} < (uint)0x{1,8:X8} = {2}", l_data1, l_data2, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("((uint)x{0} < (uint)imm)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("((uint)x{0} < (uint)x{1})", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: (uint)0x{0,8:X8} < (uint)0x{1,8:X8} = {2}", l_data1, l_data2, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("((uint)x{0} < (uint)imm)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("((uint)x{0} < (uint)x{1})", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result ? (UInt32)1 : (UInt32)0);
@@ -910,14 +984,17 @@ namespace Emu5
                 {
                     UInt32 l_result = l_data1 ^ l_data2;
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} ^ 0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("(x{0} ^ imm)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("(x{0} ^ x{1})", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} ^ 0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("(x{0} ^ imm)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("(x{0} ^ x{1})", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result);
@@ -928,14 +1005,17 @@ namespace Emu5
                 {
                     UInt32 l_result = l_data1 >> (int)(l_data2 & 0x1F);
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} >> 0x{1,2:X2} = 0x{2,8:X8}", l_data1, l_data2 & 0x1F, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("(x{0} >> imm)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("(x{0} >> x{1}[4:0])", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} >> 0x{1,2:X2} = 0x{2,8:X8}", l_data1, l_data2 & 0x1F, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("(x{0} >> imm)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("(x{0} >> x{1}[4:0])", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result);
@@ -946,14 +1026,17 @@ namespace Emu5
                 {
                     UInt32 l_result = (UInt32)((Int32)l_data1 >> (int)(l_data2 & 0x1F));
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} >>> 0x{1,2:X2} = 0x{2,8:X8}", l_data1, l_data2 & 0x1F, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("(x{0} >>> imm)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("(x{0} >>> x{1}[4:0])", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} >>> 0x{1,2:X2} = 0x{2,8:X8}", l_data1, l_data2 & 0x1F, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("(x{0} >>> imm)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("(x{0} >>> x{1}[4:0])", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result);
@@ -964,14 +1047,17 @@ namespace Emu5
                 {
                     UInt32 l_result = l_data1 | l_data2;
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} | 0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("(x{0} | imm)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("(x{0} | x{1})", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} | 0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("(x{0} | imm)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("(x{0} | x{1})", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result);
@@ -982,14 +1068,17 @@ namespace Emu5
                 {
                     UInt32 l_result = l_data1 & l_data2;
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} & 0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("(x{0} & imm)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("(x{0} & x{1})", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} & 0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("(x{0} & imm)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("(x{0} & x{1})", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result);
@@ -1000,14 +1089,17 @@ namespace Emu5
                 {
                     UInt32 l_result = l_data1 * l_data2;
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} * 0x{1,8:X8} & 0xFFFFFFFF = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("(x{0} * imm & 0xFFFFFFFF)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("(x{0} * x{1} & 0xFFFFFFFF)", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} * 0x{1,8:X8} & 0xFFFFFFFF = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("(x{0} * imm & 0xFFFFFFFF)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("(x{0} * x{1} & 0xFFFFFFFF)", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result);
@@ -1027,14 +1119,17 @@ namespace Emu5
 
                     UInt32 l_result = (UInt32)((l_extendedData1 * l_extendedData2) >> 32);
 
-                    m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} * (int)0x{1,8:X8} >> 32 = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("((int)x{0} * (int)imm >> 32)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("((int)x{0} * (int)x{1} >> 32)", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} * (int)0x{1,8:X8} >> 32 = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("((int)x{0} * (int)imm >> 32)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("((int)x{0} * (int)x{1} >> 32)", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result);
@@ -1054,14 +1149,17 @@ namespace Emu5
 
                     UInt32 l_result = (UInt32)((l_extendedData1 * l_extendedData2) >> 32);
 
-                    m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} * (uint)0x{1,8:X8} >> 32 = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("((int)x{0} * (uint)imm >> 32)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("((int)x{0} * (uint)x{1} >> 32)", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} * (uint)0x{1,8:X8} >> 32 = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("((int)x{0} * (uint)imm >> 32)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("((int)x{0} * (uint)x{1} >> 32)", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result);
@@ -1072,14 +1170,17 @@ namespace Emu5
                 {
                     UInt32 l_result = (UInt32)(((UInt64)l_data1 * (UInt64)l_data2) >> 32);
 
-                    m_logger?.LogText(String.Format("Executing: (uint)0x{0,8:X8} * (uint)0x{1,8:X8} >> 32 = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("((uint)x{0} * (uint)imm >> 32)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("((uint)x{0} * (uint)x{1} >> 32)", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: (uint)0x{0,8:X8} * (uint)0x{1,8:X8} >> 32 = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("((uint)x{0} * (uint)imm >> 32)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("((uint)x{0} * (uint)x{1} >> 32)", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result);
@@ -1106,14 +1207,17 @@ namespace Emu5
 
                     UInt32 l_result = (UInt32)((Int32)l_data1 / (Int32)l_data2);
 
-                    m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} / (int)0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("((int)x{0} / (int)imm)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("((int)x{0} / (int)x{1})", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} / (int)0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("((int)x{0} / (int)imm)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("((int)x{0} / (int)x{1})", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result);
@@ -1132,14 +1236,17 @@ namespace Emu5
 
                     UInt32 l_result = l_data1 / l_data2;
 
-                    m_logger?.LogText(String.Format("Executing: (uint)0x{0,8:X8} / (uint)0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("((uint)x{0} / (uint)imm)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("((uint)x{0} / (uint)x{1})", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: (uint)0x{0,8:X8} / (uint)0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("((uint)x{0} / (uint)imm)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("((uint)x{0} / (uint)x{1})", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result);
@@ -1158,14 +1265,17 @@ namespace Emu5
 
                     UInt32 l_result = (UInt32)((Int32)l_data1 % (Int32)l_data2);
 
-                    m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} % (int)0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("((int)x{0} % (int)imm)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("((int)x{0} % (int)x{1})", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} % (int)0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("((int)x{0} % (int)imm)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("((int)x{0} % (int)x{1})", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result);
@@ -1184,14 +1294,17 @@ namespace Emu5
 
                     UInt32 l_result = l_data1 % l_data2;
 
-                    m_logger?.LogText(String.Format("Executing: (uint)0x{0,8:X8} % (uint)0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
-                    if (imm)
+                    if (m_loggingVerbosity == Verbosity.Detailed)
                     {
-                        m_logger?.LogText(String.Format("((uint)x{0} % (uint)imm)", operand1), true);
-                    }
-                    else
-                    {
-                        m_logger?.LogText(String.Format("((uint)x{0} % (uint)x{1})", operand1, operand2), true);
+                        m_logger?.LogText(String.Format("Executing: (uint)0x{0,8:X8} % (uint)0x{1,8:X8} = 0x{2,8:X8}", l_data1, l_data2, l_result), false);
+                        if (imm)
+                        {
+                            m_logger?.LogText(String.Format("((uint)x{0} % (uint)imm)", operand1), true);
+                        }
+                        else
+                        {
+                            m_logger?.LogText(String.Format("((uint)x{0} % (uint)x{1})", operand1, operand2), true);
+                        }
                     }
 
                     WriteRegister(destination, l_result);
@@ -1219,7 +1332,10 @@ namespace Emu5
                 {
                     bool l_result = l_data1 == l_data2;
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} == 0x{1,8:X8} = {2} (x{3} == x{4})", l_data1, l_data2, l_result, register1, register2), true);
+                    if (m_loggingVerbosity == Verbosity.Detailed)
+                    {
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} == 0x{1,8:X8} = {2} (x{3} == x{4})", l_data1, l_data2, l_result, register1, register2), true);
+                    }
 
                     return l_result;
                 }
@@ -1228,7 +1344,10 @@ namespace Emu5
                 {
                     bool l_result = l_data1 != l_data2;
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} != 0x{1,8:X8} = {2} (x{3} != x{4})", l_data1, l_data2, l_result, register1, register2), true);
+                    if (m_loggingVerbosity == Verbosity.Detailed)
+                    {
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} != 0x{1,8:X8} = {2} (x{3} != x{4})", l_data1, l_data2, l_result, register1, register2), true);
+                    }
 
                     return l_result;
                 }
@@ -1237,7 +1356,10 @@ namespace Emu5
                 {
                     bool l_result = (Int32)l_data1 < (Int32)l_data2;
 
-                    m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} < (int)0x{1,8:X8} = {2} ((int)x{3} < (int)x{4})", l_data1, l_data2, l_result, register1, register2), true);
+                    if (m_loggingVerbosity == Verbosity.Detailed)
+                    {
+                        m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} < (int)0x{1,8:X8} = {2} ((int)x{3} < (int)x{4})", l_data1, l_data2, l_result, register1, register2), true);
+                    }
 
                     return l_result;
                 }
@@ -1246,7 +1368,10 @@ namespace Emu5
                 {
                     bool l_result = (Int32)l_data1 >= (Int32)l_data2;
 
-                    m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} >= (int)0x{1,8:X8} = {2} ((int)x{3} >= (int)x{4})", l_data1, l_data2, l_result, register1, register2), true);
+                    if (m_loggingVerbosity == Verbosity.Detailed)
+                    {
+                        m_logger?.LogText(String.Format("Executing: (int)0x{0,8:X8} >= (int)0x{1,8:X8} = {2} ((int)x{3} >= (int)x{4})", l_data1, l_data2, l_result, register1, register2), true);
+                    }
 
                     return l_result;
                 }
@@ -1255,7 +1380,10 @@ namespace Emu5
                 {
                     bool l_result = l_data1 < l_data2;
 
-                    m_logger?.LogText(String.Format("Executing: (uint)0x{0,8:X8} < (uint)0x{1,8:X8} = {2} ((uint)x{3} < (uint)x{4})", l_data1, l_data2, l_result, register1, register2), true);
+                    if (m_loggingVerbosity == Verbosity.Detailed)
+                    {
+                        m_logger?.LogText(String.Format("Executing: (uint)0x{0,8:X8} < (uint)0x{1,8:X8} = {2} ((uint)x{3} < (uint)x{4})", l_data1, l_data2, l_result, register1, register2), true);
+                    }
 
                     return l_result;
                 }
@@ -1264,7 +1392,10 @@ namespace Emu5
                 {
                     bool l_result = l_data1 >= l_data2;
 
-                    m_logger?.LogText(String.Format("Executing: (uint)0x{0,8:X8} >= (uint)0x{1,8:X8} = {2} ((uint)x{3} >= (uint)x{4})", l_data1, l_data2, l_result, register1, register2), true);
+                    if (m_loggingVerbosity == Verbosity.Detailed)
+                    {
+                        m_logger?.LogText(String.Format("Executing: (uint)0x{0,8:X8} >= (uint)0x{1,8:X8} = {2} ((uint)x{3} >= (uint)x{4})", l_data1, l_data2, l_result, register1, register2), true);
+                    }
 
                     return l_result;
                 }
@@ -1361,9 +1492,12 @@ namespace Emu5
                         // restore registers
                         byte?[] l_registerBackup = m_memoryMap.Read(0x80, 128);
 
-                        m_logger?.LogText("Memory read:", false);
-                        m_logger?.LogByteArray(l_registerBackup, false);
-                        m_logger?.LogText(String.Format("<= [0x{0,8:X8}] (Saved registers)", 0x80), true);
+                        if (m_loggingVerbosity == Verbosity.Detailed)
+                        {
+                            m_logger?.LogText("Memory read:", false);
+                            m_logger?.LogByteArray(l_registerBackup, false);
+                            m_logger?.LogText(String.Format("<= [0x{0,8:X8}] (Saved registers)", 0x80), true);
+                        }
 
                         for (int i_registerIndex = 0; i_registerIndex < 32; ++i_registerIndex)
                         {
@@ -1383,9 +1517,12 @@ namespace Emu5
                         // load return PC
                         byte?[] l_returnPC = m_memoryMap.Read(0x100, 4);
 
-                        m_logger?.LogText("Memory read:", false);
-                        m_logger?.LogByteArray(l_returnPC, false);
-                        m_logger?.LogText(String.Format("<= [0x{0,8:X8}] (Return PC)", 0x100), true);
+                        if (m_loggingVerbosity > Verbosity.Minimal)
+                        {
+                            m_logger?.LogText("Memory read:", false);
+                            m_logger?.LogByteArray(l_returnPC, false);
+                            m_logger?.LogText(String.Format("<= [0x{0,8:X8}] (Return PC)", 0x100), true);
+                        }
 
                         m_programCounter = 0x0;
                         for (int i_byteIndex = 3; i_byteIndex >= 0; --i_byteIndex)
@@ -1433,7 +1570,10 @@ namespace Emu5
                     byte l_destinationRegister = (byte)((instruction >> 7) & 0x1F);
                     UInt32 l_immediate = instruction & ~(UInt32)0xFFF;
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} (imm)", l_immediate), true);
+                    if (m_loggingVerbosity == Verbosity.Detailed)
+                    {
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} (imm)", l_immediate), true);
+                    }
 
                     WriteRegister(l_destinationRegister, l_immediate);
                 }
@@ -1445,7 +1585,10 @@ namespace Emu5
                     UInt32 l_immediate = instruction & ~(UInt32)0xFFF;
                     UInt32 l_result = l_immediate + m_programCounter;
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 0x{1,8:X8} = 0x{2,8:X8} (PC + imm)", m_programCounter, l_immediate, l_result), true);
+                    if (m_loggingVerbosity == Verbosity.Detailed)
+                    {
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 0x{1,8:X8} = 0x{2,8:X8} (PC + imm)", m_programCounter, l_immediate, l_result), true);
+                    }
 
                     WriteRegister(l_destinationRegister, l_result);
                 }
@@ -1465,8 +1608,11 @@ namespace Emu5
 
                     UInt32 l_returnAddress = m_programCounter + 4;
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 4 = 0x{1,8:X8} (PC + 4)", m_programCounter, l_returnAddress), true);
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 0x{1,8:X8} = 0x{2,8:X8} (PC + imm)", m_programCounter, l_offset, l_branchTo), true);
+                    if (m_loggingVerbosity == Verbosity.Detailed)
+                    {
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 4 = 0x{1,8:X8} (PC + 4)", m_programCounter, l_returnAddress), true);
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 0x{1,8:X8} = 0x{2,8:X8} (PC + imm)", m_programCounter, l_offset, l_branchTo), true);
+                    }
 
                     WriteRegister(l_destinationRegister, l_returnAddress);
                 }
@@ -1492,8 +1638,11 @@ namespace Emu5
 
                     UInt32 l_returnAddress = m_programCounter + 4;
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 4 = 0x{1,8:X8} (PC + 4)", m_programCounter, l_returnAddress), true);
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 0x{1,8:X8} &~ 1 = 0x{2,8:X8} (x{3} + imm &~ 1)", l_base, l_offset, l_branchTo, l_sourceRegister1), true);
+                    if (m_loggingVerbosity == Verbosity.Detailed)
+                    {
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 4 = 0x{1,8:X8} (PC + 4)", m_programCounter, l_returnAddress), true);
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 0x{1,8:X8} &~ 1 = 0x{2,8:X8} (x{3} + imm &~ 1)", l_base, l_offset, l_branchTo, l_sourceRegister1), true);
+                    }
 
                     WriteRegister(l_destinationRegister, l_returnAddress);
                 }
@@ -1523,7 +1672,11 @@ namespace Emu5
                         l_branchTo = m_programCounter + l_offset;
 
                         m_logger?.LogText("Branch taken", true);
-                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 0x{1,8:X8} = 0x{2,8:X8} (PC + imm)", m_programCounter, l_offset, l_branchTo), true);
+
+                        if (m_loggingVerbosity == Verbosity.Detailed)
+                        {
+                            m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 0x{1,8:X8} = 0x{2,8:X8} (PC + imm)", m_programCounter, l_offset, l_branchTo), true);
+                        }
                     }
                     else
                     {
@@ -1543,7 +1696,10 @@ namespace Emu5
                     UInt32 l_base = ReadRegister(l_sourceRegister1);
                     UInt32 l_loadAddress = l_base + l_offset;
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 0x{1,8:X8} = 0x{2,8:X8} (x{3} + imm)", l_base, l_offset, l_loadAddress, l_sourceRegister1), true);
+                    if (m_loggingVerbosity == Verbosity.Detailed)
+                    {
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 0x{1,8:X8} = 0x{2,8:X8} (x{3} + imm)", l_base, l_offset, l_loadAddress, l_sourceRegister1), true);
+                    }
 
                     if (LoadFromMemory(l_func3, l_destinationRegister, l_loadAddress) == false)
                     {
@@ -1564,7 +1720,10 @@ namespace Emu5
                     UInt32 l_base = ReadRegister(l_sourceRegister1);
                     UInt32 l_storeAddress = l_base + l_offset;
 
-                    m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 0x{1,8:X8} = 0x{2,8:X8} (x{3} + imm)", l_base, l_offset, l_storeAddress, l_sourceRegister1), true);
+                    if (m_loggingVerbosity == Verbosity.Detailed)
+                    {
+                        m_logger?.LogText(String.Format("Executing: 0x{0,8:X8} + 0x{1,8:X8} = 0x{2,8:X8} (x{3} + imm)", l_base, l_offset, l_storeAddress, l_sourceRegister1), true);
+                    }
 
                     UInt32 l_data = ReadRegister(l_sourceRegister2);
 

@@ -172,6 +172,7 @@ namespace Emu5
             if (Properties.Settings.Default.logging_enable)
             {
                 m_rvEmulator.RegisterLogger(m_logger);
+                m_rvEmulator.SetLoggingVerbosity((Verbosity)Properties.Settings.Default.logging_verbosity);
             }
             else
             {

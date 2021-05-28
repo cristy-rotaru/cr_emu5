@@ -196,5 +196,17 @@ namespace Emu5.Properties {
                 this["logging_enable"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int logging_verbosity {
+            get {
+                return ((int)(this["logging_verbosity"]));
+            }
+            set {
+                this["logging_verbosity"] = value;
+            }
+        }
     }
 }
