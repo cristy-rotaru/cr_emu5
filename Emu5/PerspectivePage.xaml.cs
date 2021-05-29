@@ -173,6 +173,7 @@ namespace Emu5
             {
                 m_rvEmulator.RegisterLogger(m_logger);
                 m_rvEmulator.SetLoggingVerbosity((Verbosity)Properties.Settings.Default.logging_verbosity);
+                m_rvEmulator.DisableEcallLogging = Properties.Settings.Default.logging_dontLogEcall;
             }
             else
             {
@@ -457,6 +458,11 @@ namespace Emu5
 
             m_stepCount = 0;
 
+            if (Properties.Settings.Default.logging_clearOnNewSimulation)
+            {
+                m_logger.Clear();
+            }
+
             if (Properties.Settings.Default.logging_enable)
             {
                 m_logger.LogText("Simulation started:", false);
@@ -566,7 +572,10 @@ namespace Emu5
         {
             if (Properties.Settings.Default.logging_enable)
             {
-                m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+                if (Properties.Settings.Default.logging_dontLogEcall == false || m_rvEmulator.HandlingTrap() != RVVector.ECALL)
+                {
+                    m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+                }
             }
             ++m_stepCount;
 
@@ -574,7 +583,11 @@ namespace Emu5
 
             if (Properties.Settings.Default.logging_enable)
             {
-                m_logger.NewLine();
+                if (Properties.Settings.Default.logging_dontLogEcall == false || m_rvEmulator.HandlingTrap() != RVVector.ECALL)
+                {
+                    m_logger.NewLine();
+                }
+
                 m_logger.UpdateLogUI();
             }
 
@@ -765,7 +778,10 @@ namespace Emu5
             () => {
                 if (Properties.Settings.Default.logging_enable)
                 {
-                    m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+                    if (Properties.Settings.Default.logging_dontLogEcall == false || m_rvEmulator.HandlingTrap() != RVVector.ECALL)
+                    {
+                        m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+                    }
                 }
                 ++m_stepCount;
 
@@ -773,7 +789,11 @@ namespace Emu5
 
                 if (Properties.Settings.Default.logging_enable)
                 {
-                    m_logger.NewLine();
+                    if (Properties.Settings.Default.logging_dontLogEcall == false || m_rvEmulator.HandlingTrap() != RVVector.ECALL)
+                    {
+                        m_logger.NewLine();
+                    }
+
                     m_logger.UpdateLogUI();
                 }
 
@@ -835,7 +855,10 @@ namespace Emu5
 
                 if (Properties.Settings.Default.logging_enable)
                 {
-                    m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+                    if (Properties.Settings.Default.logging_dontLogEcall == false || m_rvEmulator.HandlingTrap() != RVVector.ECALL)
+                    {
+                        m_logger.LogText(String.Format("Step {0:00000000}:", m_stepCount), true);
+                    }
                 }
                 ++m_stepCount;
 
@@ -843,7 +866,10 @@ namespace Emu5
 
                 if (Properties.Settings.Default.logging_enable)
                 {
-                    m_logger.NewLine();
+                    if (Properties.Settings.Default.logging_dontLogEcall == false || m_rvEmulator.HandlingTrap() != RVVector.ECALL)
+                    {
+                        m_logger.NewLine();
+                    }
                 }
 
                 if (m_rvEmulator.Halted)

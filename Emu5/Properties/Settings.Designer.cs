@@ -208,5 +208,29 @@ namespace Emu5.Properties {
                 this["logging_verbosity"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool logging_clearOnNewSimulation {
+            get {
+                return ((bool)(this["logging_clearOnNewSimulation"]));
+            }
+            set {
+                this["logging_clearOnNewSimulation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool logging_dontLogEcall {
+            get {
+                return ((bool)(this["logging_dontLogEcall"]));
+            }
+            set {
+                this["logging_dontLogEcall"] = value;
+            }
+        }
     }
 }

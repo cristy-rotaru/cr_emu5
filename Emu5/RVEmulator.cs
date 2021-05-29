@@ -63,8 +63,9 @@ namespace Emu5
         bool m_ebreakExecuted;
         bool m_softReset;
 
-        LogPerspective m_logger;
+        LogPerspective m_logger, m_loggerBackup;
         Verbosity m_loggingVerbosity;
+        bool m_disableEcallLogging;
 
         public bool Halted
         {
@@ -88,6 +89,14 @@ namespace Emu5
             }
         }
 
+        public bool DisableEcallLogging
+        {
+            set
+            {
+                m_disableEcallLogging = value;
+            }
+        }
+
         public RVEmulator()
         {
             m_halted = true;
@@ -103,7 +112,9 @@ namespace Emu5
             m_softReset = false;
 
             m_logger = null;
+            m_loggerBackup = null;
             m_loggingVerbosity = Verbosity.Normal;
+            m_disableEcallLogging = false;
         }
 
         public void RegisterLogger(LogPerspective logger)
@@ -1413,6 +1424,12 @@ namespace Emu5
             {
                 case 0x000: // ecall
                 {
+                    if (m_disableEcallLogging && m_trapHandled == null)
+                    {
+                        m_loggerBackup = m_logger;
+                        m_logger = null;
+                    }
+
                     LoadVector(RVVector.ECALL, CreateByteStream(m_programCounter + 4));
                     return false;
                 }
@@ -1427,6 +1444,12 @@ namespace Emu5
 
                 case 0xFFF: // hlt
                 {
+                    if (m_trapHandled == RVVector.ECALL && m_disableEcallLogging)
+                    {
+                        m_logger = m_loggerBackup;
+                    }
+
+                    m_trapHandled = null;
                     m_logger?.LogText("Halting core", true);
 
                     m_halted = true;
@@ -1436,6 +1459,11 @@ namespace Emu5
 
                 case 0xFFE: // rst
                 {
+                    if (m_trapHandled == RVVector.ECALL && m_disableEcallLogging)
+                    {
+                        m_logger = m_loggerBackup;
+                    }
+
                     m_softReset = true;
                     ResetProcessor();
                     return false;
@@ -1489,6 +1517,11 @@ namespace Emu5
                 {
                     if (m_trapHandled != null)
                     {
+                        if (m_trapHandled == RVVector.ECALL && m_disableEcallLogging)
+                        {
+                            m_logger = m_loggerBackup;
+                        }
+
                         // restore registers
                         byte?[] l_registerBackup = m_memoryMap.Read(0x80, 128);
 
