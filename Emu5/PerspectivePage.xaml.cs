@@ -381,7 +381,7 @@ namespace Emu5
             bool l_useIntegratedEcallHandler = Properties.Settings.Default.emulator_useIntegratedEcallHandler;
             UInt32 l_ecallBase = Properties.Settings.Default.emulator_ecallBase;
 
-            m_editor.GenerateTemplate(l_template, 0x20000, 0xFFFFFFC, l_useIntegratedEcallHandler, l_ecallBase, 0x300);
+            m_editor.GenerateTemplate(l_template, 0x20000, 0x7FFFC, l_useIntegratedEcallHandler, l_ecallBase, 0x300);
         }
 
         public void NotifyUpdateRequired()
