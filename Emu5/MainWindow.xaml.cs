@@ -809,7 +809,21 @@ namespace Emu5
 
         private void menuItemHelpSettings_Click(object sender, RoutedEventArgs e)
         {
-            (new SettingsWindow()).ShowDialog();
+            bool l_simulationsRunning = false;
+
+            foreach (TabItem i_tab in tabControlMain.Items)
+            {
+                if (i_tab.Content.GetType() == typeof(PerspectivePage))
+                {
+                    if (((PerspectivePage)i_tab.Content).IsRunning)
+                    {
+                        l_simulationsRunning = true;
+                        break;
+                    }
+                }
+            }
+
+            (new SettingsWindow(l_simulationsRunning)).ShowDialog();
         }
 
         private void menuItemHelpAbout_Click(object sender, RoutedEventArgs e)

@@ -10,6 +10,8 @@ namespace Emu5
     /// </summary>
     public partial class SettingsWindow : Window
     {
+        bool m_simulationsAreRunning;
+
         EditorSettingsPanel m_editorSettings;
         EmulatorSettingsPanel m_emulatorSettings;
         MemoryMapSettingsPanel m_memoryMapSettings;
@@ -40,9 +42,11 @@ namespace Emu5
         bool m_loggingClearOnNewSimulation;
         bool m_loggingDontLogEcall;
 
-        public SettingsWindow()
+        public SettingsWindow(bool simulationsRunning = false)
         {
             InitializeComponent();
+
+            m_simulationsAreRunning = simulationsRunning;
 
             m_editorSettings = new EditorSettingsPanel();
             m_emulatorSettings = new EmulatorSettingsPanel();
