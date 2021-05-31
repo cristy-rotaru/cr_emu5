@@ -238,6 +238,97 @@ namespace Emu5
             m_logSettings.SetEcallLoggingDisable(m_loggingDontLogEcall);
         }
 
+        private bool SettingsChanged()
+        {
+            if (m_editorSettings.GetFontSize() != m_editorFontSize)
+            {
+                return true;
+            }
+            if (m_editorSettings.GetSyntaxHighlightingEnable() != m_editorEnableHighlighting)
+            {
+                return true;
+            }
+            if (m_editorSettings.GetNewFileTemplate() != m_editorDefaultTemplate)
+            {
+                return true;
+            }
+
+            if (m_emulatorSettings.GetClearMemoryMap() != m_emulatorClearMemoryMap)
+            {
+                return true;
+            }
+            if (m_emulatorSettings.GetUseIntegratedEcall() != m_emulatorUseIntegratedEcallHandler)
+            {
+                return true;
+            }
+            if (m_emulatorSettings.GetEcallBase() != m_emulatorEcallBase)
+            {
+                return true;
+            }
+
+            List<Interval> l_memoryRanges = m_memoryMapSettings.GetMemoryRanges();
+            if (l_memoryRanges.Count != m_memoryMapMemoryRanges.Count)
+            {
+                return true;
+            }
+            for (int i_rangeIndex = 0; i_rangeIndex < l_memoryRanges.Count; ++i_rangeIndex)
+            {
+                if (l_memoryRanges[i_rangeIndex].start != m_memoryMapMemoryRanges[i_rangeIndex].start)
+                {
+                    return true;
+                }
+                if (l_memoryRanges[i_rangeIndex].end != m_memoryMapMemoryRanges[i_rangeIndex].end)
+                {
+                    return true;
+                }
+            }
+            if (m_memoryMapSettings.GetDefaultMemoryValue() != m_memoryMapUninitializedMemoryValue)
+            {
+                return true;
+            }
+
+            if (m_peripheralsSettings.GetIOPanelEnabled() != m_peripheralsEnableIOPanel)
+            {
+                return true;
+            }
+            if (m_peripheralsSettings.GetTerminalEnabled() != m_peripheralsEnableTerminal)
+            {
+                return true;
+            }
+            if (m_peripheralsSettings.GetInterruptInjectorEnabled() != m_peripheralsEnableInterruptInjector)
+            {
+                return true;
+            }
+
+            if (m_terminalSettings.GetTextColorIndex() != m_terminalTextColorIndex)
+            {
+                return true;
+            }
+            if (m_terminalSettings.GetBackgroundColorIndex() != m_terminalBackgroundColorIndex)
+            {
+                return true;
+            }
+
+            if (m_logSettings.GetLoggingEnabled() != m_loggingEnable)
+            {
+                return true;
+            }
+            if (m_logSettings.GetVerbosityLevel() != m_loggingVerbosity)
+            {
+                return true;
+            }
+            if (m_logSettings.GetClearLogOnNewSimulation() != m_loggingClearOnNewSimulation)
+            {
+                return true;
+            }
+            if (m_logSettings.GetEcallLoggingDisable() != m_loggingDontLogEcall)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         private void treeViewItemEditor_Selected(object sender, RoutedEventArgs e)
         {
             scrollViewerSettings.Content = m_editorSettings;
@@ -278,7 +369,19 @@ namespace Emu5
 
         private void buttonClose_Click(object sender, RoutedEventArgs e)
         {
+            this.Close();
+        }
 
+        private void SettingsWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (SettingsChanged())
+            {
+                MessageBoxResult l_result = MessageBox.Show("Settings changes were not saved.\nAre you sure you want to close this window?", "Settings unsaved", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (l_result == MessageBoxResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
         }
     }
 }
