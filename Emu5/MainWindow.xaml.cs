@@ -848,7 +848,7 @@ namespace Emu5
 
         private void menuItemHelpAbout_Click(object sender, RoutedEventArgs e)
         {
-
+            (new AboutWindow()).ShowDialog();
         }
         #endregion
 
