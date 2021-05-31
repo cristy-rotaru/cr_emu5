@@ -532,19 +532,37 @@ namespace Emu5
 
                     Dispatcher.BeginInvoke(l_compilationFinishedDelegate);
                 }
-                catch (RVAssemblyException e_assemblyException)
+                catch (Exception e_assemblyException)
                 {
                     Delegate l_exceptionDelegate = new Action(
                     () => {
                         ChangePerspective(Perspective.Editor);
 
-                        if (Properties.Settings.Default.logging_enable)
+                        if (e_assemblyException.GetType() == typeof(RVAssemblyException))
                         {
-                            m_logger.LogText("Compilation failed! Line " + e_assemblyException.Line + ", Column " + e_assemblyException.Column + ": \"" + e_assemblyException.Message + "\"", false);
-                            m_logger.UpdateLogUI();
-                        }
+                            RVAssemblyException l_assemblyError = (RVAssemblyException)e_assemblyException;
 
-                        MessageBox.Show("L: " + e_assemblyException.Line + "; C: " + e_assemblyException.Column + "\n" + e_assemblyException.Message, "Compilation error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                            if (Properties.Settings.Default.logging_enable)
+                            {
+                                m_logger.LogText("Compilation failed! Line " + l_assemblyError.Line + ", Column " + l_assemblyError.Column + ": \"" + l_assemblyError.Message + "\"", true);
+                                m_logger.UpdateLogUI();
+                            }
+
+                            MessageBox.Show("L: " + l_assemblyError.Line + "; C: " + l_assemblyError.Column + "\n" + l_assemblyError.Message, "Compilation error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                        else if (e_assemblyException.GetType() == typeof(RVMemoryException))
+                        {
+                            RVMemoryException l_memoryError = (RVMemoryException)e_assemblyException;
+
+                            if (Properties.Settings.Default.logging_enable)
+                            {
+                                m_logger.LogText(String.Format("Compilation failed! Trying to place code at undefined memory address: 0x{0,8:X8}", l_memoryError.FaultingAddress), true);
+                                m_logger.UpdateLogUI();
+                            }
+
+                            MessageBox.Show(String.Format("Trying to place code at undefined memory address: 0x{0,8:X8}", l_memoryError.FaultingAddress), "Compilation error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                        
                         m_editor.SetEditable(true);
 
                         if (Properties.Settings.Default.logging_enable)
