@@ -329,6 +329,174 @@ namespace Emu5
             return false;
         }
 
+        private bool CheckNewSettings()
+        { // returns true if all settings are valid | for invalid settings shows a message and switches to the corresponding panel
+            int? l_fontSize = m_editorSettings.GetFontSize();
+            if (l_fontSize == null)
+            {
+                treeViewItemEditor.IsSelected = true;
+                MessageBox.Show("Invalid font size.", "Invalid settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+            if (l_fontSize < 6 || l_fontSize > 48)
+            {
+                treeViewItemEditor.IsSelected = true;
+                MessageBox.Show("Invalid font size.\nThe accepted range is 6..48", "Invalid settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            List<Interval> l_memoryRanges = m_memoryMapSettings.GetMemoryRanges();
+            bool l_mainRangeFound = false;
+            foreach (Interval i_range in l_memoryRanges)
+            {
+                if (i_range.start == 0x00000000 && i_range.end >= 0x80000)
+                {
+                    l_mainRangeFound = true;
+                    break;
+                }
+            }
+            if (l_mainRangeFound == false)
+            {
+                treeViewItemMemoryMap.IsSelected = true;
+                MessageBox.Show("Memory range 0x00000000 .. 0x00080000 must be defined.", "Invalid settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (m_emulatorSettings.GetUseIntegratedEcall())
+            {
+                UInt32? l_ecallBase = m_emulatorSettings.GetEcallBase();
+                if (l_ecallBase == null)
+                {
+                    treeViewItemEmulator.IsSelected = true;
+                    MessageBox.Show("Invalid ECALL base address.", "Invalid settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+                if ((l_ecallBase & 0x3) != 0)
+                {
+                    treeViewItemEmulator.IsSelected = true;
+                    MessageBox.Show("ECALL base address must be alligned to 32 bits.", "Invalid settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+                if (l_ecallBase < 0x10000000)
+                {
+                    treeViewItemEmulator.IsSelected = true;
+                    MessageBox.Show("ECALL handler cannot be placed below 0x10000000.", "Invalid settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+
+                MemoryStream l_ecallHandlerStream = new MemoryStream(Properties.Resources.ecall_handler);
+                UInt32 l_ecallEnd = (UInt32)l_ecallBase + (UInt32)l_ecallHandlerStream.Length - 1;
+                bool l_ecallRangeFound = false;
+                foreach (Interval i_range in l_memoryRanges)
+                {
+                    if (i_range.start <= l_ecallBase && i_range.end >= l_ecallEnd)
+                    {
+                        l_ecallRangeFound = true;
+                        break;
+                    }
+                }
+                if (l_ecallRangeFound == false)
+                {
+                    treeViewItemEmulator.IsSelected = true;
+                    MessageBox.Show("ECALL handler must be placed in a defined memory space.", "Invalid settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+
+                if (m_peripheralsSettings.GetTerminalEnabled() == false)
+                {
+                    treeViewItemPeripherals.IsSelected = true;
+                    MessageBox.Show("Terminal peripheral must be enabled if integrated ECALL handler is used.", "Invalid settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+            }
+
+            if (m_memoryMapSettings.GetDefaultMemoryValue() == null)
+            {
+                treeViewItemMemoryMap.IsSelected = true;
+                MessageBox.Show("Invalid value for uninitialized memory.", "Invalid settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (m_logSettings.GetLoggingEnabled())
+            {
+                if (m_logSettings.GetEcallLoggingDisable() == true && m_emulatorSettings.GetUseIntegratedEcall() == false)
+                {
+                    treeViewItemLogging.IsSelected = true;
+                    MessageBox.Show("ECALL logging can be disabled only if the integrated ECALL handler is used.", "Invalid settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private void SaveSettings()
+        { // this function considers that all settings are valid
+            m_editorFontSize = (int)m_editorSettings.GetFontSize();
+            m_editorEnableHighlighting = m_editorSettings.GetSyntaxHighlightingEnable();
+            m_editorDefaultTemplate = m_editorSettings.GetNewFileTemplate();
+
+            m_emulatorClearMemoryMap = m_emulatorSettings.GetClearMemoryMap();
+            m_emulatorUseIntegratedEcallHandler = m_emulatorSettings.GetUseIntegratedEcall();
+            UInt32? l_ecallBase = m_emulatorSettings.GetEcallBase();
+            if (l_ecallBase == null)
+            {
+                m_emulatorSettings.SetEcallBase(m_emulatorEcallBase);
+            }
+            else
+            {
+                m_emulatorEcallBase = (UInt32)(l_ecallBase & ~0x3);
+            }
+
+            m_memoryMapMemoryRanges = m_memoryMapSettings.GetMemoryRanges();
+            m_memoryMapUninitializedMemoryValue = (byte)m_memoryMapSettings.GetDefaultMemoryValue();
+
+            m_peripheralsEnableIOPanel = m_peripheralsSettings.GetIOPanelEnabled();
+            m_peripheralsEnableTerminal = m_peripheralsSettings.GetTerminalEnabled();
+            m_peripheralsEnableInterruptInjector = m_peripheralsSettings.GetInterruptInjectorEnabled();
+
+            m_terminalTextColorIndex = m_terminalSettings.GetTextColorIndex();
+            m_terminalBackgroundColorIndex = m_terminalSettings.GetBackgroundColorIndex();
+
+            m_loggingEnable = m_logSettings.GetLoggingEnabled();
+            m_loggingVerbosity = m_logSettings.GetVerbosityLevel();
+            m_loggingClearOnNewSimulation = m_logSettings.GetClearLogOnNewSimulation();
+            m_loggingDontLogEcall = m_logSettings.GetEcallLoggingDisable();
+
+            Properties.Settings.Default.editor_fontSize = m_editorFontSize;
+            Properties.Settings.Default.editor_enableHighlighting = m_editorEnableHighlighting;
+            Properties.Settings.Default.editor_defaultTemplate = (int)m_editorDefaultTemplate;
+
+            Properties.Settings.Default.emulator_clearMemoryMap = m_emulatorClearMemoryMap;
+            Properties.Settings.Default.emulator_useIntegratedEcallHandler = m_emulatorUseIntegratedEcallHandler;
+            Properties.Settings.Default.emulator_ecallBase = m_emulatorEcallBase;
+
+            UInt32[] l_memoryRanges = new UInt32[m_memoryMapMemoryRanges.Count << 1];
+            for (int i_rangeIndex = 0; i_rangeIndex < l_memoryRanges.Length; i_rangeIndex += 2)
+            {
+                Interval l_range = m_memoryMapMemoryRanges[i_rangeIndex >> 1];
+
+                l_memoryRanges[i_rangeIndex] = l_range.start;
+                l_memoryRanges[i_rangeIndex + 1] = l_range.end;
+            }
+            Properties.Settings.Default.memoryMap_memoryRanges = l_memoryRanges;
+            Properties.Settings.Default.memoryMap_uninitializedMemoryValue = m_memoryMapUninitializedMemoryValue;
+
+            Properties.Settings.Default.peripherals_enableIOPanel = m_peripheralsEnableIOPanel;
+            Properties.Settings.Default.peripherals_enableTerminal = m_peripheralsEnableTerminal;
+            Properties.Settings.Default.peripherals_enableInterruptInjector = m_peripheralsEnableInterruptInjector;
+
+            Properties.Settings.Default.terminal_textColorIndex = m_terminalTextColorIndex;
+            Properties.Settings.Default.terminal_backgroundColorIndex = m_terminalBackgroundColorIndex;
+
+            Properties.Settings.Default.logging_enable = m_loggingEnable;
+            Properties.Settings.Default.logging_verbosity = (int)m_loggingVerbosity;
+            Properties.Settings.Default.logging_clearOnNewSimulation = m_loggingClearOnNewSimulation;
+            Properties.Settings.Default.logging_dontLogEcall = m_loggingDontLogEcall;
+
+            Properties.Settings.Default.Save();
+        }
+
         private void treeViewItemEditor_Selected(object sender, RoutedEventArgs e)
         {
             scrollViewerSettings.Content = m_editorSettings;
@@ -364,7 +532,16 @@ namespace Emu5
 
         private void buttonApply_Click(object sender, RoutedEventArgs e)
         {
+            if (SettingsChanged() == false)
+            {
+                return;
+            }
 
+            if (CheckNewSettings())
+            {
+                SaveSettings();
+                MessageBox.Show("Settings saved.", "", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
 
         private void buttonClose_Click(object sender, RoutedEventArgs e)
