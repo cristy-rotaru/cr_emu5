@@ -11,6 +11,7 @@ namespace Emu5
     public partial class SettingsWindow : Window
     {
         bool m_simulationsAreRunning;
+        Action m_settingsSavedCallback;
 
         EditorSettingsPanel m_editorSettings;
         EmulatorSettingsPanel m_emulatorSettings;
@@ -42,11 +43,12 @@ namespace Emu5
         bool m_loggingClearOnNewSimulation;
         bool m_loggingDontLogEcall;
 
-        public SettingsWindow(bool simulationsRunning = false)
+        public SettingsWindow(bool simulationsRunning, Action settingsSavedCallback = null)
         {
             InitializeComponent();
 
             m_simulationsAreRunning = simulationsRunning;
+            m_settingsSavedCallback = settingsSavedCallback;
 
             m_editorSettings = new EditorSettingsPanel();
             m_emulatorSettings = new EmulatorSettingsPanel();
@@ -539,8 +541,22 @@ namespace Emu5
 
             if (CheckNewSettings())
             {
-                SaveSettings();
-                MessageBox.Show("Settings saved.", "", MessageBoxButton.OK, MessageBoxImage.Information);
+                bool l_saveSettings = true;
+                if (m_simulationsAreRunning)
+                {
+                    MessageBoxResult l_result = MessageBox.Show("Saving settings will stop all simulations.\nDo you want to continue?", "Simulations are running", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (l_result != MessageBoxResult.Yes)
+                    {
+                        l_saveSettings = false;
+                    }
+                }
+
+                if (l_saveSettings)
+                {
+                    SaveSettings();
+                    MessageBox.Show("Settings saved.", "", MessageBoxButton.OK, MessageBoxImage.Information);
+                    m_settingsSavedCallback?.Invoke();
+                }
             }
         }
 

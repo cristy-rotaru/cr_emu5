@@ -823,7 +823,27 @@ namespace Emu5
                 }
             }
 
-            (new SettingsWindow(l_simulationsRunning)).ShowDialog();
+            Action l_savedCallback = new Action(
+            () => {
+                foreach (TabItem i_tab in tabControlMain.Items)
+                {
+                    if (i_tab.Content.GetType() == typeof(PerspectivePage))
+                    {
+                        PerspectivePage l_page = (PerspectivePage)i_tab.Content;
+
+                        if (l_page.IsRunning)
+                        {
+                            l_page.StopSimulation();
+                        }
+
+                        l_page.ApplySettings();
+                    }
+                }
+
+                CommandManager.InvalidateRequerySuggested();
+            });
+
+            (new SettingsWindow(l_simulationsRunning, l_savedCallback)).ShowDialog();
         }
 
         private void menuItemHelpAbout_Click(object sender, RoutedEventArgs e)
