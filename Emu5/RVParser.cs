@@ -924,7 +924,14 @@ namespace Emu5
 
                     if (l_token.type == RVTokenType.Label)
                     {
-                        RVInstructionDescription? l_instructionDescription = RVInstructions.GetInstructionByString((String)l_token.value);
+                        String l_identifier = (String)l_token.value;
+                        
+                        if (l_identifier == "_")
+                        {
+                            throw new RVAssemblyException("Illegal label name", l_token.line, l_token.column);
+                        }
+
+                        RVInstructionDescription? l_instructionDescription = RVInstructions.GetInstructionByString(l_identifier);
                         if (l_instructionDescription != null)
                         {
                             RVToken l_instructionToken;
@@ -937,7 +944,7 @@ namespace Emu5
                             continue;
                         }
 
-                        RVRegister? l_register = RVInstructions.GetRegisterByString((String)l_token.value);
+                        RVRegister? l_register = RVInstructions.GetRegisterByString(l_identifier);
                         if (l_register != null)
                         {
                             RVToken l_registerToken;
@@ -950,7 +957,7 @@ namespace Emu5
                             continue;
                         }
 
-                        RVDataType? l_dataType = RVAssembler.GetDataTypeByString((String)l_token.value);
+                        RVDataType? l_dataType = RVAssembler.GetDataTypeByString(l_identifier);
                         if (l_dataType != null)
                         {
                             RVToken l_dataTypeToken;
@@ -961,15 +968,6 @@ namespace Emu5
 
                             l_tokenList[i_listIndex] = l_dataTypeToken;
                             continue;
-                        }
-
-                        String l_identifier = (String)l_token.value;
-                        for (int i_stringIndex = 0; i_stringIndex < l_identifier.Length; ++i_stringIndex)
-                        {
-                            if (l_identifier[i_stringIndex] == '.')
-                            {
-                                throw new RVAssemblyException("Illegal character in identifier name.", l_token.line, l_token.column + (uint)i_stringIndex);
-                            }
                         }
                     }
                     else if (l_token.type == RVTokenType.Separator && (Char)l_token.value == '-')
