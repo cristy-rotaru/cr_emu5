@@ -118,7 +118,7 @@
         </Keywords>
         
         <Rule color="Label">
-            ([_a-zA-z][_a-zA-Z0-9]+|[a-zA-z]):
+            ([._a-zA-Z]([._a-zA-Z0-9]?)+):
         </Rule>
 
         <Rule color="Adnotation">
