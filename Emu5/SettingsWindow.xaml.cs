@@ -93,7 +93,7 @@ namespace Emu5
                     ResetSettingsToDefault();
                     return;
                 }
-                if (l_memoryRanges[i_rangeIndex] == 0x00000000 && l_memoryRanges[i_rangeIndex + 1] >= 0x80000)
+                if (l_memoryRanges[i_rangeIndex] == 0x00000000 && l_memoryRanges[i_rangeIndex + 1] >= 0x7FFFF)
                 {
                     l_mainRangeFound = true;
                 }
@@ -351,7 +351,7 @@ namespace Emu5
             bool l_mainRangeFound = false;
             foreach (Interval i_range in l_memoryRanges)
             {
-                if (i_range.start == 0x00000000 && i_range.end >= 0x80000)
+                if (i_range.start == 0x00000000 && i_range.end >= 0x7FFFF)
                 {
                     l_mainRangeFound = true;
                     break;
@@ -360,7 +360,7 @@ namespace Emu5
             if (l_mainRangeFound == false)
             {
                 treeViewItemMemoryMap.IsSelected = true;
-                MessageBox.Show("Memory range 0x00000000 .. 0x00080000 must be defined.", "Invalid settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Memory range 0x00000000 .. 0x0007FFFF must be defined.", "Invalid settings", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return false;
             }
 

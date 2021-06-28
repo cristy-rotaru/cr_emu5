@@ -48,7 +48,7 @@ namespace Emu5
                     ResetSettingsToDefault();
                     return;
                 }
-                if (l_memoryRanges[i_rangeIndex] == 0x00000000 && l_memoryRanges[i_rangeIndex + 1] >= 0x80000)
+                if (l_memoryRanges[i_rangeIndex] == 0x00000000 && l_memoryRanges[i_rangeIndex + 1] >= 0x7FFFF)
                 {
                     l_mainRangeFound = true;
                 }
