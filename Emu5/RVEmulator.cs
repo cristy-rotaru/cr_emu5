@@ -453,9 +453,13 @@ namespace Emu5
                 {
                     m_logger?.NewLine();
                 }
-                else
+                else if (m_loggingVerbosity == Verbosity.Normal)
                 {
                     m_logger?.LogText(String.Format("({0})", l_dissassembly.Item2), true);
+                }
+                else
+                {
+                    m_logger?.LogText(String.Format("({0} | 0x{1,8:X8})", l_dissassembly.Item2, l_instructionData), true);
                 }
 
                 DecodeAndExecute(l_instructionData);
